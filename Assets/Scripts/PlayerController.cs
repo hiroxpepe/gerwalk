@@ -43,7 +43,7 @@ namespace Studio.MeowToon {
         float _rollSpeed = 1.25f;
 
         [SerializeField]
-        float _flySpeed = 40.0f;
+        float _flySpeed = 50.0f;
 
         [SerializeField]
         float _boostPower = 5.0f;
@@ -274,6 +274,13 @@ namespace Studio.MeowToon {
             /// </summary>
             this.OnCollisionExitAsObservable().Where(x => x.LikeBlock()).Subscribe(x => {
                 rb.useGravity = true;
+            });
+
+            /// <summary>
+            /// when touching balloons.
+            /// </summary>
+            this.OnTriggerEnterAsObservable().Where(x => x.transform.name.Contains("Balloon")).Subscribe(x => {
+                Destroy(x.gameObject);
             });
         }
 
