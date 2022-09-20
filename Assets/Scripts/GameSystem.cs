@@ -42,6 +42,9 @@ namespace Studio.MeowToon {
         Text _speed;
 
         [SerializeField]
+        Text _altitude;
+
+        [SerializeField]
         GameObject _player;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -53,12 +56,14 @@ namespace Studio.MeowToon {
 
         float _speedValue = 0f;
 
+        float _altitudeValue = 0f;
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjectives] 
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Methods [verb]
- 
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
 
@@ -96,7 +101,7 @@ namespace Studio.MeowToon {
         /// update game status
         /// </summary>
         void updateGameStatus() {
-            _targets.text = string.Format("Targets: {0}/{1}", _balloonTotalCount - _balloonRemainCount, _balloonTotalCount);
+            _targets.text = string.Format("TGT {0}/{1}", _balloonTotalCount - _balloonRemainCount, _balloonTotalCount);
         }
 
         /// <summary>
@@ -105,7 +110,9 @@ namespace Studio.MeowToon {
         void updatePlayerStatus() {
             var rb = _player.transform.GetComponent<Rigidbody>(); // FIXME: Rigidbody should be only used in FixedUpdate.
             _speedValue = rb.velocity.magnitude; // get speed.;
-            _speed.text = string.Format("Speed: {0:000.0}km", Math.Round(_speedValue * 5, 1, MidpointRounding.AwayFromZero)); // MEMO: 5?
+            _speed.text = string.Format("TAS {0:000.0}km", Math.Round(_speedValue * 5, 1, MidpointRounding.AwayFromZero)); // MEMO: 5?
+            _altitudeValue = _player.transform.position.y - 0.5f; // 0.5 is half player height.
+            _altitude.text = string.Format("ALT {0:000.0}m", Math.Round(_altitudeValue, 1, MidpointRounding.AwayFromZero));
         }
     }
 }
