@@ -43,7 +43,7 @@ namespace Studio.MeowToon {
         float _rollSpeed = 1.25f;
 
         [SerializeField]
-        float _flySpeed = 50.0f;
+        float _flySpeed = 75.0f;
 
         [SerializeField]
         float _boostPower = 5.0f;
@@ -168,7 +168,7 @@ namespace Studio.MeowToon {
             /// </summary>
             this.UpdateAsObservable().Where(_ => !_doUpdate.grounded).Subscribe(_ => {
 #if DEBUG
-                //Debug.Log($"to fly: {_acceleration.currentSpeed}");
+                Debug.Log($"to fly: {_acceleration.currentSpeed}");
 #endif
                 transform.position += transform.forward * _flySpeed * Time.deltaTime;
                 _doFixedUpdate.ApplyFly();
@@ -191,8 +191,7 @@ namespace Studio.MeowToon {
             });
 
             this.FixedUpdateAsObservable().Where(_ => _doFixedUpdate.boost).Subscribe(_ => {
-                rb.useGravity = true;
-                rb.AddRelativeFor​​ce(forward * _boostPower * POWER * 1.5f, ForceMode.Acceleration);
+                rb.AddRelativeFor​​ce(forward * _boostPower * 10.0f, ForceMode.Force);
                 _doFixedUpdate.CancelBoost();
             });
 

@@ -70,17 +70,21 @@ namespace Studio.MeowToon {
         // Start is called before the first frame update
         new void Start() {
             base.Start();
-
+            // get targets count.
             var target = GameObject.Find("Balloons");
             Transform balloons = target.GetComponentInChildren<Transform>();
-            Debug.Log($"Start balloons.childCount: {balloons.childCount}");
             _balloonTotalCount = balloons.childCount;
-
             // update text ui.
             this.UpdateAsObservable().Subscribe(_ => {
                 checkGameStatus();
                 updateGameStatus();
                 updatePlayerStatus();
+            });
+            // get player speed.
+            Vector3 prevPosition = _player.transform.position;
+            this.FixedUpdateAsObservable().Where(_ => !Mathf.Approximately(Time.deltaTime, 0)).Subscribe(_ => {
+                _speedValue = ((_player.transform.position - prevPosition) / Time.deltaTime).magnitude * 3.6f;
+                prevPosition = _player.transform.position;
             });
         }
 
@@ -93,7 +97,6 @@ namespace Studio.MeowToon {
         void checkGameStatus() {
             var target = GameObject.Find("Balloons");
             Transform balloons = target.GetComponentInChildren<Transform>();
-            Debug.Log($"checkGameStatus balloons.childCount: {balloons.childCount}");
             _balloonRemainCount = balloons.childCount;
         }
 
@@ -108,9 +111,7 @@ namespace Studio.MeowToon {
         /// update player status
         /// </summary>
         void updatePlayerStatus() {
-            var rb = _player.transform.GetComponent<Rigidbody>(); // FIXME: Rigidbody should be only used in FixedUpdate.
-            _speedValue = rb.velocity.magnitude; // get speed.;
-            _speed.text = string.Format("TAS {0:000.0}km", Math.Round(_speedValue * 5, 1, MidpointRounding.AwayFromZero)); // MEMO: 5?
+            _speed.text = string.Format("TAS {0:000.0}km", Math.Round(_speedValue, 1, MidpointRounding.AwayFromZero));
             _altitudeValue = _player.transform.position.y - 0.5f; // 0.5 is half player height.
             _altitude.text = string.Format("ALT {0:000.0}m", Math.Round(_altitudeValue, 1, MidpointRounding.AwayFromZero));
         }
