@@ -174,17 +174,29 @@ namespace Studio.MeowToon {
             });
 
             /// <summary>
-            /// boost.
+            /// gain.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _bButton.wasPressedThisFrame && !_doUpdate.grounded).Subscribe(_ => {
                 _doUpdate.grounded = false;
-                //_simpleAnime.Play("Boost");
-                _flyPower += 0.5f;
-                _doFixedUpdate.ApplyBoost();
+                _flyPower += 0.25f;
+                _doFixedUpdate.ApplyGain();
             });
 
-            this.FixedUpdateAsObservable().Where(_ => _doFixedUpdate.boost).Subscribe(_ => {
-                _doFixedUpdate.CancelBoost();
+            this.FixedUpdateAsObservable().Where(_ => _doFixedUpdate.gain).Subscribe(_ => {
+                _doFixedUpdate.CancelGain();
+            });
+
+            /// <summary>
+            /// lose.
+            /// </summary>
+            this.UpdateAsObservable().Where(_ => _yButton.wasPressedThisFrame && !_doUpdate.grounded).Subscribe(_ => {
+                _doUpdate.grounded = false;
+                _flyPower -= 0.25f;
+                _doFixedUpdate.ApplyLose();
+            });
+
+            this.FixedUpdateAsObservable().Where(_ => _doFixedUpdate.lose).Subscribe(_ => {
+                _doFixedUpdate.CancelLose();
             });
 
             /// <summary>
@@ -453,7 +465,8 @@ namespace Studio.MeowToon {
             bool _jump;
             bool _backward;
             bool _fly;
-            bool _boost;
+            bool _gain;
+            bool _lose;
 
             ///////////////////////////////////////////////////////////////////////////////////////
             // Properties
@@ -464,7 +477,8 @@ namespace Studio.MeowToon {
             public bool jump { get => _jump; }
             public bool backward { get => _backward; }
             public bool fly { get => _fly; }
-            public bool boost { get => _boost; }
+            public bool gain { get => _gain; }
+            public bool lose { get => _lose; }
 
             ///////////////////////////////////////////////////////////////////////////////////////
             // Constructor
@@ -481,11 +495,11 @@ namespace Studio.MeowToon {
 
             public void ApplyIdol() {
                 _idol = true;
-                _run = _walk = _backward = _jump = _fly = _boost = false;
+                _run = _walk = _backward = _jump = _fly = _gain = false;
             }
 
             public void ApplyRun() {
-                _idol = _walk = _backward = _fly = _boost = false;
+                _idol = _walk = _backward = _fly = _gain = false;
                 _run = true;
             }
 
@@ -494,7 +508,7 @@ namespace Studio.MeowToon {
             }
 
             public void ApplyWalk() {
-                _idol = _run = _backward = _fly = _boost = false;
+                _idol = _run = _backward = _fly = _gain = false;
                 _walk = true;
             }
 
@@ -503,7 +517,7 @@ namespace Studio.MeowToon {
             }
 
             public void ApplyBackward() {
-                _idol = _run = _walk = _fly = _boost = false;
+                _idol = _run = _walk = _fly = _gain = false;
                 _backward = true;
             }
 
@@ -528,12 +542,20 @@ namespace Studio.MeowToon {
                 _fly = false;
             }
 
-            public void ApplyBoost() {
-                _boost = true;
+            public void ApplyGain() {
+                _gain = true;
             }
 
-            public void CancelBoost() {
-                _boost = false;
+            public void CancelGain() {
+                _gain = false;
+            }
+
+            public void ApplyLose() {
+                _gain = true;
+            }
+
+            public void CancelLose() {
+                _gain = false;
             }
         }
 
