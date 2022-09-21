@@ -545,7 +545,7 @@ MonoBehaviour:
   _rotationalSpeed: 10
   _pitchSpeed: 5
   _rollSpeed: 5
-  _flySpeed: 10
+  _flyPower: 5
   _boostPower: 5
   _forwardSpeedLimit: 1.1
   _runSpeedLimit: 3.25

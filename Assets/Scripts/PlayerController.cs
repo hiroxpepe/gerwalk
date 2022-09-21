@@ -31,19 +31,19 @@ namespace Studio.MeowToon {
         // References
 
         [SerializeField]
-        float _jumpPower = 5.0f;
+        float _jumpPower = 15.0f;
 
         [SerializeField]
-        float _rotationalSpeed = 5.0f;
+        float _rotationalSpeed = 10.0f;
 
         [SerializeField]
-        float _pitchSpeed = 1.25f;
+        float _pitchSpeed = 5.0f;
 
         [SerializeField]
-        float _rollSpeed = 1.25f;
+        float _rollSpeed = 5.0f;
 
         [SerializeField]
-        float _flySpeed = 75.0f;
+        float _flyPower = 5.0f;
 
         [SerializeField]
         float _boostPower = 5.0f;
@@ -90,9 +90,6 @@ namespace Studio.MeowToon {
             this.FixedUpdateAsObservable().Subscribe(_ => {
                 _acceleration.previousSpeed = _acceleration.currentSpeed;// hold previous speed.
                 _acceleration.currentSpeed = rb.velocity.magnitude; // get speed.
-#if DEBUG
-                //Debug.Log($"currentSpeed: {_acceleration.currentSpeed}");
-#endif
             });
 
             /// <summary>
@@ -167,32 +164,39 @@ namespace Studio.MeowToon {
             /// fly.
             /// </summary>
             this.UpdateAsObservable().Where(_ => !_doUpdate.grounded).Subscribe(_ => {
-#if DEBUG
-                Debug.Log($"to fly: {_acceleration.currentSpeed}");
-#endif
-                transform.position += transform.forward * _flySpeed * Time.deltaTime;
                 _doFixedUpdate.ApplyFly();
             });
 
-            this.FixedUpdateAsObservable().Where(_ => !_doUpdate.grounded && _doFixedUpdate.fly).Subscribe(_ => {
+            this.FixedUpdateAsObservable().Where(_ => _doFixedUpdate.fly).Subscribe(_ => {
                 rb.useGravity = false;
+                rb.velocity = transform.forward * _flyPower * 2.5f;
+                _doFixedUpdate.CancelFly();
             });
 
             /// <summary>
-            /// boost.
+            /// gain.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _bButton.wasPressedThisFrame && !_doUpdate.grounded).Subscribe(_ => {
-#if DEBUG
-                Debug.Log($"to boost: {_acceleration.currentSpeed}");
-#endif
                 _doUpdate.grounded = false;
-                //_simpleAnime.Play("Boost");
-                _doFixedUpdate.ApplyBoost();
+                _flyPower += 0.25f;
+                _doFixedUpdate.ApplyGain();
             });
 
-            this.FixedUpdateAsObservable().Where(_ => _doFixedUpdate.boost).Subscribe(_ => {
-                rb.AddRelativeFor​​ce(forward * _boostPower * 10.0f, ForceMode.Force);
-                _doFixedUpdate.CancelBoost();
+            this.FixedUpdateAsObservable().Where(_ => _doFixedUpdate.gain).Subscribe(_ => {
+                _doFixedUpdate.CancelGain();
+            });
+
+            /// <summary>
+            /// lose.
+            /// </summary>
+            this.UpdateAsObservable().Where(_ => _yButton.wasPressedThisFrame && !_doUpdate.grounded).Subscribe(_ => {
+                _doUpdate.grounded = false;
+                _flyPower -= 0.25f;
+                _doFixedUpdate.ApplyLose();
+            });
+
+            this.FixedUpdateAsObservable().Where(_ => _doFixedUpdate.lose).Subscribe(_ => {
+                _doFixedUpdate.CancelLose();
             });
 
             /// <summary>
@@ -206,7 +210,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// pitch.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => !_doUpdate.grounded).Subscribe(_ => {
+            this.UpdateAsObservable().Where(_ => !_doUpdate.grounded && (_upButton.isPressed || _downButton.isPressed)).Subscribe(_ => {
                 var axis = _upButton.isPressed ? 1 : _downButton.isPressed ? -1 : 0;
                 transform.Rotate(axis * (_pitchSpeed * Time.deltaTime) * POWER, 0, 0);
             });
@@ -214,7 +218,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// roll and yaw.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => !_doUpdate.grounded).Subscribe(_ => {
+            this.UpdateAsObservable().Where(_ => !_doUpdate.grounded && (_leftButton.isPressed || _rightButton.isPressed)).Subscribe(_ => {
                 var axis = _leftButton.isPressed ? 1 : _rightButton.isPressed ? -1 : 0;
                 transform.Rotate(0, 0, axis * (_rollSpeed * Time.deltaTime) * POWER);
                 axis = _rightButton.isPressed ? 1 : _leftButton.isPressed ? -1 : 0;
@@ -461,7 +465,8 @@ namespace Studio.MeowToon {
             bool _jump;
             bool _backward;
             bool _fly;
-            bool _boost;
+            bool _gain;
+            bool _lose;
 
             ///////////////////////////////////////////////////////////////////////////////////////
             // Properties
@@ -472,7 +477,8 @@ namespace Studio.MeowToon {
             public bool jump { get => _jump; }
             public bool backward { get => _backward; }
             public bool fly { get => _fly; }
-            public bool boost { get => _boost; }
+            public bool gain { get => _gain; }
+            public bool lose { get => _lose; }
 
             ///////////////////////////////////////////////////////////////////////////////////////
             // Constructor
@@ -489,11 +495,11 @@ namespace Studio.MeowToon {
 
             public void ApplyIdol() {
                 _idol = true;
-                _run = _walk = _backward = _jump = _fly = _boost = false;
+                _run = _walk = _backward = _jump = _fly = _gain = false;
             }
 
             public void ApplyRun() {
-                _idol = _walk = _backward = _fly = _boost = false;
+                _idol = _walk = _backward = _fly = _gain = false;
                 _run = true;
             }
 
@@ -502,7 +508,7 @@ namespace Studio.MeowToon {
             }
 
             public void ApplyWalk() {
-                _idol = _run = _backward = _fly = _boost = false;
+                _idol = _run = _backward = _fly = _gain = false;
                 _walk = true;
             }
 
@@ -511,7 +517,7 @@ namespace Studio.MeowToon {
             }
 
             public void ApplyBackward() {
-                _idol = _run = _walk = _fly = _boost = false;
+                _idol = _run = _walk = _fly = _gain = false;
                 _backward = true;
             }
 
@@ -536,12 +542,20 @@ namespace Studio.MeowToon {
                 _fly = false;
             }
 
-            public void ApplyBoost() {
-                _boost = true;
+            public void ApplyGain() {
+                _gain = true;
             }
 
-            public void CancelBoost() {
-                _boost = false;
+            public void CancelGain() {
+                _gain = false;
+            }
+
+            public void ApplyLose() {
+                _gain = true;
+            }
+
+            public void CancelLose() {
+                _gain = false;
             }
         }
 
