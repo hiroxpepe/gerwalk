@@ -46,9 +46,6 @@ namespace Studio.MeowToon {
         float _flyPower = 5.0f;
 
         [SerializeField]
-        float _boostPower = 5.0f;
-
-        [SerializeField]
         float _forwardSpeedLimit = 1.1f;
 
         [SerializeField]
@@ -69,6 +66,8 @@ namespace Studio.MeowToon {
 
         Acceleration _acceleration;
 
+        Energy _energy;
+
         ///////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
 
@@ -77,6 +76,7 @@ namespace Studio.MeowToon {
             _doUpdate = DoUpdate.GetInstance();
             _doFixedUpdate = DoFixedUpdate.GetInstance();
             _acceleration = Acceleration.GetInstance(_forwardSpeedLimit, _runSpeedLimit, _backwardSpeedLimit);
+            _energy = Energy.GetInstance(_flyPower);
         }
 
         // Start is called before the first frame update
@@ -169,7 +169,7 @@ namespace Studio.MeowToon {
 
             this.FixedUpdateAsObservable().Where(_ => _doFixedUpdate.fly).Subscribe(_ => {
                 rb.useGravity = false;
-                rb.velocity = transform.forward * _flyPower * 2.5f;
+                rb.velocity = transform.forward * _energy.power;
                 _doFixedUpdate.CancelFly();
             });
 
@@ -178,12 +178,7 @@ namespace Studio.MeowToon {
             /// </summary>
             this.UpdateAsObservable().Where(_ => _bButton.wasPressedThisFrame && !_doUpdate.grounded).Subscribe(_ => {
                 _doUpdate.grounded = false;
-                _flyPower += 0.25f;
-                _doFixedUpdate.ApplyGain();
-            });
-
-            this.FixedUpdateAsObservable().Where(_ => _doFixedUpdate.gain).Subscribe(_ => {
-                _doFixedUpdate.CancelGain();
+                _energy.Gain();
             });
 
             /// <summary>
@@ -191,12 +186,7 @@ namespace Studio.MeowToon {
             /// </summary>
             this.UpdateAsObservable().Where(_ => _yButton.wasPressedThisFrame && !_doUpdate.grounded).Subscribe(_ => {
                 _doUpdate.grounded = false;
-                _flyPower -= 0.25f;
-                _doFixedUpdate.ApplyLose();
-            });
-
-            this.FixedUpdateAsObservable().Where(_ => _doFixedUpdate.lose).Subscribe(_ => {
-                _doFixedUpdate.CancelLose();
+                _energy.Lose();
             });
 
             /// <summary>
@@ -247,17 +237,11 @@ namespace Studio.MeowToon {
             /// when touching grounds.
             /// </summary>
             this.OnCollisionEnterAsObservable().Where(x => x.LikeGround()).Subscribe(x => {
-#if DEBUG
-                Debug.Log($"touching grounds: {_acceleration.currentSpeed}");
-#endif
                 _doUpdate.grounded = true;
                 rb.useGravity = true;
 
                 // reset rotate.
                 Vector3 angle = transform.eulerAngles;
-#if DEBUG
-                //Debug.Log($"angle.x: {angle.x} angle.y: {angle.y} angle.z: {angle.z}");
-#endif
                 angle.x = angle.z = 0f;
                 transform.eulerAngles = angle;
             });
@@ -465,8 +449,6 @@ namespace Studio.MeowToon {
             bool _jump;
             bool _backward;
             bool _fly;
-            bool _gain;
-            bool _lose;
 
             ///////////////////////////////////////////////////////////////////////////////////////
             // Properties
@@ -477,8 +459,6 @@ namespace Studio.MeowToon {
             public bool jump { get => _jump; }
             public bool backward { get => _backward; }
             public bool fly { get => _fly; }
-            public bool gain { get => _gain; }
-            public bool lose { get => _lose; }
 
             ///////////////////////////////////////////////////////////////////////////////////////
             // Constructor
@@ -495,11 +475,11 @@ namespace Studio.MeowToon {
 
             public void ApplyIdol() {
                 _idol = true;
-                _run = _walk = _backward = _jump = _fly = _gain = false;
+                _run = _walk = _backward = _jump = _fly = false;
             }
 
             public void ApplyRun() {
-                _idol = _walk = _backward = _fly = _gain = false;
+                _idol = _walk = _backward = _fly = false;
                 _run = true;
             }
 
@@ -508,7 +488,7 @@ namespace Studio.MeowToon {
             }
 
             public void ApplyWalk() {
-                _idol = _run = _backward = _fly = _gain = false;
+                _idol = _run = _backward = _fly = false;
                 _walk = true;
             }
 
@@ -517,7 +497,7 @@ namespace Studio.MeowToon {
             }
 
             public void ApplyBackward() {
-                _idol = _run = _walk = _fly = _gain = false;
+                _idol = _run = _walk = _fly = false;
                 _backward = true;
             }
 
@@ -540,22 +520,6 @@ namespace Studio.MeowToon {
 
             public void CancelFly() {
                 _fly = false;
-            }
-
-            public void ApplyGain() {
-                _gain = true;
-            }
-
-            public void CancelGain() {
-                _gain = false;
-            }
-
-            public void ApplyLose() {
-                _gain = true;
-            }
-
-            public void CancelLose() {
-                _gain = false;
             }
         }
 
@@ -610,6 +574,55 @@ namespace Studio.MeowToon {
             /// </summary>
             public static Acceleration GetInstance(float forwardSpeedLimit, float runSpeedLimit, float backwardSpeedLimit) {
                 return new Acceleration(forwardSpeedLimit, runSpeedLimit, backwardSpeedLimit);
+            }
+        }
+
+        #endregion
+
+        #region Energy
+
+        class Energy {
+
+            ///////////////////////////////////////////////////////////////////////////////////////
+            // Fields
+
+            float _flyPower;
+
+            ///////////////////////////////////////////////////////////////////////////////////////
+            // Properties [noun, adjectives] 
+
+            public float power {
+                get {
+                    return _flyPower * 2.65f;
+                }
+            }
+
+            ///////////////////////////////////////////////////////////////////////////////////////
+            // Constructor
+
+            /// <summary>
+            /// hide the constructor.
+            /// </summary>
+            Energy(float flyPower) {
+                _flyPower = flyPower;
+            }
+
+            /// <summary>
+            /// returns an initialized instance.
+            /// </summary>
+            public static Energy GetInstance(float flyPower) {
+                return new Energy(flyPower);
+            }
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // public Methods
+
+            public void Gain() {
+                _flyPower += 0.25f;
+            }
+
+            public void Lose() {
+                _flyPower -= 0.25f;
             }
         }
 
