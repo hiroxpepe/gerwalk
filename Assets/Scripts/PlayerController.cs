@@ -188,7 +188,6 @@ namespace Studio.MeowToon {
             /// gain.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _bButton.wasPressedThisFrame && !_doUpdate.grounded).Subscribe(_ => {
-                _doUpdate.grounded = false;
                 _energy.Gain();
             });
 
@@ -196,7 +195,6 @@ namespace Studio.MeowToon {
             /// lose.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _yButton.wasPressedThisFrame && !_doUpdate.grounded).Subscribe(_ => {
-                _doUpdate.grounded = false;
                 _energy.Lose();
             });
 
@@ -599,6 +597,8 @@ namespace Studio.MeowToon {
 
             float _flyPower;
 
+            float _defaultFlyPower;
+
             float _altitude;
 
             Queue<float> _previousAltitudes = new();
@@ -607,7 +607,7 @@ namespace Studio.MeowToon {
 
             float _total;
 
-            float _threshold = 1500;
+            float _threshold = 750;
 
             ///////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjectives] 
@@ -625,6 +625,9 @@ namespace Studio.MeowToon {
                             _flyPower += 0.010f;
                             Debug.Log($"down! _flyPower : {_flyPower}");
                         }
+                    }
+                    if (_total <= _threshold && _altitude < 8.0f) {
+                        _flyPower = _defaultFlyPower;
                     }
                     return _flyPower * 2.65f;
                 }
@@ -659,6 +662,7 @@ namespace Studio.MeowToon {
             /// </summary>
             Energy(float flyPower) {
                 _flyPower = flyPower;
+                _defaultFlyPower = _flyPower;
             }
 
             /// <summary>
