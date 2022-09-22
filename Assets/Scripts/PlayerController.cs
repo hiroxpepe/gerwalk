@@ -14,6 +14,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using static UnityEngine.Vector3;
 using UniRx;
@@ -92,6 +93,14 @@ namespace Studio.MeowToon {
                 _acceleration.currentSpeed = rb.velocity.magnitude; // get speed.
             });
 
+            // get player speed for fly.
+            Vector3 prevPosition = transform.position;
+            float flySpeed = 0f;
+            this.FixedUpdateAsObservable().Where(_ => !Mathf.Approximately(Time.deltaTime, 0)).Subscribe(_ => {
+                flySpeed = ((transform.position - prevPosition) / Time.deltaTime).magnitude * 3.6f;
+                prevPosition = transform.position;
+            });
+
             /// <summary>
             /// idol.
             /// </summary>
@@ -164,6 +173,8 @@ namespace Studio.MeowToon {
             /// fly.
             /// </summary>
             this.UpdateAsObservable().Where(_ => !_doUpdate.grounded).Subscribe(_ => {
+                _energy.speed = flySpeed;
+                _energy.altitude = transform.position.y - 0.5f; // 0.5 is half player height.
                 _doFixedUpdate.ApplyFly();
             });
 
@@ -588,12 +599,55 @@ namespace Studio.MeowToon {
 
             float _flyPower;
 
+            float _altitude;
+
+            Queue<float> _previousAltitudes = new();
+
+            float _speed;
+
+            float _total;
+
+            float _threshold = 1500;
+
             ///////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjectives] 
 
             public float power {
                 get {
+                    _total = _altitude * _speed;
+                    if (_total > _threshold) {
+                        Debug.Log($"over!: {_total} _previous: {_previousAltitudes.Peek()} _altitude: {_altitude}");
+                        if (_previousAltitudes.Peek() < _altitude) { // up
+                            _flyPower -= 0.025f;
+                            Debug.Log($"up! _flyPower : {_flyPower}");
+                        }
+                        if (_previousAltitudes.Peek() > _altitude) { // down
+                            _flyPower += 0.010f;
+                            Debug.Log($"down! _flyPower : {_flyPower}");
+                        }
+                    }
                     return _flyPower * 2.65f;
+                }
+            }
+
+            public float altitude {
+                set {
+                    const int QUEUE_COUNT = 30;
+                    if (_previousAltitudes.Count < QUEUE_COUNT) {
+                        _previousAltitudes.Enqueue(_altitude);
+                    }
+                    else {
+                        _previousAltitudes.Dequeue();
+                        _previousAltitudes.Enqueue(_altitude);
+                    }
+                    Debug.Log($"_previousAltitudes.Count: {_previousAltitudes.Count}");
+                    _altitude = value;
+                }
+            }
+
+            public float speed {
+                set {
+                    _speed = value;
                 }
             }
 
@@ -618,11 +672,11 @@ namespace Studio.MeowToon {
             // public Methods
 
             public void Gain() {
-                _flyPower += 0.25f;
+                _flyPower += 0.375f;
             }
 
             public void Lose() {
-                _flyPower -= 0.25f;
+                _flyPower -= 0.250f;
             }
         }
 
