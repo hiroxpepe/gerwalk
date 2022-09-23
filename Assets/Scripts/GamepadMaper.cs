@@ -28,7 +28,7 @@ namespace Studio.MeowToon {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////
-        // Fields
+        // Fields [noun, adjectives] 
 
         protected ButtonControl _a_button;
 
@@ -67,7 +67,7 @@ namespace Studio.MeowToon {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////
-        // private Methods
+        // private Methods [verb]
 
         void mapGamepad() {
             // Identifies the OS.

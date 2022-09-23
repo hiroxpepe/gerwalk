@@ -30,6 +30,8 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constants
 
+        const string TARGETS_OBJECT = "Balloons"; // name of target objects holder.
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
@@ -54,9 +56,9 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields
 
-        int _balloon_total_count = 0;
+        int _target_total_count = 0;
 
-        int _balloon_remain_count = 0;
+        int _target_remain_count = 0;
 
         float _speed = 0f;
 
@@ -74,20 +76,17 @@ namespace Studio.MeowToon {
         // Start is called before the first frame update
         void Start() {
             // get targets count.
-            var target = GameObject.Find("Balloons");
-            Transform balloons = target.GetComponentInChildren<Transform>();
-            _balloon_total_count = balloons.childCount;
+            _target_total_count = getTargetsCount();
             // update text ui.
             this.UpdateAsObservable().Subscribe(_ => {
                 checkGameStatus();
                 updateGameStatus();
                 updatePlayerStatus();
             });
-            // get player speed. FIXME:
-            Vector3 prev_position = _player.transform.position;
+            // get player speed.
             this.FixedUpdateAsObservable().Where(_ => !Mathf.Approximately(Time.deltaTime, 0)).Subscribe(_ => {
-                _speed = ((_player.transform.position - prev_position) / Time.deltaTime).magnitude * 3.6f;
-                prev_position = _player.transform.position;
+                var player_controller = _player.gameObject.GetPlayerController();
+                _speed = player_controller.flySpeed;
             });
         }
 
@@ -98,16 +97,14 @@ namespace Studio.MeowToon {
         /// check game status
         /// </summary>
         void checkGameStatus() {
-            var target = GameObject.Find("Balloons");
-            Transform balloons = target.GetComponentInChildren<Transform>();
-            _balloon_remain_count = balloons.childCount;
+            _target_remain_count = getTargetsCount();
         }
 
         /// <summary>
         /// update game status
         /// </summary>
         void updateGameStatus() {
-            _targets_text.text = string.Format("TGT {0}/{1}", _balloon_total_count - _balloon_remain_count, _balloon_total_count);
+            _targets_text.text = string.Format("TGT {0}/{1}", _target_total_count - _target_remain_count, _target_total_count);
         }
 
         /// <summary>
@@ -119,6 +116,15 @@ namespace Studio.MeowToon {
             _altitude_text.text = string.Format("ALT {0:000.0}m", Math.Round(_altitude, 1, MidpointRounding.AwayFromZero));
         }
 
+        /// <summary>
+        /// get targets count.
+        /// </summary>
+        int getTargetsCount() {
+            var targets = GameObject.Find(TARGETS_OBJECT);
+            Transform targets_transform = targets.GetComponentInChildren<Transform>();
+            return targets_transform.childCount;
+        }
+        
         /// <summary>
         /// debug trace
         /// </summary>

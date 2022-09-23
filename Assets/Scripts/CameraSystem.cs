@@ -28,7 +28,7 @@ namespace Studio.MeowToon {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // References
+        // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
         [SerializeField]
         GameObject _horizontal_axis;
@@ -43,7 +43,7 @@ namespace Studio.MeowToon {
         GameObject _look_target;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Fields
+        // Fields [noun, adjectives] 
 
         Vector3 _default_local_position;
 

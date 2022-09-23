@@ -29,7 +29,7 @@ namespace Studio.MeowToon {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////
-        // References
+        // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
         [SerializeField]
         float _jump_power = 15.0f;
@@ -59,7 +59,7 @@ namespace Studio.MeowToon {
         SimpleAnimation _simple_anime;
 
         ///////////////////////////////////////////////////////////////////////////////////////////
-        // Fields
+        // Fields [noun, adjectives] 
 
         DoUpdate _do_update;
 
@@ -68,6 +68,19 @@ namespace Studio.MeowToon {
         Acceleration _acceleration;
 
         Energy _energy;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Properties [noun, adjectives] 
+
+        /// <summary>
+        /// current speed of the player object to fly.
+        /// </summary>
+        public float flySpeed { get => _energy.speed; }
+
+        /// <summary>
+        /// current power of the player object to fly.
+        /// </summary>
+        public float flyPower { get => _energy.power; }
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -185,14 +198,14 @@ namespace Studio.MeowToon {
             });
 
             /// <summary>
-            /// gain.
+            /// gain energy.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _b_button.wasPressedThisFrame && !_do_update.grounded).Subscribe(_ => {
                 _energy.Gain();
             });
 
             /// <summary>
-            /// lose.
+            /// lose energy.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _y_button.wasPressedThisFrame && !_do_update.grounded).Subscribe(_ => {
                 _energy.Lose();
@@ -408,12 +421,12 @@ namespace Studio.MeowToon {
         class DoUpdate {
 
             ///////////////////////////////////////////////////////////////////////////////////////
-            // Fields
+            // Fields [noun, adjectives] 
 
             bool _grounded;
 
             ///////////////////////////////////////////////////////////////////////////////////////
-            // Properties
+            // Properties [noun, adjectives] 
 
             public bool grounded {
                 get => _grounded;
@@ -450,7 +463,7 @@ namespace Studio.MeowToon {
         class DoFixedUpdate {
 
             ///////////////////////////////////////////////////////////////////////////////////////
-            // Fields
+            // Fields [noun, adjectives] 
 
             bool _idol;
             bool _run;
@@ -460,7 +473,7 @@ namespace Studio.MeowToon {
             bool _fly;
 
             ///////////////////////////////////////////////////////////////////////////////////////
-            // Properties
+            // Properties [noun, adjectives] 
 
             public bool idol { get => _idol; }
             public bool run { get => _run; }
@@ -480,7 +493,7 @@ namespace Studio.MeowToon {
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////////
-            // public Methods
+            // public Methods [verb]
 
             public void ApplyIdol() {
                 _idol = true;
@@ -539,7 +552,7 @@ namespace Studio.MeowToon {
         class Acceleration {
 
             ///////////////////////////////////////////////////////////////////////////////////////
-            // Fields
+            // Fields [noun, adjectives] 
 
             float _current_speed;
             float _previous_speed;
@@ -593,7 +606,7 @@ namespace Studio.MeowToon {
         class Energy {
 
             ///////////////////////////////////////////////////////////////////////////////////////
-            // Fields
+            // Fields [noun, adjectives] 
 
             float _fly_power;
 
@@ -648,6 +661,9 @@ namespace Studio.MeowToon {
             }
 
             public float speed {
+                get {
+                    return _speed;
+                }
                 set {
                     _speed = value;
                 }
@@ -672,7 +688,7 @@ namespace Studio.MeowToon {
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////////
-            // public Methods
+            // public Methods [verb]
 
             public void Gain() {
                 _fly_power += 0.375f;
