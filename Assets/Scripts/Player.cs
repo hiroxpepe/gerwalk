@@ -61,6 +61,8 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives] 
 
+        StatusSystem _status_system;
+
         DoUpdate _do_update;
 
         DoFixedUpdate _do_fixed_update;
@@ -105,6 +107,7 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
+            _status_system = gameObject.GetStatusSystem();
             _do_update = DoUpdate.GetInstance();
             _do_fixed_update = DoFixedUpdate.GetInstance();
             _acceleration = Acceleration.GetInstance(_forward_speed_limit, _run_speed_limit, _backward_speed_limit);
@@ -221,14 +224,20 @@ namespace Studio.MeowToon {
             /// gain energy.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _b_button.wasPressedThisFrame && !_do_update.grounded).Subscribe(_ => {
-                _energy.Gain();
+                if (_status_system.usePower) {
+                    _status_system.DecrementCoin(); // spend coins.
+                    _energy.Gain();
+                }
             });
 
             /// <summary>
             /// lose energy.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _y_button.wasPressedThisFrame && !_do_update.grounded).Subscribe(_ => {
-                _energy.Lose();
+                if (_status_system.usePower) {
+                    _status_system.DecrementCoin(); // spend coins.
+                    _energy.Lose();
+                }
             });
 
             /// <summary>
@@ -316,17 +325,18 @@ namespace Studio.MeowToon {
             });
 
             /// <summary>
-            /// when touching balloons.
+            /// when touching balloon.
             /// </summary>
-            //this.OnTriggerEnterAsObservable().Where(x => x.transform.name.Contains("Balloon")).Subscribe(x => {
-            //    Destroy(x.gameObject);
-            //});
+            this.OnTriggerEnterAsObservable().Where(x => x.LikeBalloon()).Subscribe(x => {
+                x.gameObject.GetBalloon().DestroyWithItems(transform);
+            });
 
             /// <summary>
-            /// when touching balloons.
+            /// when touching coin.
             /// </summary>
-            this.OnTriggerEnterAsObservable().Where(x => x.transform.name.Contains("Balloon")).Subscribe(x => {
-                x.gameObject.GetBalloon().DestroyWithItems(transform);
+            this.OnCollisionEnterAsObservable().Where(x => x.LikeCoin()).Subscribe(x => {
+                _status_system.IncrementCoin(); // get coins.
+                Destroy(x.gameObject);
             });
         }
 

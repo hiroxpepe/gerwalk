@@ -89,7 +89,7 @@ namespace Studio.MeowToon {
         /// <summary>
         /// generate the pieces.
         /// </summary>
-        void explodePiece(int number = 16, float scale = 1.0f, int force = 15) {
+        void explodePiece(int number = 32, float scale = 1.0f, int force = 15) {
             var random = new System.Random();
             var min = -getRandomForce(force);
             var max = getRandomForce(force);
@@ -194,7 +194,7 @@ namespace Studio.MeowToon {
             }
 
             public static ExplodeParam getDefaultInstance() {
-                return new ExplodeParam(number: 16, scale: 1.0f, force:15); // default value.
+                return new ExplodeParam(number: 32, scale: 1.0f, force:15); // default value.
             }
 
             public static ExplodeParam getInstance(int number, float scale, int force) {

@@ -103,6 +103,20 @@ namespace Studio.MeowToon {
             return self.gameObject.name.Contains("Wall");
         }
 
+        /// <summary>
+        /// whether the Collider's name contains "Balloon".
+        /// </summary>
+        public static bool LikeBalloon(this Collider self) {
+            return self.name.Contains("Balloon");
+        }
+
+        /// <summary>
+        /// whether the Collision's name contains "Coin".
+        /// </summary>
+        public static bool LikeCoin(this Collision self) {
+            return self.gameObject.name.Contains("Coin");
+        }
+
         #endregion
 
         #region get the object.
@@ -192,10 +206,17 @@ namespace Studio.MeowToon {
         }
 
         /// <summary>
-        /// get CameraSystem object.
+        /// get CameraSystem component.
         /// </summary>
         public static CameraSystem GetCameraSystem(this GameObject self) {
             return GameObject.Find("CameraSystem").GetComponent<CameraSystem>();
+        }
+
+        /// <summary>
+        /// get StatusSystem component.
+        /// </summary>
+        public static StatusSystem GetStatusSystem(this GameObject self) {
+            return GameObject.Find("StatusSystem").GetComponent<StatusSystem>();
         }
 
         /// <summary>

@@ -42,6 +42,9 @@ namespace Studio.MeowToon {
         Text _targets_text;
 
         [SerializeField]
+        Text _coins_text;
+
+        [SerializeField]
         Text _speed_text;
 
         [SerializeField]
@@ -81,6 +84,8 @@ namespace Studio.MeowToon {
 
         int _target_remain_count = 0;
 
+        int _coin_total_count = 100;
+
         float _speed = 0f;
 
         float _altitude = 0f;
@@ -103,8 +108,31 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjectives] 
 
+        public bool usePower {
+            get {
+                return _coin_total_count > 0 ? true : false;
+            }
+        }
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Methods [verb]
+
+        /// <summary>
+        /// increment number of coins.
+        /// </summary>
+        public void IncrementCoin() {
+            const int COIN_VALUE = 5;
+            _coin_total_count += COIN_VALUE;
+            updateGameStatus();
+        }
+
+        /// <summary>
+        /// decrement number of coins.
+        /// </summary>
+        public void DecrementCoin() {
+            _coin_total_count--;
+            updateGameStatus();
+        }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -148,6 +176,7 @@ namespace Studio.MeowToon {
         /// </summary>
         void updateGameStatus() {
             _targets_text.text = string.Format("TGT {0}/{1}", _target_total_count - _target_remain_count, _target_total_count);
+            _coins_text.text = string.Format("COIN {0}", _coin_total_count);
         }
 
         /// <summary>
