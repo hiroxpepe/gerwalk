@@ -53,8 +53,6 @@ namespace Studio.MeowToon {
         [SerializeField]
         Text _debug_text;
 
-
-
         /// <remarks>
         /// for development.
         /// </remarks>
@@ -74,10 +72,10 @@ namespace Studio.MeowToon {
         Text _time_after_takeoff_text;
 
         [SerializeField]
-        GameObject _player;
+        GameObject _player_object;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Fields
+        // Fields [noun, adjectives] 
 
         int _target_total_count = 0;
 
@@ -123,15 +121,15 @@ namespace Studio.MeowToon {
             });
             // get player status.
             this.FixedUpdateAsObservable().Where(_ => !Mathf.Approximately(Time.deltaTime, 0)).Subscribe(_ => {
-                var player_controller = _player.gameObject.GetPlayerController();
-                _speed = player_controller.flySpeed;
+                var player = _player_object.gameObject.GetPlayer();
+                _speed = player.flySpeed;
                 /// <remarks>
                 /// for development.
                 /// </remarks>
-                _time_after_takeoff = player_controller.timeAfterTakeoff;
-                _total_energy = player_controller.totalEnergy;
-                _power = player_controller.flyPower;
-                Debug.Log($"_total_energy: {_total_energy}");
+                _time_after_takeoff = player.timeAfterTakeoff;
+                _total_energy = player.totalEnergy;
+                _power = player.flyPower;
+                //Debug.Log($"_total_energy: {_total_energy}");
             });
         }
 
@@ -157,7 +155,7 @@ namespace Studio.MeowToon {
         /// </summary>
         void updatePlayerStatus() {
             _speed_text.text = string.Format("TAS {0:000.0}km", Math.Round(_speed, 1, MidpointRounding.AwayFromZero));
-            _altitude = _player.transform.position.y - 0.5f; // 0.5 is half player height.
+            _altitude = _player_object.transform.position.y - 0.5f; // 0.5 is half player height.
             _altitude_text.text = string.Format("ALT {0:000.0}m", Math.Round(_altitude, 1, MidpointRounding.AwayFromZero));
             /// <remarks>
             /// for development.
