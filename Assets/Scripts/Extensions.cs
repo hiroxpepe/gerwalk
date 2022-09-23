@@ -21,7 +21,6 @@ namespace Studio.MeowToon {
     /// @author h.adachi
     /// </summary>
     public static class Extensions {
-
 #nullable enable
 
         #region type of object.
@@ -178,10 +177,17 @@ namespace Studio.MeowToon {
         }
 
         /// <summary>
-        /// get CameraSystem objects.
+        /// get CameraSystem object.
         /// </summary>
         public static CameraSystem GetCameraSystem(this GameObject self) {
             return GameObject.Find("CameraSystem").GetComponent<CameraSystem>();
+        }
+
+        /// <summary>
+        /// get the PlayerController object.
+        /// </summary>
+        public static PlayerController GetPlayerController(this GameObject self) {
+            return self.GetComponent<PlayerController>();
         }
 
         #endregion
