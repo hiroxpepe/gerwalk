@@ -13,6 +13,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Studio.MeowToon {
@@ -128,6 +129,13 @@ namespace Studio.MeowToon {
         }
 
         /// <summary>
+        /// get the SphereCollider object.
+        /// </summary>
+        public static SphereCollider GetSphereCollider(this GameObject self) {
+            return self.GetComponent<SphereCollider>();
+        }
+
+        /// <summary>
         /// get the Rigidbody object.
         /// </summary>
         public static Rigidbody GetRigidbody(this GameObject self) {
@@ -177,6 +185,13 @@ namespace Studio.MeowToon {
         }
 
         /// <summary>
+        /// get Transform objects.
+        /// </summary>
+        public static IEnumerable<Transform> GetTransformsInChildren(this GameObject self) {
+            return self.GetComponentsInChildren<Transform>();
+        }
+
+        /// <summary>
         /// get CameraSystem object.
         /// </summary>
         public static CameraSystem GetCameraSystem(this GameObject self) {
@@ -184,10 +199,24 @@ namespace Studio.MeowToon {
         }
 
         /// <summary>
-        /// get the PlayerController object.
+        /// get the Player component.
         /// </summary>
-        public static PlayerController GetPlayerController(this GameObject self) {
-            return self.GetComponent<PlayerController>();
+        public static Player GetPlayer(this GameObject self) {
+            return self.GetComponent<Player>();
+        }
+
+        /// <summary>
+        /// get the Balloon component.
+        /// </summary>
+        public static Balloon GetBalloon(this GameObject self) {
+            return self.GetComponent<Balloon>();
+        }
+
+        /// <summary>
+        /// get the Coin component.
+        /// </summary>
+        public static Coin GetCoin(this GameObject self) {
+            return self.GetComponent<Coin>();
         }
 
         #endregion

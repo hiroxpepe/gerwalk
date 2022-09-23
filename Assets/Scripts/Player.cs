@@ -25,7 +25,7 @@ namespace Studio.MeowToon {
     /// player controller.
     /// @author h.adachi
     /// </summary>
-    public class PlayerController : GamepadMaper {
+    public class Player : GamepadMaper {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////
@@ -318,8 +318,15 @@ namespace Studio.MeowToon {
             /// <summary>
             /// when touching balloons.
             /// </summary>
+            //this.OnTriggerEnterAsObservable().Where(x => x.transform.name.Contains("Balloon")).Subscribe(x => {
+            //    Destroy(x.gameObject);
+            //});
+
+            /// <summary>
+            /// when touching balloons.
+            /// </summary>
             this.OnTriggerEnterAsObservable().Where(x => x.transform.name.Contains("Balloon")).Subscribe(x => {
-                Destroy(x.gameObject);
+                x.gameObject.GetBalloon().DestroyWithItems(transform);
             });
         }
 
@@ -661,11 +668,11 @@ namespace Studio.MeowToon {
                     if (total > _threshold /*|| timeAfterTakeoff > 3.0f*/) {
                         if (_previous_altitudes.Peek() < _altitude) { // up
                             _fly_power -= 0.025f;
-                            Debug.Log($"_flyPower : {_fly_power}");
+                            //Debug.Log($"_flyPower : {_fly_power}");
                         }
                         if (_previous_altitudes.Peek() > _altitude) { // down
                             _fly_power += 0.010f;
-                            Debug.Log($"_flyPower : {_fly_power}");
+                            //Debug.Log($"_flyPower : {_fly_power}");
                         }
                     }
                     if (total <= _threshold && _altitude < AUTO_FLARE_ALTITUDE) {
