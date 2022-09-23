@@ -21,7 +21,6 @@ namespace Studio.MeowToon {
     /// @author h.adachi
     /// </summary>
     public static class Extensions {
-
 #nullable enable
 
         #region type of object.

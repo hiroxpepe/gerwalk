@@ -30,31 +30,31 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////
         // Fields
 
-        protected ButtonControl _aButton;
+        protected ButtonControl _a_button;
 
-        protected ButtonControl _bButton;
+        protected ButtonControl _b_button;
 
-        protected ButtonControl _xButton;
+        protected ButtonControl _x_button;
 
-        protected ButtonControl _yButton;
+        protected ButtonControl _y_button;
 
-        protected ButtonControl _upButton;
+        protected ButtonControl _up_button;
 
-        protected ButtonControl _downButton;
+        protected ButtonControl _down_button;
 
-        protected ButtonControl _leftButton;
+        protected ButtonControl _left_button;
 
-        protected ButtonControl _rightButton;
+        protected ButtonControl _right_button;
 
-        protected ButtonControl _rightStickUpButton;
+        protected ButtonControl _right_stick_up_button;
 
-        protected ButtonControl _rightStickDownButton;
+        protected ButtonControl _right_stick_down_button;
 
-        protected ButtonControl _rightStickLeftButton;
+        protected ButtonControl _right_stick_left_button;
 
-        protected ButtonControl _rightStickRightButton;
+        protected ButtonControl _right_stick_right_button;
 
-        protected ButtonControl _rightStickButton;
+        protected ButtonControl _right_stick_button;
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -69,38 +69,38 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////
         // private Methods
 
-        private void mapGamepad() {
+        void mapGamepad() {
             // Identifies the OS.
-            _upButton = Gamepad.current.dpad.up;
-            _downButton = Gamepad.current.dpad.down;
-            _leftButton = Gamepad.current.dpad.left;
-            _rightButton = Gamepad.current.dpad.right;
+            _up_button = Gamepad.current.dpad.up;
+            _down_button = Gamepad.current.dpad.down;
+            _left_button = Gamepad.current.dpad.left;
+            _right_button = Gamepad.current.dpad.right;
             if (Application.platform == RuntimePlatform.Android) {
                 // Android OS
-                _aButton = Gamepad.current.aButton;
-                _bButton = Gamepad.current.bButton;
-                _xButton = Gamepad.current.xButton;
-                _yButton = Gamepad.current.yButton;
+                _a_button = Gamepad.current.aButton;
+                _b_button = Gamepad.current.bButton;
+                _x_button = Gamepad.current.xButton;
+                _y_button = Gamepad.current.yButton;
             }
             else if (Application.platform == RuntimePlatform.WindowsPlayer) {
                 // Windows OS
-                _aButton = Gamepad.current.bButton;
-                _bButton = Gamepad.current.aButton;
-                _xButton = Gamepad.current.yButton;
-                _yButton = Gamepad.current.xButton;
+                _a_button = Gamepad.current.bButton;
+                _b_button = Gamepad.current.aButton;
+                _x_button = Gamepad.current.yButton;
+                _y_button = Gamepad.current.xButton;
             }
             else {
                 // FIXME: can't get it during development with Unity?
-                _aButton = Gamepad.current.bButton;
-                _bButton = Gamepad.current.aButton;
-                _xButton = Gamepad.current.yButton;
-                _yButton = Gamepad.current.xButton;
+                _a_button = Gamepad.current.bButton;
+                _b_button = Gamepad.current.aButton;
+                _x_button = Gamepad.current.yButton;
+                _y_button = Gamepad.current.xButton;
             }
-            _rightStickUpButton = Gamepad.current.rightStick.up;
-            _rightStickDownButton = Gamepad.current.rightStick.down;
-            _rightStickLeftButton = Gamepad.current.rightStick.left;
-            _rightStickRightButton = Gamepad.current.rightStick.right;
-            _rightStickButton = Gamepad.current.rightStickButton;
+            _right_stick_up_button = Gamepad.current.rightStick.up;
+            _right_stick_down_button = Gamepad.current.rightStick.down;
+            _right_stick_left_button = Gamepad.current.rightStick.left;
+            _right_stick_right_button = Gamepad.current.rightStick.right;
+            _right_stick_button = Gamepad.current.rightStickButton;
         }
     }
 }

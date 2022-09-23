@@ -31,23 +31,23 @@ namespace Studio.MeowToon {
         // References
 
         [SerializeField]
-        GameObject _horizontalAxis;
+        GameObject _horizontal_axis;
 
         [SerializeField]
-        GameObject _verticalAxis;
+        GameObject _vertical_axis;
 
         [SerializeField]
-        GameObject _mainCamera;
+        GameObject _main_camera;
 
         [SerializeField]
-        GameObject _lookTarget;
+        GameObject _look_target;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields
 
-        Vector3 _defaultLocalPosition;
+        Vector3 _default_local_position;
 
-        Quaternion _defaultLocalRotation;
+        Quaternion _default_local_rotation;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -59,8 +59,8 @@ namespace Studio.MeowToon {
             /// <summary>
             /// hold the default position and rotation of the camera.
             /// </summary>
-            _defaultLocalPosition = transform.localPosition;
-            _defaultLocalRotation = transform.localRotation;
+            _default_local_position = transform.localPosition;
+            _default_local_rotation = transform.localRotation;
 
             /// <summary>
             /// rotate the camera view.
@@ -72,7 +72,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// reset the camera view.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => _rightStickButton.wasPressedThisFrame).Subscribe(_ => {
+            this.UpdateAsObservable().Where(_ => _right_stick_button.wasPressedThisFrame).Subscribe(_ => {
                 resetRotateView();
             });
 
@@ -80,8 +80,8 @@ namespace Studio.MeowToon {
             /// when touching the back wall.
             /// </summary>
             this.OnTriggerEnterAsObservable().Where(x => x.LikeWall()).Subscribe(x => {
-                var materialList = x.gameObject.GetMeshRenderer().materials.ToList();
-                materialList.ForEach(material => {
+                var material_list = x.gameObject.GetMeshRenderer().materials.ToList();
+                material_list.ForEach(material => {
                     material.ToOpaque();
                 });
             });
@@ -90,8 +90,8 @@ namespace Studio.MeowToon {
             /// when leaving the back wall.
             /// </summary>
             this.OnTriggerExitAsObservable().Where(x => x.LikeWall()).Subscribe(x => {
-                var materialList = x.gameObject.GetMeshRenderer().materials.ToList();
-                materialList.ForEach(material => {
+                var material_list = x.gameObject.GetMeshRenderer().materials.ToList();
+                material_list.ForEach(material => {
                     material.ToTransparent();
                 });
             });
@@ -100,8 +100,8 @@ namespace Studio.MeowToon {
             /// when touching the block.
             /// </summary>
             this.OnTriggerEnterAsObservable().Where(x => x.LikeBlock()).Subscribe(x => {
-                var materialList = x.gameObject.GetMeshRenderer().materials.ToList();
-                materialList.ForEach(material => {
+                var material_list = x.gameObject.GetMeshRenderer().materials.ToList();
+                material_list.ForEach(material => {
                     material.ToOpaque();
                 });
             });
@@ -110,8 +110,8 @@ namespace Studio.MeowToon {
             /// when leaving the block.
             /// </summary>
             this.OnTriggerExitAsObservable().Where(x => x.LikeBlock()).Subscribe(x => {
-                var materialList = x.gameObject.GetMeshRenderer().materials.ToList();
-                materialList.ForEach(material => {
+                var material_list = x.gameObject.GetMeshRenderer().materials.ToList();
+                material_list.ForEach(material => {
                     material.ToTransparent();
                 });
             });
@@ -125,24 +125,24 @@ namespace Studio.MeowToon {
         /// </summary>
         void rotateView() {
             const float ADJUST = 120.0f;
-            var playerPosition = transform.parent.gameObject.transform.position;
+            var player_position = transform.parent.gameObject.transform.position;
             // up.
-            if (_rightStickUpButton.isPressed) {
-                transform.RotateAround(playerPosition, right, 1.0f * ADJUST * Time.deltaTime);
-                transform.LookAt(_lookTarget.transform);
+            if (_right_stick_up_button.isPressed) {
+                transform.RotateAround(player_position, right, 1.0f * ADJUST * Time.deltaTime);
+                transform.LookAt(_look_target.transform);
             }
             // down.
-            else if (_rightStickDownButton.isPressed) {
-                transform.RotateAround(playerPosition, right, -1.0f * ADJUST * Time.deltaTime);
-                transform.LookAt(_lookTarget.transform);
+            else if (_right_stick_down_button.isPressed) {
+                transform.RotateAround(player_position, right, -1.0f * ADJUST * Time.deltaTime);
+                transform.LookAt(_look_target.transform);
             }
             // left.
-            else if (_rightStickLeftButton.isPressed) {
-                transform.RotateAround(playerPosition, up, 1.0f * ADJUST * Time.deltaTime);
+            else if (_right_stick_left_button.isPressed) {
+                transform.RotateAround(player_position, up, 1.0f * ADJUST * Time.deltaTime);
             }
             // right
-            else if (_rightStickRightButton.isPressed) {
-                transform.RotateAround(playerPosition, up, -1.0f * ADJUST * Time.deltaTime);
+            else if (_right_stick_right_button.isPressed) {
+                transform.RotateAround(player_position, up, -1.0f * ADJUST * Time.deltaTime);
             }
         }
 
@@ -150,8 +150,8 @@ namespace Studio.MeowToon {
         /// reset the camera view.
         /// </summary>
         void resetRotateView() {
-            transform.localPosition = _defaultLocalPosition;
-            transform.localRotation = _defaultLocalRotation;
+            transform.localPosition = _default_local_position;
+            transform.localRotation = _default_local_rotation;
         }
     }
 }

@@ -24,7 +24,8 @@ namespace Studio.MeowToon {
     /// game system
     /// @author h.adachi
     /// </summary>
-    public class GameSystem : GamepadMaper {
+    public class StatusSystem : MonoBehaviour {
+#nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constants
@@ -33,16 +34,19 @@ namespace Studio.MeowToon {
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
         [SerializeField]
-        Text _message;
+        Text _message_text;
 
         [SerializeField]
-        Text _targets;
+        Text _targets_text;
 
         [SerializeField]
-        Text _speed;
+        Text _speed_text;
 
         [SerializeField]
-        Text _altitude;
+        Text _altitude_text;
+
+        [SerializeField]
+        Text _debug_text;
 
         [SerializeField]
         GameObject _player;
@@ -50,13 +54,13 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields
 
-        int _balloonTotalCount = 0;
+        int _balloon_total_count = 0;
 
-        int _balloonRemainCount = 0;
+        int _balloon_remain_count = 0;
 
-        float _speedValue = 0f;
+        float _speed = 0f;
 
-        float _altitudeValue = 0f;
+        float _altitude = 0f;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjectives] 
@@ -68,23 +72,22 @@ namespace Studio.MeowToon {
         // update Methods
 
         // Start is called before the first frame update
-        new void Start() {
-            base.Start();
+        void Start() {
             // get targets count.
             var target = GameObject.Find("Balloons");
             Transform balloons = target.GetComponentInChildren<Transform>();
-            _balloonTotalCount = balloons.childCount;
+            _balloon_total_count = balloons.childCount;
             // update text ui.
             this.UpdateAsObservable().Subscribe(_ => {
                 checkGameStatus();
                 updateGameStatus();
                 updatePlayerStatus();
             });
-            // get player speed.
-            Vector3 prevPosition = _player.transform.position;
+            // get player speed. FIXME:
+            Vector3 prev_position = _player.transform.position;
             this.FixedUpdateAsObservable().Where(_ => !Mathf.Approximately(Time.deltaTime, 0)).Subscribe(_ => {
-                _speedValue = ((_player.transform.position - prevPosition) / Time.deltaTime).magnitude * 3.6f;
-                prevPosition = _player.transform.position;
+                _speed = ((_player.transform.position - prev_position) / Time.deltaTime).magnitude * 3.6f;
+                prev_position = _player.transform.position;
             });
         }
 
@@ -97,23 +100,30 @@ namespace Studio.MeowToon {
         void checkGameStatus() {
             var target = GameObject.Find("Balloons");
             Transform balloons = target.GetComponentInChildren<Transform>();
-            _balloonRemainCount = balloons.childCount;
+            _balloon_remain_count = balloons.childCount;
         }
 
         /// <summary>
         /// update game status
         /// </summary>
         void updateGameStatus() {
-            _targets.text = string.Format("TGT {0}/{1}", _balloonTotalCount - _balloonRemainCount, _balloonTotalCount);
+            _targets_text.text = string.Format("TGT {0}/{1}", _balloon_total_count - _balloon_remain_count, _balloon_total_count);
         }
 
         /// <summary>
         /// update player status
         /// </summary>
         void updatePlayerStatus() {
-            _speed.text = string.Format("TAS {0:000.0}km", Math.Round(_speedValue, 1, MidpointRounding.AwayFromZero));
-            _altitudeValue = _player.transform.position.y - 0.5f; // 0.5 is half player height.
-            _altitude.text = string.Format("ALT {0:000.0}m", Math.Round(_altitudeValue, 1, MidpointRounding.AwayFromZero));
+            _speed_text.text = string.Format("TAS {0:000.0}km", Math.Round(_speed, 1, MidpointRounding.AwayFromZero));
+            _altitude = _player.transform.position.y - 0.5f; // 0.5 is half player height.
+            _altitude_text.text = string.Format("ALT {0:000.0}m", Math.Round(_altitude, 1, MidpointRounding.AwayFromZero));
+        }
+
+        /// <summary>
+        /// debug trace
+        /// </summary>
+        public void trace(string value) {
+            _debug_text.text = value;
         }
     }
 }

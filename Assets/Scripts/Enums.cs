@@ -18,6 +18,8 @@ namespace Studio.MeowToon {
     /// an enumeration that represents the direction.
     /// </summary>
     public enum Direction {
+#nullable enable
+
         PositiveZ,
         NegativeZ,
         PositiveX,
