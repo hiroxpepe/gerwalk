@@ -69,6 +69,8 @@ namespace Studio.MeowToon {
 
         Energy _energy;
 
+        System.Diagnostics.Stopwatch _flying_stopwatch = new();
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjectives] 
 
@@ -81,6 +83,22 @@ namespace Studio.MeowToon {
         /// current power of the player object to fly.
         /// </summary>
         public float flyPower { get => _energy.power; }
+
+        /// <summary>
+        /// elapsed time after takeoff.
+        /// </summary>
+        /// <remarks>
+        /// for development.
+        /// </remarks>
+        public float timeAfterTakeoff { get => (float) _flying_stopwatch.Elapsed.TotalSeconds; }
+
+        /// <summary>
+        /// total energy.
+        /// </summary>
+        /// <remarks>
+        /// for development.
+        /// </remarks>
+        public float totalEnergy { get => _energy.total; }
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -188,6 +206,7 @@ namespace Studio.MeowToon {
             this.UpdateAsObservable().Where(_ => !_do_update.grounded).Subscribe(_ => {
                 _energy.speed = fly_speed;
                 _energy.altitude = transform.position.y - 0.5f; // 0.5 is half player height.
+                _energy.timeAfterTakeoff = timeAfterTakeoff;
                 _do_fixed_update.ApplyFly();
             });
 
@@ -195,6 +214,7 @@ namespace Studio.MeowToon {
                 rb.useGravity = false;
                 rb.velocity = transform.forward * _energy.power;
                 _do_fixed_update.CancelFly();
+                _flying_stopwatch.Start();
             });
 
             /// <summary>
@@ -241,6 +261,13 @@ namespace Studio.MeowToon {
             });
 
             /// <summary>
+            /// stall.
+            /// </summary>
+            this.UpdateAsObservable().Where(_ => !_do_update.grounded && _energy.total < 10.0f && timeAfterTakeoff > 3.0f).Subscribe(_ => {
+                Debug.Log($"stall");
+            });
+
+            /// <summary>
             /// freeze.
             /// </summary>
             this.OnCollisionStayAsObservable().Where(x => x.LikeBlock() && (_up_button.isPressed || _down_button.isPressed) && _acceleration.freeze).Subscribe(_ => {
@@ -266,6 +293,9 @@ namespace Studio.MeowToon {
                 Vector3 angle = transform.eulerAngles;
                 angle.x = angle.z = 0f;
                 transform.eulerAngles = angle;
+
+                // reset flying time.
+                _flying_stopwatch.Reset();
             });
 
             /// <summary>
@@ -618,18 +648,17 @@ namespace Studio.MeowToon {
 
             float _speed;
 
-            float _total;
+            float _threshold = 750.0f;
 
-            float _threshold = 750;
+            float _timeAfterTakeoff;
 
             ///////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjectives] 
 
             public float power {
                 get {
-                    _total = _altitude * _speed;
-                    if (_total > _threshold) {
-                        Debug.Log($"over!");
+                    const float AUTO_FLARE_ALTITUDE = 8.0f;
+                    if (total > _threshold /*|| timeAfterTakeoff > 3.0f*/) {
                         if (_previous_altitudes.Peek() < _altitude) { // up
                             _fly_power -= 0.025f;
                             Debug.Log($"_flyPower : {_fly_power}");
@@ -639,7 +668,7 @@ namespace Studio.MeowToon {
                             Debug.Log($"_flyPower : {_fly_power}");
                         }
                     }
-                    if (_total <= _threshold && _altitude < 8.0f) {
+                    if (total <= _threshold && _altitude < AUTO_FLARE_ALTITUDE) {
                         _fly_power = _default_fly_power;
                     }
                     return _fly_power * 2.65f;
@@ -660,13 +689,27 @@ namespace Studio.MeowToon {
                 }
             }
 
+            /// <summary>
+            /// speed in flying.
+            /// </summary>
             public float speed {
-                get {
-                    return _speed;
-                }
-                set {
-                    _speed = value;
-                }
+                get => _speed;
+                set => _speed = value;
+            }
+
+            /// <summary>
+            /// total energy.
+            /// </summary>
+            public float total {
+                get => _altitude * _speed;
+            }
+
+            /// <summary>
+            /// elapsed time after takeoff.
+            /// </summary>
+            public float timeAfterTakeoff {
+                get => _timeAfterTakeoff;
+                set => _timeAfterTakeoff = value; 
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////

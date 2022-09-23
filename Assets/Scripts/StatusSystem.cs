@@ -47,8 +47,31 @@ namespace Studio.MeowToon {
         [SerializeField]
         Text _altitude_text;
 
+        /// <remarks>
+        /// for development.
+        /// </remarks>
         [SerializeField]
         Text _debug_text;
+
+
+
+        /// <remarks>
+        /// for development.
+        /// </remarks>
+        [SerializeField]
+        Text _total_energy_text;
+
+        /// <remarks>
+        /// for development.
+        /// </remarks>
+        [SerializeField]
+        Text _power_text;
+
+        /// <remarks>
+        /// for development.
+        /// </remarks>
+        [SerializeField]
+        Text _time_after_takeoff_text;
 
         [SerializeField]
         GameObject _player;
@@ -63,6 +86,21 @@ namespace Studio.MeowToon {
         float _speed = 0f;
 
         float _altitude = 0f;
+
+        /// <remarks>
+        /// for development.
+        /// </remarks>
+        float _total_energy = 0f;
+
+        /// <remarks>
+        /// for development.
+        /// </remarks>
+        float _power = 0;
+
+        /// <remarks>
+        /// for development.
+        /// </remarks>
+        float _time_after_takeoff = 0;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjectives] 
@@ -83,10 +121,17 @@ namespace Studio.MeowToon {
                 updateGameStatus();
                 updatePlayerStatus();
             });
-            // get player speed.
+            // get player status.
             this.FixedUpdateAsObservable().Where(_ => !Mathf.Approximately(Time.deltaTime, 0)).Subscribe(_ => {
                 var player_controller = _player.gameObject.GetPlayerController();
                 _speed = player_controller.flySpeed;
+                /// <remarks>
+                /// for development.
+                /// </remarks>
+                _time_after_takeoff = player_controller.timeAfterTakeoff;
+                _total_energy = player_controller.totalEnergy;
+                _power = player_controller.flyPower;
+                Debug.Log($"_total_energy: {_total_energy}");
             });
         }
 
@@ -114,6 +159,13 @@ namespace Studio.MeowToon {
             _speed_text.text = string.Format("TAS {0:000.0}km", Math.Round(_speed, 1, MidpointRounding.AwayFromZero));
             _altitude = _player.transform.position.y - 0.5f; // 0.5 is half player height.
             _altitude_text.text = string.Format("ALT {0:000.0}m", Math.Round(_altitude, 1, MidpointRounding.AwayFromZero));
+            /// <remarks>
+            /// for development.
+            /// </remarks>
+            setTotalEnergyColor(_total_energy);
+            _total_energy_text.text = string.Format("ENG {0:0000.0}", Math.Round(_total_energy, 1, MidpointRounding.AwayFromZero));
+            _power_text.text = string.Format("POW {0:0000.0}", Math.Round(_power, 1, MidpointRounding.AwayFromZero));
+            _time_after_takeoff_text.text = string.Format("TIME {0:000.0}sec", Math.Round(_time_after_takeoff, 1, MidpointRounding.AwayFromZero));
         }
 
         /// <summary>
@@ -124,7 +176,55 @@ namespace Studio.MeowToon {
             Transform targets_transform = targets.GetComponentInChildren<Transform>();
             return targets_transform.childCount;
         }
-        
+
+        /// <remarks>
+        /// for development.
+        /// </remarks>
+        public void setTotalEnergyColor(float value) {
+            // https://www.color-sample.com/colorschemes/rule/dominant/
+            Color color;
+            if (value is < 750.0f) {
+                ColorUtility.TryParseHtmlString("#FF0000", out color); // red
+                _total_energy_text.color = color;
+            }
+            else if (value is < 1250.0f and >= 750.0f) {
+                ColorUtility.TryParseHtmlString("#FF7F00", out color); // orange
+                _total_energy_text.color = color;
+            }
+            else if (value is < 1750.0f and >= 1250.0f) {
+                ColorUtility.TryParseHtmlString("#FFFF00", out color); // yellow
+                _total_energy_text.color = color;
+            }
+            else if (value is < 2250.0f and >= 1750.0f) {
+                ColorUtility.TryParseHtmlString("#7FFF00", out color); // lime
+                _total_energy_text.color = color;
+            }
+            else if (value is < 2750.0f and >= 2250.0f) {
+                ColorUtility.TryParseHtmlString("#00FF00", out color); // green
+                _total_energy_text.color = color;
+            }
+            else if (value is < 3250.0f and >= 2750.0f) {
+                ColorUtility.TryParseHtmlString("#00FFFF", out color); // cyan
+                _total_energy_text.color = color;
+            }
+            else if (value is < 3750.0f and >= 3250.0f) {
+                ColorUtility.TryParseHtmlString("#007FFF", out color); // azure
+                _total_energy_text.color = color;
+            }
+            else if (value is < 4250.0f and >= 3750.0f) {
+                ColorUtility.TryParseHtmlString("#002AFF", out color); // blue
+                _total_energy_text.color = color;
+            }
+            else if (value is < 4750.0f and >= 4250.0f) {
+                ColorUtility.TryParseHtmlString("#D400FF", out color); // purple
+                _total_energy_text.color = color;
+            }
+            else {
+                ColorUtility.TryParseHtmlString("#FF007F", out color); // magenta
+                _total_energy_text.color = color;
+            }
+        }
+
         /// <summary>
         /// debug trace
         /// </summary>
