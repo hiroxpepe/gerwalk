@@ -104,10 +104,10 @@ namespace Studio.MeowToon {
         }
 
         /// <summary>
-        /// whether the Collider's name contains "Balloon".
+        /// whether the Collision's name contains "Balloon".
         /// </summary>
-        public static bool LikeBalloon(this Collider self) {
-            return self.name.Contains("Balloon");
+        public static bool LikeBalloon(this Collision self) {
+            return self.gameObject.name.Contains("Balloon");
         }
 
         /// <summary>

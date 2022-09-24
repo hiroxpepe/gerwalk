@@ -52,7 +52,6 @@ namespace Studio.MeowToon {
         /// </summary>
         public void DestroyWithItems(Transform bullet, int numberOfPiece = 8) {
             if (_destroyable) {
-                _explode_param = ExplodeParam.getDefaultInstance();
                 _do_fixed_update.explode = true;
             }
         }
@@ -63,6 +62,8 @@ namespace Studio.MeowToon {
         // Awake is called when the script instance is being loaded.
         void Awake() {
             _do_fixed_update = DoFixedUpdate.getInstance();
+            _explode_param = ExplodeParam.getDefaultInstance();
+            initializePiece();
         }
 
         // Start is called before the first frame update.
@@ -74,7 +75,7 @@ namespace Studio.MeowToon {
             // FixedUpdate is called just before each physics update.
             this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.explode).Subscribe(_ => {
                 gameObject.GetSphereCollider().enabled = false; // collider detection off. *passed on to children.
-                explodePiece(_explode_param.number, _explode_param.scale, _explode_param.force);
+                explodePiece();
                 gameObject.GetSphereCollider().enabled = true; // collider detection on.
                 _do_fixed_update.explode = false;
                 if (_destroyable) {
@@ -87,31 +88,49 @@ namespace Studio.MeowToon {
         // private Methods [verb]
 
         /// <summary>
-        /// generate the pieces.
+        /// initialize pieces.
         /// </summary>
-        void explodePiece(int number = 32, float scale = 1.0f, int force = 15) {
-            var random = new System.Random();
-            var min = -getRandomForce(force);
-            var max = getRandomForce(force);
+        void initializePiece() {
+            var number = _explode_param.number;
+            var scale = _explode_param.scale;
             for (var i = 0; i < number; i++) {
                 var piece = Instantiate(_item_object);
-                piece.transform.position = transform.position; // set position.
+                // set shifted position.
+                var position = transform.position;
+                var shift = i % 4;
+                piece.transform.position = new Vector3(
+                    position.x + ((float)shift / 2.25f) - 0.65f,
+                    position.y + ((float)shift / 1.0f) - 2.00f,
+                    position.z + ((float)shift / 2.25f) - 0.65f
+                );
                 piece.name += "_Piece"; // add "_Piece" to the name of the piece.
                 piece.transform.localScale = new Vector3(scale, scale, scale);
                 if (piece.GetRigidbody() == null) {
                     piece.AddRigidbody();
                 }
-                piece.GetRigidbody().isKinematic = false;
+                piece.GetRigidbody().useGravity = false;
+                piece.GetRigidbody().isKinematic = true;
+                piece.transform.parent = transform;
+            }
+        }
+
+        /// <summary>
+        /// explode pieces.
+        /// </summary>
+        void explodePiece() {
+            var force = _explode_param.force;
+            foreach (Transform piece in transform) {
+                var random = new System.Random();
+                piece.parent = null;
+                var min = -getRandomForce(force);
+                var max = getRandomForce(force);
                 var force_value = new Vector3(random.Next(min, max), random.Next(min, max), random.Next(min, max));
+                //Debug.Log($"force_value : {force_value}");
                 piece.GetRigidbody().AddForce(force_value, ForceMode.Impulse);
                 piece.GetRigidbody().AddTorque(force_value, ForceMode.Impulse);
-                piece.GetTransformsInChildren().ToList().ForEach(child => {
-                    if (piece.name != child.name) { // for some reason pieces are also in the child list of pieces, so they are excluded.
-                        child.parent = null;
-                        Destroy(child.gameObject); // child objects of pieces are deleted first.
-                    }
-                });
-                piece.GetCoin().autoDestroy = true; // clear pieces after 2 seconds.
+                piece.GetRigidbody().useGravity = true;
+                piece.GetRigidbody().isKinematic = false;
+                piece.gameObject.GetCoin().autoDestroy = true; // clear pieces after 2 seconds.
             }
         }
 
@@ -194,7 +213,7 @@ namespace Studio.MeowToon {
             }
 
             public static ExplodeParam getDefaultInstance() {
-                return new ExplodeParam(number: 32, scale: 1.0f, force:15); // default value.
+                return new ExplodeParam(number: 32, scale: 1.0f, force: 15); // default value.
             }
 
             public static ExplodeParam getInstance(int number, float scale, int force) {

@@ -327,7 +327,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// when touching balloon.
             /// </summary>
-            this.OnTriggerEnterAsObservable().Where(x => x.LikeBalloon()).Subscribe(x => {
+            this.OnCollisionEnterAsObservable().Where(x => x.LikeBalloon()).Subscribe(x => {
                 x.gameObject.GetBalloon().DestroyWithItems(transform);
             });
 
