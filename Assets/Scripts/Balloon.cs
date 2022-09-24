@@ -95,10 +95,9 @@ namespace Studio.MeowToon {
             var scale = _explode_param.scale;
             for (var i = 0; i < number; i++) {
                 var piece = Instantiate(_item_object);
-                // set shifted position.
                 var position = transform.position;
                 var shift = i % 4;
-                piece.transform.position = new Vector3(
+                piece.transform.position = new Vector3( // set shifted position.
                     position.x + ((float)shift / 2.25f) - 0.65f,
                     position.y + ((float)shift / 1.0f) - 2.00f,
                     position.z + ((float)shift / 2.25f) - 0.65f
@@ -125,11 +124,10 @@ namespace Studio.MeowToon {
                 var min = -getRandomForce(force);
                 var max = getRandomForce(force);
                 var force_value = new Vector3(random.Next(min, max), random.Next(min, max), random.Next(min, max));
-                //Debug.Log($"force_value : {force_value}");
-                piece.GetRigidbody().AddForce(force_value, ForceMode.Impulse);
-                piece.GetRigidbody().AddTorque(force_value, ForceMode.Impulse);
                 piece.GetRigidbody().useGravity = true;
                 piece.GetRigidbody().isKinematic = false;
+                piece.GetRigidbody().AddTorque(force_value, ForceMode.Impulse);
+                piece.GetRigidbody().AddForce(force_value, ForceMode.Impulse);
                 piece.gameObject.GetCoin().autoDestroy = true; // clear pieces after 2 seconds.
             }
         }
@@ -213,7 +211,7 @@ namespace Studio.MeowToon {
             }
 
             public static ExplodeParam getDefaultInstance() {
-                return new ExplodeParam(number: 32, scale: 1.0f, force: 15); // default value.
+                return new ExplodeParam(number: 32, scale: 1.0f, force: 10); // default value.
             }
 
             public static ExplodeParam getInstance(int number, float scale, int force) {
