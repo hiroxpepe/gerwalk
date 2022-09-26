@@ -54,31 +54,60 @@ namespace Studio.MeowToon {
 
         // Start is called before the first frame update.
         void Start() {
-
             // hide default mark.
             _target_mark_object.GetComponent<Image>().enabled = false;
 
             // get target positions
-            int idx = 1;
-            foreach (Transform target_transform in _targets_object.transform) {
-                var position = target_transform.position;
-                Debug.Log($"position.x: {position.x} position.y: {position.y} position.z: {position.z}");
-                var target_mark = Instantiate(_target_mark_object);
-                target_mark.name += $"_{idx}";
-                target_mark.transform.SetParent(transform, false);
-                target_mark.transform.localPosition = new Vector3(0, 0, 0);
-                target_mark.GetComponent<Image>().enabled = true;
-                idx++;
-            }
+            mapPositionsToRadar(create:true);
 
             // Update is called once per frame.
             this.UpdateAsObservable().Subscribe(_ => {
+                mapPositionsToRadar(create: false);
             });
         }
 
         void LateUpdate() {
             Quaternion player_rotation = _player_object.transform.rotation; // set the player's y-axis to the radar direction's z-axis
             _direction_object.transform.rotation = Quaternion.Euler(0f, 0f, -player_rotation.eulerAngles.y);
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // private Methods [verb]
+
+        /// <summary>
+        /// get target positions.
+        /// </summary>
+        void mapPositionsToRadar(bool create = false) {
+            // reset target mark.
+            if (!create) {
+                for (int reset_idx = 1; reset_idx < TARGETS_COUNT + 1; reset_idx++) {
+                    var target_mark = GameObject.Find($"RadarTarget(Clone)_{reset_idx}");
+                    target_mark.GetComponent<Image>().enabled = false;
+                }
+            }
+            // set target mark.
+            int idx = 1;
+            foreach (Transform target_transform in _targets_object.transform) {
+                var position = target_transform.position;
+                Debug.Log($"G [{idx}] position.x: {position.x} position.y: {position.y} position.z: {position.z}");
+                GameObject target_mark = new();
+                if (create) {
+                    // create target mark.
+                    target_mark = Instantiate(_target_mark_object);
+                    target_mark.name += $"_{idx}";
+                    target_mark.transform.SetParent(transform, false);
+                } else if (!create) {
+                    // get target mark.
+                    target_mark = GameObject.Find($"RadarTarget(Clone)_{idx}"); // FIXME:
+                }
+                // get target position from player point of view.
+                Vector3 target_position = target_transform.transform.position - _player_object.transform.position;
+                Debug.Log($"T [{idx}] position.x: {target_position.x} position.y: {target_position.y} position.z: {target_position.z}");
+                // map positions to radar.
+                target_mark.transform.localPosition = new Vector3(target_position.x, target_position.z, 0);
+                target_mark.GetComponent<Image>().enabled = true;
+                idx++;
+            }
         }
     }
 }
