@@ -71,7 +71,7 @@ namespace Studio.MeowToon {
 
         Energy _energy;
 
-        System.Diagnostics.Stopwatch _flying_stopwatch = new();
+        System.Diagnostics.Stopwatch _flight_stopwatch = new();
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjectives] 
@@ -79,12 +79,12 @@ namespace Studio.MeowToon {
         /// <summary>
         /// current speed of the player object to fly.
         /// </summary>
-        public float flySpeed { get => _energy.speed; }
+        public float flightSpeed { get => _energy.speed; }
 
         /// <summary>
         /// current power of the player object to fly.
         /// </summary>
-        public float flyPower { get => _energy.power; }
+        public float flightPower { get => _energy.power; }
 
         /// <summary>
         /// elapsed time after takeoff.
@@ -92,7 +92,7 @@ namespace Studio.MeowToon {
         /// <remarks>
         /// for development.
         /// </remarks>
-        public float timeAfterTakeoff { get => (float) _flying_stopwatch.Elapsed.TotalSeconds; }
+        public float flightTime { get => (float) _flight_stopwatch.Elapsed.TotalSeconds; }
 
         /// <summary>
         /// total energy.
@@ -100,7 +100,7 @@ namespace Studio.MeowToon {
         /// <remarks>
         /// for development.
         /// </remarks>
-        public float totalEnergy { get => _energy.total; }
+        public float flightEnergy { get => _energy.total; }
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -120,8 +120,12 @@ namespace Studio.MeowToon {
 
             const float POWER = 12.0f;
 
-            var rb = transform.GetComponent<Rigidbody>(); // Rigidbody should be only used in FixedUpdate.
+            /// <remarks>
+            /// fRigidbody should be only used in FixedUpdate.
+            /// </remarks>
+            var rb = transform.GetComponent<Rigidbody>();
 
+            // FIXME: to integrate with Energy function.
             this.FixedUpdateAsObservable().Subscribe(_ => {
                 _acceleration.previousSpeed = _acceleration.currentSpeed;// hold previous speed.
                 _acceleration.currentSpeed = rb.velocity.magnitude; // get speed.
@@ -138,26 +142,24 @@ namespace Studio.MeowToon {
             /// <summary>
             /// idol.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => _do_update.grounded && !_up_button.isPressed && !_down_button.isPressed)
-                .Subscribe(_ => {
-                    //_simpleAnime.Play("Default");
-                    _do_fixed_update.ApplyIdol();
-                });
+            this.UpdateAsObservable().Where(_ => _do_update.grounded && !_up_button.isPressed && !_down_button.isPressed).Subscribe(_ => {
+                //_simpleAnime.Play("Default");
+                _do_fixed_update.ApplyIdol();
+            });
 
-            this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.idol)
-                .Subscribe(_ => {
-                    rb.useGravity = true;
-                });
+            this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.idol).Subscribe(_ => {
+                rb.useGravity = true;
+            });
 
             /// <summary>
             /// walk.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _do_update.grounded && _up_button.isPressed && !_y_button.isPressed).Subscribe(_ => {
-                if (_do_update.grounded) { /*_simpleAnime.Play("Walk");*/ }
+                /*_simpleAnime.Play("Walk");*/
                 _do_fixed_update.ApplyWalk();
             });
 
-            this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.walk && _acceleration.walk).Subscribe(_ => {
+            this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.walk && _acceleration.canWalk).Subscribe(_ => {
                 rb.AddFor​​ce(transform.forward * POWER * 7.5f, ForceMode.Acceleration);
                 _do_fixed_update.CancelWalk();
             });
@@ -166,11 +168,11 @@ namespace Studio.MeowToon {
             /// run.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _do_update.grounded && _up_button.isPressed && _y_button.isPressed).Subscribe(_ => {
-                if (_do_update.grounded) { /*_simpleAnime.Play("Run");*/ }
+                /*_simpleAnime.Play("Run");*/
                 _do_fixed_update.ApplyRun();
             });
 
-            this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.run && _acceleration.run).Subscribe(_ => {
+            this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.run && _acceleration.canRun).Subscribe(_ => {
                 rb.AddFor​​ce(transform.forward * POWER * 7.5f, ForceMode.Acceleration);
                 _do_fixed_update.CancelRun();
             });
@@ -178,12 +180,12 @@ namespace Studio.MeowToon {
             /// <summary>
             /// backward.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => _down_button.isPressed).Subscribe(_ => {
-                if (_do_update.grounded) { /*_simpleAnime.Play("Walk");*/ }
+            this.UpdateAsObservable().Where(_ => _do_update.grounded && _down_button.isPressed).Subscribe(_ => {
+                /*_simpleAnime.Play("Walk");*/
                 _do_fixed_update.ApplyBackward();
             });
 
-            this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.backward && _acceleration.backward).Subscribe(_ => {
+            this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.backward && _acceleration.canBackward).Subscribe(_ => {
                 rb.AddFor​​ce(-transform.forward * POWER * 7.5f, ForceMode.Acceleration);
                 _do_fixed_update.CancelBackward();
             });
@@ -209,7 +211,7 @@ namespace Studio.MeowToon {
             this.UpdateAsObservable().Where(_ => !_do_update.grounded).Subscribe(_ => {
                 _energy.speed = fly_speed;
                 _energy.altitude = transform.position.y - 0.5f; // 0.5 is half player height.
-                _energy.timeAfterTakeoff = timeAfterTakeoff;
+                _energy.flightTime = flightTime;
                 _do_fixed_update.ApplyFly();
             });
 
@@ -217,27 +219,23 @@ namespace Studio.MeowToon {
                 rb.useGravity = false;
                 rb.velocity = transform.forward * _energy.power;
                 _do_fixed_update.CancelFly();
-                _flying_stopwatch.Start();
+                _flight_stopwatch.Start();
             });
 
             /// <summary>
             /// gain energy.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => _b_button.wasPressedThisFrame && !_do_update.grounded).Subscribe(_ => {
-                if (_status_system.usePower) {
-                    _status_system.DecrementCoin(); // spend coins.
-                    _energy.Gain();
-                }
+            this.UpdateAsObservable().Where(_ => _b_button.wasPressedThisFrame && !_do_update.grounded && _status_system.usePoint).Subscribe(_ => {
+                _status_system.DecrementPoints(); // spend coins.
+                _energy.Gain();
             });
 
             /// <summary>
             /// lose energy.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => _y_button.wasPressedThisFrame && !_do_update.grounded).Subscribe(_ => {
-                if (_status_system.usePower) {
-                    _status_system.DecrementCoin(); // spend coins.
-                    _energy.Lose();
-                }
+            this.UpdateAsObservable().Where(_ => _y_button.wasPressedThisFrame && !_do_update.grounded && _status_system.usePoint).Subscribe(_ => {
+                _status_system.DecrementPoints(); // spend coins.
+                _energy.Lose();
             });
 
             /// <summary>
@@ -272,8 +270,19 @@ namespace Studio.MeowToon {
             /// <summary>
             /// stall.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => !_do_update.grounded && _energy.total < 10.0f && timeAfterTakeoff > 3.0f).Subscribe(_ => {
+            this.UpdateAsObservable().Where(_ => !_do_update.grounded && _energy.power < 1.0f && flightTime > 0.5f).Subscribe(_ => {
                 Debug.Log($"stall");
+                //const int DOWN_AXIS = 1;
+                //transform.Rotate(DOWN_AXIS * (2.5f * _pitch_speed * Time.deltaTime) * POWER, 0, 0);
+                var ground_object = GameObject.Find("Ground");
+                Quaternion ground_rotation = Quaternion.LookRotation(ground_object.transform.position);
+                float speed = 2.5f;
+                float step = speed * Time.deltaTime;
+                transform.rotation = Quaternion.Slerp(transform.rotation, ground_rotation, step);
+                if (_energy.power < 10.0f || _energy.total < 10.0f) {
+                    _energy.Gain();
+
+                }
             });
 
             /// <summary>
@@ -303,8 +312,11 @@ namespace Studio.MeowToon {
                 angle.x = angle.z = 0f;
                 transform.eulerAngles = angle;
 
-                // reset flying time.
-                _flying_stopwatch.Reset();
+                // reset fly power.
+                _energy.hasLanded = true;
+
+                // reset flight time.
+                _flight_stopwatch.Reset();
             });
 
             /// <summary>
@@ -335,7 +347,7 @@ namespace Studio.MeowToon {
             /// when touching coin.
             /// </summary>
             this.OnCollisionEnterAsObservable().Where(x => x.LikeCoin()).Subscribe(x => {
-                _status_system.IncrementCoin(); // get coins.
+                _status_system.IncrementPoints(); // get coins.
                 Destroy(x.gameObject);
             });
         }
@@ -414,28 +426,20 @@ namespace Studio.MeowToon {
             var forward_x = (float) Math.Round(forwardVector.x);
             var forward_y = (float) Math.Round(forwardVector.y);
             var forward_z = (float) Math.Round(forwardVector.z);
-            // z-axis positive.
-            if (forward_x == 0 && forward_z == 1) { return Direction.PositiveZ; }
-            // z-axis negative.
-            if (forward_x == 0 && forward_z == -1) { return Direction.NegativeZ; }
-            // x-axis positive.
-            if (forward_x == 1 && forward_z == 0) { return Direction.PositiveX; }
-            // x-axis negative.
-            if (forward_x == -1 && forward_z == 0) { return Direction.NegativeX; }
+            if (forward_x == 0 && forward_z == 1) { return Direction.PositiveZ; } // z-axis positive.
+            if (forward_x == 0 && forward_z == -1) { return Direction.NegativeZ; } // z-axis negative.
+            if (forward_x == 1 && forward_z == 0) { return Direction.PositiveX; } // x-axis positive.
+            if (forward_x == -1 && forward_z == 0) { return Direction.NegativeX; } // x-axis negative.
             // determine the difference between the two axes.
             float absolute_x = Math.Abs(forwardVector.x);
-            float Absolute_z = Math.Abs(forwardVector.z);
-            if (absolute_x > Absolute_z) {
-                // x-axis positive.
-                if (forward_x == 1) { return Direction.PositiveX; }
-                // x-axis negative.
-                if (forward_x == -1) { return Direction.NegativeX; }
+            float absolute_z = Math.Abs(forwardVector.z);
+            if (absolute_x > absolute_z) {
+                if (forward_x == 1) { return Direction.PositiveX; } // x-axis positive.
+                if (forward_x == -1) { return Direction.NegativeX; } // x-axis negative.
             }
-            else if (absolute_x < Absolute_z) {
-                // z-axis positive.
-                if (forward_z == 1) { return Direction.PositiveZ; }
-                // z-axis negative.
-                if (forward_z == -1) { return Direction.NegativeZ; }
+            else if (absolute_x < absolute_z) {
+                if (forward_z == 1) { return Direction.PositiveZ; } // z-axis positive.
+                if (forward_z == -1) { return Direction.NegativeZ; } // z-axis negative.
             }
             return Direction.None; // unknown.
         }
@@ -612,9 +616,9 @@ namespace Studio.MeowToon {
 
             public float currentSpeed { get => _current_speed; set => _current_speed = value; }
             public float previousSpeed { get => _previous_speed; set => _previous_speed = value; }
-            public bool walk { get => _current_speed < _forward_speed_limit; }
-            public bool run { get => _current_speed < _run_speed_limit; }
-            public bool backward { get => _current_speed < _backward_speed_limit; }
+            public bool canWalk { get => _current_speed < _forward_speed_limit; }
+            public bool canRun { get => _current_speed < _run_speed_limit; }
+            public bool canBackward { get => _current_speed < _backward_speed_limit; }
             public bool freeze {
                 get {
                     if (Math.Round(_previous_speed, 2) < 0.02 &&
@@ -665,9 +669,9 @@ namespace Studio.MeowToon {
 
             float _speed;
 
-            float _threshold = 750.0f;
+            float _threshold = 1f; // FIXME:
 
-            float _timeAfterTakeoff;
+            float _flight_time;
 
             ///////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjectives] 
@@ -675,20 +679,19 @@ namespace Studio.MeowToon {
             public float power {
                 get {
                     const float AUTO_FLARE_ALTITUDE = 8.0f;
-                    if (total > _threshold /*|| timeAfterTakeoff > 3.0f*/) {
+                    if (total > _threshold /*|| flightTime > 3.0f*/) {
                         if (_previous_altitudes.Peek() < _altitude) { // up
-                            _fly_power -= 0.025f;
-                            //Debug.Log($"_flyPower : {_fly_power}");
+                            _fly_power -= 0.0009375f;
                         }
                         if (_previous_altitudes.Peek() > _altitude) { // down
-                            _fly_power += 0.010f;
-                            //Debug.Log($"_flyPower : {_fly_power}");
+                            _fly_power += 0.0009375f;
                         }
                     }
                     if (total <= _threshold && _altitude < AUTO_FLARE_ALTITUDE) {
                         _fly_power = _default_fly_power;
                     }
-                    return _fly_power * 2.65f;
+                    var result = _fly_power * 2.65f;
+                    return result < 0 ? 0 : result;
                 }
             }
 
@@ -718,15 +721,27 @@ namespace Studio.MeowToon {
             /// total energy.
             /// </summary>
             public float total {
-                get => _altitude * _speed;
+                get => _altitude + _speed;
             }
 
             /// <summary>
             /// elapsed time after takeoff.
             /// </summary>
-            public float timeAfterTakeoff {
-                get => _timeAfterTakeoff;
-                set => _timeAfterTakeoff = value; 
+            public float flightTime {
+                get => _flight_time;
+                set => _flight_time = value;
+            }
+
+            /// <summary>
+            /// whether it has landed.
+            /// </summary>
+            public bool hasLanded {
+                set {
+                    if (value) {
+                        _speed = 0;
+                        _fly_power = _default_fly_power;// 0;
+                    }
+                }
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////
@@ -751,11 +766,11 @@ namespace Studio.MeowToon {
             // public Methods [verb]
 
             public void Gain() {
-                _fly_power += 0.375f;
+                _fly_power += 0.125f;
             }
 
             public void Lose() {
-                _fly_power -= 0.250f;
+                _fly_power -= 0.125f;
             }
         }
 

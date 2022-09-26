@@ -98,9 +98,9 @@ namespace Studio.MeowToon {
                 var position = transform.position;
                 var shift = i % 4;
                 piece.transform.position = new Vector3( // set shifted position.
-                    position.x + ((float)shift / 2.25f) - 0.65f,
-                    position.y + ((float)shift / 1.0f) - 2.00f,
-                    position.z + ((float)shift / 2.25f) - 0.65f
+                    position.x + ((float) shift / 2.25f) - 0.65f,
+                    position.y + ((float) shift / 1.0f) - 2.00f,
+                    position.z + ((float) shift / 2.25f) - 0.65f
                 );
                 piece.name += "_Piece"; // add "_Piece" to the name of the piece.
                 piece.transform.localScale = new Vector3(scale, scale, scale);

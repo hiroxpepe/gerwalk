@@ -42,7 +42,7 @@ namespace Studio.MeowToon {
         Text _targets_text;
 
         [SerializeField]
-        Text _coins_text;
+        Text _points_text;
 
         [SerializeField]
         Text _speed_text;
@@ -54,13 +54,7 @@ namespace Studio.MeowToon {
         /// for development.
         /// </remarks>
         [SerializeField]
-        Text _debug_text;
-
-        /// <remarks>
-        /// for development.
-        /// </remarks>
-        [SerializeField]
-        Text _total_energy_text;
+        Text _energy_text;
 
         /// <remarks>
         /// for development.
@@ -72,7 +66,13 @@ namespace Studio.MeowToon {
         /// for development.
         /// </remarks>
         [SerializeField]
-        Text _time_after_takeoff_text;
+        Text _flight_text;
+
+        /// <remarks>
+        /// for development.
+        /// </remarks>
+        [SerializeField]
+        Text _debug_text;
 
         [SerializeField]
         GameObject _player_object;
@@ -80,11 +80,11 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives] 
 
-        int _target_total_count = 0;
+        int _target_total = 0;
 
-        int _target_remain_count = 0;
+        int _target_remain = 0;
 
-        int _coin_total_count = 100;
+        int _point_total = 100;
 
         float _speed = 0f;
 
@@ -93,7 +93,7 @@ namespace Studio.MeowToon {
         /// <remarks>
         /// for development.
         /// </remarks>
-        float _total_energy = 0f;
+        float _energy = 0f;
 
         /// <remarks>
         /// for development.
@@ -103,14 +103,14 @@ namespace Studio.MeowToon {
         /// <remarks>
         /// for development.
         /// </remarks>
-        float _time_after_takeoff = 0;
+        float _flight_time = 0;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjectives] 
 
-        public bool usePower {
+        public bool usePoint {
             get {
-                return _coin_total_count > 0 ? true : false;
+                return _point_total > 0 ? true : false;
             }
         }
 
@@ -118,19 +118,19 @@ namespace Studio.MeowToon {
         // public Methods [verb]
 
         /// <summary>
-        /// increment number of coins.
+        /// increment number of points.
         /// </summary>
-        public void IncrementCoin() {
-            const int COIN_VALUE = 5;
-            _coin_total_count += COIN_VALUE;
+        public void IncrementPoints() {
+            const int POINT_VALUE = 5;
+            _point_total += POINT_VALUE;
             updateGameStatus();
         }
 
         /// <summary>
-        /// decrement number of coins.
+        /// decrement number of points.
         /// </summary>
-        public void DecrementCoin() {
-            _coin_total_count--;
+        public void DecrementPoints() {
+            _point_total--;
             updateGameStatus();
         }
 
@@ -140,7 +140,7 @@ namespace Studio.MeowToon {
         // Start is called before the first frame update
         void Start() {
             // get targets count.
-            _target_total_count = getTargetsCount();
+            _target_total = getTargetsCount();
             // update text ui.
             this.UpdateAsObservable().Subscribe(_ => {
                 checkGameStatus();
@@ -150,13 +150,13 @@ namespace Studio.MeowToon {
             // get player status.
             this.FixedUpdateAsObservable().Where(_ => !Mathf.Approximately(Time.deltaTime, 0)).Subscribe(_ => {
                 var player = _player_object.gameObject.GetPlayer();
-                _speed = player.flySpeed;
+                _speed = player.flightSpeed;
                 /// <remarks>
                 /// for development.
                 /// </remarks>
-                _time_after_takeoff = player.timeAfterTakeoff;
-                _total_energy = player.totalEnergy;
-                _power = player.flyPower;
+                _flight_time = player.flightTime;
+                _energy = player.flightEnergy;
+                _power = player.flightPower;
                 //Debug.Log($"_total_energy: {_total_energy}");
             });
         }
@@ -168,15 +168,15 @@ namespace Studio.MeowToon {
         /// check game status
         /// </summary>
         void checkGameStatus() {
-            _target_remain_count = getTargetsCount();
+            _target_remain = getTargetsCount();
         }
 
         /// <summary>
         /// update game status
         /// </summary>
         void updateGameStatus() {
-            _targets_text.text = string.Format("TGT {0}/{1}", _target_total_count - _target_remain_count, _target_total_count);
-            _coins_text.text = string.Format("COIN {0}", _coin_total_count);
+            _targets_text.text = string.Format("TGT {0}/{1}", _target_total - _target_remain, _target_total);
+            _points_text.text = string.Format("POINT {0}", _point_total);
         }
 
         /// <summary>
@@ -189,10 +189,10 @@ namespace Studio.MeowToon {
             /// <remarks>
             /// for development.
             /// </remarks>
-            setTotalEnergyColor(_total_energy);
-            _total_energy_text.text = string.Format("ENG {0:0000.0}", Math.Round(_total_energy, 1, MidpointRounding.AwayFromZero));
+            setTotalEnergyColor(_energy);
+            _energy_text.text = string.Format("ENG {0:0000.0}", Math.Round(_energy, 1, MidpointRounding.AwayFromZero));
             _power_text.text = string.Format("POW {0:0000.0}", Math.Round(_power, 1, MidpointRounding.AwayFromZero));
-            _time_after_takeoff_text.text = string.Format("TIME {0:000.0}sec", Math.Round(_time_after_takeoff, 1, MidpointRounding.AwayFromZero));
+            _flight_text.text = string.Format("TIME {0:000.0}sec", Math.Round(_flight_time, 1, MidpointRounding.AwayFromZero));
         }
 
         /// <summary>
@@ -212,43 +212,43 @@ namespace Studio.MeowToon {
             Color color;
             if (value is < 750.0f) {
                 ColorUtility.TryParseHtmlString("#FF0000", out color); // red
-                _total_energy_text.color = color;
+                _energy_text.color = color;
             }
             else if (value is < 1250.0f and >= 750.0f) {
                 ColorUtility.TryParseHtmlString("#FF7F00", out color); // orange
-                _total_energy_text.color = color;
+                _energy_text.color = color;
             }
             else if (value is < 1750.0f and >= 1250.0f) {
                 ColorUtility.TryParseHtmlString("#FFFF00", out color); // yellow
-                _total_energy_text.color = color;
+                _energy_text.color = color;
             }
             else if (value is < 2250.0f and >= 1750.0f) {
                 ColorUtility.TryParseHtmlString("#7FFF00", out color); // lime
-                _total_energy_text.color = color;
+                _energy_text.color = color;
             }
             else if (value is < 2750.0f and >= 2250.0f) {
                 ColorUtility.TryParseHtmlString("#00FF00", out color); // green
-                _total_energy_text.color = color;
+                _energy_text.color = color;
             }
             else if (value is < 3250.0f and >= 2750.0f) {
                 ColorUtility.TryParseHtmlString("#00FFFF", out color); // cyan
-                _total_energy_text.color = color;
+                _energy_text.color = color;
             }
             else if (value is < 3750.0f and >= 3250.0f) {
                 ColorUtility.TryParseHtmlString("#007FFF", out color); // azure
-                _total_energy_text.color = color;
+                _energy_text.color = color;
             }
             else if (value is < 4250.0f and >= 3750.0f) {
                 ColorUtility.TryParseHtmlString("#002AFF", out color); // blue
-                _total_energy_text.color = color;
+                _energy_text.color = color;
             }
             else if (value is < 4750.0f and >= 4250.0f) {
                 ColorUtility.TryParseHtmlString("#D400FF", out color); // purple
-                _total_energy_text.color = color;
+                _energy_text.color = color;
             }
             else {
                 ColorUtility.TryParseHtmlString("#FF007F", out color); // magenta
-                _total_energy_text.color = color;
+                _energy_text.color = color;
             }
         }
 
