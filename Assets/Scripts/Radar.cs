@@ -20,10 +20,11 @@ using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
-    /// Radar class.
+    /// radar class.
     /// @author h.adachi
     /// </summary>
     public class Radar : MonoBehaviour {
+#nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constants

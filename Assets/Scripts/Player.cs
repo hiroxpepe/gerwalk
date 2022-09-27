@@ -272,16 +272,13 @@ namespace Studio.MeowToon {
             /// </summary>
             this.UpdateAsObservable().Where(_ => !_do_update.grounded && _energy.power < 1.0f && flightTime > 0.5f).Subscribe(_ => {
                 Debug.Log($"stall");
-                //const int DOWN_AXIS = 1;
-                //transform.Rotate(DOWN_AXIS * (2.5f * _pitch_speed * Time.deltaTime) * POWER, 0, 0);
                 var ground_object = GameObject.Find("Ground");
                 Quaternion ground_rotation = Quaternion.LookRotation(ground_object.transform.position);
                 float speed = 2.5f;
                 float step = speed * Time.deltaTime;
                 transform.rotation = Quaternion.Slerp(transform.rotation, ground_rotation, step);
-                if (_energy.power < 10.0f || _energy.total < 10.0f) {
+                if (_energy.power < 10.0f || _energy.total < 10.0f || _energy.speed < 10.0f) {
                     _energy.Gain();
-
                 }
             });
 
@@ -739,7 +736,7 @@ namespace Studio.MeowToon {
                 set {
                     if (value) {
                         _speed = 0;
-                        _fly_power = _default_fly_power;// 0;
+                        _fly_power = _default_fly_power;
                     }
                 }
             }
