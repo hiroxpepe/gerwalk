@@ -209,40 +209,42 @@ namespace Studio.MeowToon {
         /// </remarks>
         public void setTotalEnergyColor(float value) {
             // https://www.color-sample.com/colorschemes/rule/dominant/
+            const float START_VALUE = 20.0f;
+            const float ADDED_VALUE = 20.0f;
             Color color;
-            if (value is < 750.0f) {
+            if (value is < START_VALUE) {
                 ColorUtility.TryParseHtmlString("#FF0000", out color); // red
                 _energy_text.color = color;
             }
-            else if (value is < 1250.0f and >= 750.0f) {
+            else if (value is < START_VALUE + ADDED_VALUE and >= START_VALUE) {
                 ColorUtility.TryParseHtmlString("#FF7F00", out color); // orange
                 _energy_text.color = color;
             }
-            else if (value is < 1750.0f and >= 1250.0f) {
+            else if (value is < START_VALUE + ADDED_VALUE * 2 and >= START_VALUE + ADDED_VALUE) {
                 ColorUtility.TryParseHtmlString("#FFFF00", out color); // yellow
                 _energy_text.color = color;
             }
-            else if (value is < 2250.0f and >= 1750.0f) {
+            else if (value is < START_VALUE + ADDED_VALUE * 3 and >= START_VALUE + ADDED_VALUE * 2) {
                 ColorUtility.TryParseHtmlString("#7FFF00", out color); // lime
                 _energy_text.color = color;
             }
-            else if (value is < 2750.0f and >= 2250.0f) {
+            else if (value is < START_VALUE + ADDED_VALUE * 4 and >= START_VALUE + ADDED_VALUE * 3) {
                 ColorUtility.TryParseHtmlString("#00FF00", out color); // green
                 _energy_text.color = color;
             }
-            else if (value is < 3250.0f and >= 2750.0f) {
+            else if (value is < START_VALUE + ADDED_VALUE * 5 and >= START_VALUE + ADDED_VALUE * 4) {
                 ColorUtility.TryParseHtmlString("#00FFFF", out color); // cyan
                 _energy_text.color = color;
             }
-            else if (value is < 3750.0f and >= 3250.0f) {
+            else if (value is < START_VALUE + ADDED_VALUE * 6 and >= START_VALUE + ADDED_VALUE * 5) {
                 ColorUtility.TryParseHtmlString("#007FFF", out color); // azure
                 _energy_text.color = color;
             }
-            else if (value is < 4250.0f and >= 3750.0f) {
+            else if (value is < START_VALUE + ADDED_VALUE * 7 and >= START_VALUE + ADDED_VALUE * 6) {
                 ColorUtility.TryParseHtmlString("#002AFF", out color); // blue
                 _energy_text.color = color;
             }
-            else if (value is < 4750.0f and >= 4250.0f) {
+            else if (value is < START_VALUE + ADDED_VALUE * 8 and >= START_VALUE + ADDED_VALUE * 7) {
                 ColorUtility.TryParseHtmlString("#D400FF", out color); // purple
                 _energy_text.color = color;
             }
