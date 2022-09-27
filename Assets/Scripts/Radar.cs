@@ -58,7 +58,7 @@ namespace Studio.MeowToon {
             _target_mark_object.GetComponent<Image>().enabled = false;
 
             // get target positions
-            mapPositionsToRadar(create:true);
+            mapPositionsToRadar(create: true);
 
             // Update is called once per frame.
             this.UpdateAsObservable().Subscribe(_ => {
@@ -68,7 +68,7 @@ namespace Studio.MeowToon {
 
         void LateUpdate() {
             Quaternion player_rotation = _player_object.transform.rotation; // set the player's y-axis to the radar direction's z-axis
-            _direction_object.transform.rotation = Quaternion.Euler(0f, 0f, -player_rotation.eulerAngles.y);
+            _direction_object.transform.rotation = Quaternion.Euler(0f, 0f, player_rotation.eulerAngles.y);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -95,7 +95,7 @@ namespace Studio.MeowToon {
                     // create target mark.
                     target_mark = Instantiate(_target_mark_object);
                     target_mark.name += $"_{idx}";
-                    target_mark.transform.SetParent(transform, false);
+                    target_mark.transform.SetParent(_direction_object.transform, false);
                 } else if (!create) {
                     // get target mark.
                     target_mark = GameObject.Find($"RadarTarget(Clone)_{idx}"); // FIXME:
