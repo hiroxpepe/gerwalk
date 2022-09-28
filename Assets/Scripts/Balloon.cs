@@ -118,9 +118,11 @@ namespace Studio.MeowToon {
         /// </summary>
         void explodePiece() {
             var force = _explode_param.force;
+            var scale = _explode_param.scale;
             foreach (Transform piece in transform) {
-                var random = new System.Random();
                 piece.parent = null;
+                piece.transform.localScale = new Vector3(scale * 2, scale * 2, scale * 2);
+                var random = new System.Random();
                 var min = -getRandomForce(force);
                 var max = getRandomForce(force);
                 var force_value = new Vector3(random.Next(min, max), random.Next(min, max), random.Next(min, max));

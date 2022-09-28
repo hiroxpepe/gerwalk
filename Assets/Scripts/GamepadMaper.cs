@@ -30,6 +30,8 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives] 
 
+        protected GameObject _v_controller_object;
+
         protected ButtonControl _a_button;
 
         protected ButtonControl _b_button;
@@ -56,11 +58,29 @@ namespace Studio.MeowToon {
 
         protected ButtonControl _right_stick_button;
 
+        protected ButtonControl _start_button;
+
+        protected ButtonControl _select_button;
+
+        bool _use_v_controller;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Properties [noun, adjectives] 
+
+        /// <summary>
+        /// whether to use virtual controllers.
+        /// </summary>
+        public bool useVirtualController { get => _use_v_controller; }
+
         ///////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
 
         // Start is called before the first frame update
         protected void Start() {
+            // get virtual controller object.
+            _v_controller_object = GameObject.Find("VController");
+
+            // Update is called once per frame.
             this.UpdateAsObservable().Subscribe(_ => {
                 mapGamepad();
             });
@@ -70,11 +90,25 @@ namespace Studio.MeowToon {
         // private Methods [verb]
 
         void mapGamepad() {
-            // Identifies the OS.
+
+            // check a physical gamepad connected.
+            var controller_names = Input.GetJoystickNames();
+            if (controller_names.Length == 0 || controller_names[0] == "") {
+                _v_controller_object.SetActive(true);
+                _use_v_controller = true;
+            }
+            else {
+                _v_controller_object.SetActive(false);
+                _use_v_controller = false;
+            }
+
+            // identifies the OS.
             _up_button = Gamepad.current.dpad.up;
             _down_button = Gamepad.current.dpad.down;
             _left_button = Gamepad.current.dpad.left;
             _right_button = Gamepad.current.dpad.right;
+            _start_button = Gamepad.current.startButton;
+            _select_button = Gamepad.current.selectButton;
             if (Application.platform == RuntimePlatform.Android) {
                 // Android OS
                 _a_button = Gamepad.current.aButton;
