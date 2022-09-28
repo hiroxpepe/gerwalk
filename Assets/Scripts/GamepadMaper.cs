@@ -58,6 +58,10 @@ namespace Studio.MeowToon {
 
         protected ButtonControl _right_stick_button;
 
+        protected ButtonControl _start_button;
+
+        protected ButtonControl _select_button;
+
         bool _use_v_controller;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,6 +107,8 @@ namespace Studio.MeowToon {
             _down_button = Gamepad.current.dpad.down;
             _left_button = Gamepad.current.dpad.left;
             _right_button = Gamepad.current.dpad.right;
+            _start_button = Gamepad.current.startButton;
+            _select_button = Gamepad.current.selectButton;
             if (Application.platform == RuntimePlatform.Android) {
                 // Android OS
                 _a_button = Gamepad.current.aButton;

@@ -21,7 +21,7 @@ using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
-    /// game system
+    /// status system
     /// @author h.adachi
     /// </summary>
     public class StatusSystem : MonoBehaviour {
