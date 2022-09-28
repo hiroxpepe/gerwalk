@@ -157,7 +157,6 @@ namespace Studio.MeowToon {
                 _flight_time = player.flightTime;
                 _energy = player.flightEnergy;
                 _power = player.flightPower;
-                //Debug.Log($"_total_energy: {_total_energy}");
             });
         }
 
