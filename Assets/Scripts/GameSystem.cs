@@ -39,12 +39,14 @@ namespace Studio.MeowToon {
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
         [SerializeField]
-        Text message_text;
+        Text _message_text;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields
 
-        bool is_pausing = false;
+        bool _use_vibration = true;
+
+        bool _is_pausing = false;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -60,17 +62,34 @@ namespace Studio.MeowToon {
             // get scene name.
             var active_scene_name = SceneManager.GetActiveScene().name;
 
+            #region mobile phone vibration.
+
+            // vibrate the smartphone when the button is pressed.
+            this.UpdateAsObservable().Where(_ => _v_controller_object && _use_vibration &&
+                (_a_button.wasPressedThisFrame || _b_button.wasPressedThisFrame || _x_button.wasPressedThisFrame || _y_button.wasPressedThisFrame ||
+                _up_button.wasPressedThisFrame || _down_button.wasPressedThisFrame || _left_button.wasPressedThisFrame || _right_button.wasPressedThisFrame ||
+                _left_button.wasPressedThisFrame || _right_button.wasPressedThisFrame || _select_button.wasPressedThisFrame || _start_button.wasPressedThisFrame)).Subscribe(_ => {
+                AndroidVibrator.Vibrate(50L);
+            });
+
+            // no vibration of the smartphone by pressing the start and X buttons at the same time.
+            this.UpdateAsObservable().Where(_ => (_x_button.isPressed && _start_button.wasPressedThisFrame) || (_x_button.wasPressedThisFrame && _start_button.isPressed)).Subscribe(_ => {
+                _use_vibration = !_use_vibration;
+            });
+
+            #endregion
+
             /// <summary>
             /// pause the game execute or cancel.
             /// </summary>
             this.UpdateAsObservable().Where(_ => active_scene_name.Contains("Level") && _start_button.wasPressedThisFrame).Subscribe(_ => {
-                if (is_pausing) {
-                    Time.timeScale = 1f; message_text.text = "";
+                if (_is_pausing) {
+                    Time.timeScale = 1f; _message_text.text = "";
                 } 
                 else {
-                    Time.timeScale = 0f; message_text.text = MESSAGE_GAME_PAUSE; 
+                    Time.timeScale = 0f; _message_text.text = MESSAGE_GAME_PAUSE; 
                 }
-                is_pausing = !is_pausing;
+                _is_pausing = !_is_pausing;
             });
 
             /// <summary>
