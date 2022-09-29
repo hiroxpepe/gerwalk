@@ -68,7 +68,7 @@ namespace Studio.MeowToon {
             this.UpdateAsObservable().Where(_ => _v_controller_object && _use_vibration &&
                 (_a_button.wasPressedThisFrame || _b_button.wasPressedThisFrame || _x_button.wasPressedThisFrame || _y_button.wasPressedThisFrame ||
                 _up_button.wasPressedThisFrame || _down_button.wasPressedThisFrame || _left_button.wasPressedThisFrame || _right_button.wasPressedThisFrame ||
-                _left_button.wasPressedThisFrame || _right_button.wasPressedThisFrame || _select_button.wasPressedThisFrame || _start_button.wasPressedThisFrame)).Subscribe(_ => {
+                _left_1_button.wasPressedThisFrame || _right_1_button.wasPressedThisFrame || _select_button.wasPressedThisFrame || _start_button.wasPressedThisFrame)).Subscribe(_ => {
                 AndroidVibrator.Vibrate(50L);
             });
 
