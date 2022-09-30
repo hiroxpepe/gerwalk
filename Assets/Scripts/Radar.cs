@@ -29,7 +29,13 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constants
 
+        const float RANGE = 2.0f;
+
         const int TARGETS_COUNT = 5;
+
+        const float TO_MIDDLE_VALUE = 0.5f;
+
+        const int ADJUSTED_VALUE = 10;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
@@ -38,13 +44,28 @@ namespace Studio.MeowToon {
         GameObject _player_object;
 
         [SerializeField]
-        GameObject _direction_object;
+        GameObject _home_object;
+
+        [SerializeField]
+        GameObject _home_mark_object;
 
         [SerializeField]
         GameObject _targets_object;
 
         [SerializeField]
         GameObject _target_mark_object;
+
+        [SerializeField]
+        GameObject _direction_object;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Fields
+
+        float _fast_cycle = 0.25f;
+
+        float _slow_cycle = 1.0f;
+
+        float _time;
 
         ///////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -58,15 +79,18 @@ namespace Studio.MeowToon {
             // hide default mark.
             _target_mark_object.GetImage().enabled = false;
 
-            // get target positions
-            mapPositionsToRadar(create: true);
+            // get home and target positions.
+            mapHomePositionsToRadar();
+            mapTargetPositionsToRadar(create: true);
 
             // Update is called once per frame.
             this.UpdateAsObservable().Subscribe(_ => {
-                mapPositionsToRadar(create: false);
+                mapHomePositionsToRadar();
+                mapTargetPositionsToRadar(create: false);
             });
         }
 
+        // LateUpdate is called after all Update functions have been called.
         void LateUpdate() {
             /// <remarks>
             /// set the player's y-axis to the radar direction's z-axis.
@@ -79,9 +103,27 @@ namespace Studio.MeowToon {
         // private Methods [verb]
 
         /// <summary>
+        /// get home position.
+        /// </summary>
+        void mapHomePositionsToRadar() {
+            // get home position from player point of view.
+            Vector3 home_position = _home_object.transform.position - _player_object.transform.position;
+            // map position to radar.
+            _home_mark_object.transform.localPosition = new Vector3(home_position.x * RANGE, home_position.z * RANGE, 0);
+        }
+
+        /// <summary>
         /// get target positions.
         /// </summary>
-        void mapPositionsToRadar(bool create = false) {
+        void mapTargetPositionsToRadar(bool create = false) {
+
+            // add the time.
+            _time += Time.deltaTime;
+
+            // get the value that repeats in cycle.
+            var fast_repeat_value = Mathf.Repeat(_time, _fast_cycle);
+            var slow_repeat_value = Mathf.Repeat(_time, _slow_cycle);
+
             // reset target mark.
             if (!create) {
                 for (int reset_idx = 1; reset_idx < TARGETS_COUNT + 1; reset_idx++) {
@@ -92,7 +134,7 @@ namespace Studio.MeowToon {
             // set target mark.
             int idx = 1;
             foreach (Transform target_transform in _targets_object.transform) {
-                var position = target_transform.position;
+                Vector3 position = target_transform.position;
                 GameObject target_mark = new();
                 if (create) {
                     // create target mark.
@@ -106,8 +148,16 @@ namespace Studio.MeowToon {
                 // get target position from player point of view.
                 Vector3 target_position = target_transform.transform.position - _player_object.transform.position;
                 // map positions to radar.
-                target_mark.transform.localPosition = new Vector3(target_position.x * 2.0f, target_position.z * 2.0f, 0);
+                target_mark.transform.localPosition = new Vector3(target_position.x * RANGE, target_position.z * RANGE, 0);
                 target_mark.GetImage().enabled = true;
+
+                // higher altitude targets blink slowly, and lower altitude targets blink faster.
+                Vector3 player_position = _player_object.transform.position;
+                if (position.y < player_position.y - ADJUSTED_VALUE) {
+                    target_mark.GetImage().enabled = fast_repeat_value >= _fast_cycle * TO_MIDDLE_VALUE;
+                } else if (position.y > player_position.y + ADJUSTED_VALUE) {
+                    target_mark.GetImage().enabled = slow_repeat_value >= _slow_cycle * TO_MIDDLE_VALUE;
+                }
                 idx++;
             }
         }
