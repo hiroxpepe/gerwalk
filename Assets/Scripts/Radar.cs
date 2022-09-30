@@ -13,14 +13,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using static UnityEngine.GameObject;
 using UnityEngine;
-using UnityEngine.UI;
 using UniRx;
 using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
-    /// radar class.
+    /// radar class
     /// @author h.adachi
     /// </summary>
     public class Radar : MonoBehaviour {
@@ -56,7 +56,7 @@ namespace Studio.MeowToon {
         // Start is called before the first frame update.
         void Start() {
             // hide default mark.
-            _target_mark_object.GetComponent<Image>().enabled = false;
+            _target_mark_object.GetImage().enabled = false;
 
             // get target positions
             mapPositionsToRadar(create: true);
@@ -85,8 +85,8 @@ namespace Studio.MeowToon {
             // reset target mark.
             if (!create) {
                 for (int reset_idx = 1; reset_idx < TARGETS_COUNT + 1; reset_idx++) {
-                    var target_mark = GameObject.Find($"RadarTarget(Clone)_{reset_idx}");
-                    target_mark.GetComponent<Image>().enabled = false;
+                    var target_mark = Find($"RadarTarget(Clone)_{reset_idx}");
+                    target_mark.GetImage().enabled = false;
                 }
             }
             // set target mark.
@@ -101,13 +101,13 @@ namespace Studio.MeowToon {
                     target_mark.transform.SetParent(_direction_object.transform, false);
                 } else if (!create) {
                     // get target mark.
-                    target_mark = GameObject.Find($"RadarTarget(Clone)_{idx}"); // FIXME:
+                    target_mark = Find($"RadarTarget(Clone)_{idx}"); // FIXME:
                 }
                 // get target position from player point of view.
                 Vector3 target_position = target_transform.transform.position - _player_object.transform.position;
                 // map positions to radar.
-                target_mark.transform.localPosition = new Vector3(target_position.x, target_position.z, 0);
-                target_mark.GetComponent<Image>().enabled = true;
+                target_mark.transform.localPosition = new Vector3(target_position.x * 2.0f, target_position.z * 2.0f, 0);
+                target_mark.GetImage().enabled = true;
                 idx++;
             }
         }

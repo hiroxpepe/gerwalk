@@ -45,7 +45,10 @@ namespace Studio.MeowToon {
         Text _points_text;
 
         [SerializeField]
-        Text _speed_text;
+        Text _air_speed_text;
+
+        [SerializeField]
+        Text _vertical_speed_text;
 
         [SerializeField]
         Text _altitude_text;
@@ -86,7 +89,9 @@ namespace Studio.MeowToon {
 
         int _point_total = 100;
 
-        float _speed = 0f;
+        float _air_speed = 0f;
+
+        float _vertical_speed = 0f;
 
         float _altitude = 0f;
 
@@ -150,7 +155,8 @@ namespace Studio.MeowToon {
             // get player status.
             this.FixedUpdateAsObservable().Where(_ => !Mathf.Approximately(Time.deltaTime, 0)).Subscribe(_ => {
                 var player = _player_object.gameObject.GetPlayer();
-                _speed = player.flightSpeed;
+                _air_speed = player.flightSpeed;
+                _vertical_speed = player.flightVerticalSpeed;
                 /// <remarks>
                 /// for development.
                 /// </remarks>
@@ -182,7 +188,8 @@ namespace Studio.MeowToon {
         /// update player status
         /// </summary>
         void updatePlayerStatus() {
-            _speed_text.text = string.Format("TAS {0:000.0}km", Math.Round(_speed, 1, MidpointRounding.AwayFromZero));
+            _air_speed_text.text = string.Format("TAS {0:000.0}km/h", Math.Round(_air_speed, 1, MidpointRounding.AwayFromZero));
+            _vertical_speed_text.text = string.Format("VSI {0:000.0}m/s", Math.Round(_vertical_speed, 1, MidpointRounding.AwayFromZero));
             _altitude = _player_object.transform.position.y - 0.5f; // 0.5 is half player height.
             _altitude_text.text = string.Format("ALT {0:000.0}m", Math.Round(_altitude, 1, MidpointRounding.AwayFromZero));
             /// <remarks>

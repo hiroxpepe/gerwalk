@@ -53,6 +53,7 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
+            Application.targetFrameRate = 30; // 30fps
         }
 
         // Start is called before the first frame update

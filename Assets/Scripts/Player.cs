@@ -73,6 +73,8 @@ namespace Studio.MeowToon {
 
         System.Diagnostics.Stopwatch _flight_stopwatch = new();
 
+        float _vertical_speed = 0f;
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjectives] 
 
@@ -80,6 +82,10 @@ namespace Studio.MeowToon {
         /// current speed of the player object to fly.
         /// </summary>
         public float flightSpeed { get => _energy.speed; }
+
+        /// current vertical speed of the player object to fly.
+        /// </summary>
+        public float flightVerticalSpeed { get => _vertical_speed; }
 
         /// <summary>
         /// current power of the player object to fly.
@@ -133,9 +139,10 @@ namespace Studio.MeowToon {
 
             // get player speed for fly.
             Vector3 prev_position = transform.position;
-            float fly_speed = 0f;
+            float air_speed = 0f;
             this.FixedUpdateAsObservable().Where(_ => !Mathf.Approximately(Time.deltaTime, 0)).Subscribe(_ => {
-                fly_speed = ((transform.position - prev_position) / Time.deltaTime).magnitude * 3.6f;
+                air_speed = ((transform.position - prev_position) / Time.deltaTime).magnitude * 3.6f; // m/s -> km/h
+                _vertical_speed = ((transform.position.y - prev_position.y) / Time.deltaTime); // m/s
                 prev_position = transform.position;
             });
 
@@ -209,7 +216,7 @@ namespace Studio.MeowToon {
             /// fly.
             /// </summary>
             this.UpdateAsObservable().Where(_ => !_do_update.grounded).Subscribe(_ => {
-                _energy.speed = fly_speed;
+                _energy.speed = air_speed;
                 _energy.altitude = transform.position.y - 0.5f; // 0.5 is half player height.
                 _energy.flightTime = flightTime;
                 _do_fixed_update.ApplyFly();
