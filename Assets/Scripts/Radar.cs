@@ -90,6 +90,7 @@ namespace Studio.MeowToon {
             });
         }
 
+        // LateUpdate is called after all Update functions have been called.
         void LateUpdate() {
             /// <remarks>
             /// set the player's y-axis to the radar direction's z-axis.

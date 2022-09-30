@@ -48,6 +48,7 @@ namespace Studio.MeowToon {
             });
         }
 
+        // LateUpdate is called after all Update functions have been called.
         void LateUpdate() {
             /// <remarks>
             /// set vertical speed.
