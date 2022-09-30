@@ -26,6 +26,14 @@ namespace Studio.MeowToon {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Constants
+
+        /// <summary>
+        /// number to divide the circle.
+        /// </summary>
+        const int DIVIDE_CIRCLE = 200;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
         [SerializeField]
@@ -34,7 +42,7 @@ namespace Studio.MeowToon {
         [SerializeField]
         GameObject _needle_object;
 
-        ///////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
 
         // Awake is called when the script instance is being loaded.
@@ -46,14 +54,15 @@ namespace Studio.MeowToon {
             // Update is called once per frame.
             this.UpdateAsObservable().Subscribe(_ => {
             });
-        }
 
-        // LateUpdate is called after all Update functions have been called.
-        void LateUpdate() {
-            /// <remarks>
-            /// set speed.
-            /// </remarks>
-            _needle_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (200 / _player_object.GetPlayer().flightSpeed)));
+            // LateUpdate is called after all Update functions have been called.
+            this.LateUpdateAsObservable().Subscribe(_ => {
+                /// <summary>
+                /// set speed.
+                /// </summary>
+                _needle_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (DIVIDE_CIRCLE / _player_object.GetPlayer().flightSpeed)));
+                
+            });
         }
     }
 }

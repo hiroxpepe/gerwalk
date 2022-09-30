@@ -67,7 +67,7 @@ namespace Studio.MeowToon {
 
         float _time;
 
-        ///////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
 
         // Awake is called when the script instance is being loaded.
@@ -88,15 +88,15 @@ namespace Studio.MeowToon {
                 mapHomePositionsToRadar();
                 mapTargetPositionsToRadar(create: false);
             });
-        }
 
-        // LateUpdate is called after all Update functions have been called.
-        void LateUpdate() {
-            /// <remarks>
-            /// set the player's y-axis to the radar direction's z-axis.
-            /// </remarks>
-            Quaternion player_rotation = _player_object.transform.rotation;
-            _direction_object.transform.rotation = Quaternion.Euler(0f, 0f, player_rotation.eulerAngles.y);
+            // LateUpdate is called after all Update functions have been called.
+            this.LateUpdateAsObservable().Subscribe(_ => {
+                /// <summary>
+                /// set the player's y-axis to the radar direction's z-axis.
+                /// </summary>
+                Quaternion player_rotation = _player_object.transform.rotation;
+                _direction_object.transform.rotation = Quaternion.Euler(0f, 0f, player_rotation.eulerAngles.y);
+            });
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
