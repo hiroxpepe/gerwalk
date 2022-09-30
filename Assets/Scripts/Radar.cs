@@ -33,6 +33,10 @@ namespace Studio.MeowToon {
 
         const int TARGETS_COUNT = 5;
 
+        const float TO_MIDDLE_VALUE = 0.5f;
+
+        const int ADJUSTED_VALUE = 10;
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
@@ -53,6 +57,15 @@ namespace Studio.MeowToon {
 
         [SerializeField]
         GameObject _direction_object;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Fields
+
+        float _fast_cycle = 0.25f;
+
+        float _slow_cycle = 1.0f;
+
+        float _time;
 
         ///////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -102,6 +115,14 @@ namespace Studio.MeowToon {
         /// get target positions.
         /// </summary>
         void mapTargetPositionsToRadar(bool create = false) {
+
+            // add the time.
+            _time += Time.deltaTime;
+
+            // get the value that repeats in cycle.
+            var fast_repeat_value = Mathf.Repeat(_time, _fast_cycle);
+            var slow_repeat_value = Mathf.Repeat(_time, _slow_cycle);
+
             // reset target mark.
             if (!create) {
                 for (int reset_idx = 1; reset_idx < TARGETS_COUNT + 1; reset_idx++) {
@@ -112,7 +133,7 @@ namespace Studio.MeowToon {
             // set target mark.
             int idx = 1;
             foreach (Transform target_transform in _targets_object.transform) {
-                var position = target_transform.position;
+                Vector3 position = target_transform.position;
                 GameObject target_mark = new();
                 if (create) {
                     // create target mark.
@@ -128,6 +149,14 @@ namespace Studio.MeowToon {
                 // map positions to radar.
                 target_mark.transform.localPosition = new Vector3(target_position.x * RANGE, target_position.z * RANGE, 0);
                 target_mark.GetImage().enabled = true;
+
+                // higher altitude targets blink slowly, and lower altitude targets blink faster.
+                Vector3 player_position = _player_object.transform.position;
+                if (position.y < player_position.y - ADJUSTED_VALUE) {
+                    target_mark.GetImage().enabled = fast_repeat_value >= _fast_cycle * TO_MIDDLE_VALUE;
+                } else if (position.y > player_position.y + ADJUSTED_VALUE) {
+                    target_mark.GetImage().enabled = slow_repeat_value >= _slow_cycle * TO_MIDDLE_VALUE;
+                }
                 idx++;
             }
         }
