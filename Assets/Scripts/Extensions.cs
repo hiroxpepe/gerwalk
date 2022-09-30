@@ -15,6 +15,7 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Studio.MeowToon {
     /// <summary>
@@ -189,6 +190,13 @@ namespace Studio.MeowToon {
         /// </summary>
         public static MeshRenderer GetMeshRenderer(this GameObject self) {
             return self.GetComponent<MeshRenderer>();
+        }
+
+        /// <summary>
+        /// get the Image object.
+        /// </summary>
+        public static Image GetImage(this GameObject self) {
+            return self.GetComponent<Image>();
         }
 
         /// <summary>
