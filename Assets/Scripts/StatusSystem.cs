@@ -77,6 +77,9 @@ namespace Studio.MeowToon {
         [SerializeField]
         Text _debug_text;
 
+        [SerializeField]
+        Text _lift_spoiler_text;
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives] 
 

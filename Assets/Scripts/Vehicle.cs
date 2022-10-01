@@ -75,6 +75,8 @@ namespace Studio.MeowToon {
 
         float _vertical_speed = 0f;
 
+        bool _use_lift_spoiler = false;
+
         Action _onGainEnergy;
 
         Action _onLoseEnergy;
@@ -112,6 +114,11 @@ namespace Studio.MeowToon {
         /// </remarks>
         public float flightEnergy { get => _energy.total; }
 
+        /// <summary>
+        /// use or not use lift spoiler.
+        /// </summary>
+        public bool useLiftSpoiler { get => _use_lift_spoiler; }
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Events [verb, verb phrase]
 
@@ -135,7 +142,7 @@ namespace Studio.MeowToon {
         new void Start() {
             base.Start();
 
-            const float POWER = 12.0f;
+            const float ACTION_POWER = 12.0f;
 
             /// <remarks>
             /// fRigidbody should be only used in FixedUpdate.
@@ -178,7 +185,7 @@ namespace Studio.MeowToon {
             });
 
             this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.walk && _acceleration.canWalk).Subscribe(_ => {
-                rb.AddFor​​ce(transform.forward * POWER * 7.5f, ForceMode.Acceleration);
+                rb.AddFor​​ce(transform.forward * ACTION_POWER * 7.5f, ForceMode.Acceleration);
                 _do_fixed_update.CancelWalk();
             });
 
@@ -191,7 +198,7 @@ namespace Studio.MeowToon {
             });
 
             this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.run && _acceleration.canRun).Subscribe(_ => {
-                rb.AddFor​​ce(transform.forward * POWER * 7.5f, ForceMode.Acceleration);
+                rb.AddFor​​ce(transform.forward * ACTION_POWER * 7.5f, ForceMode.Acceleration);
                 _do_fixed_update.CancelRun();
             });
 
@@ -204,7 +211,7 @@ namespace Studio.MeowToon {
             });
 
             this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.backward && _acceleration.canBackward).Subscribe(_ => {
-                rb.AddFor​​ce(-transform.forward * POWER * 7.5f, ForceMode.Acceleration);
+                rb.AddFor​​ce(-transform.forward * ACTION_POWER * 7.5f, ForceMode.Acceleration);
                 _do_fixed_update.CancelBackward();
             });
 
@@ -219,7 +226,7 @@ namespace Studio.MeowToon {
 
             this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.jump).Subscribe(_ => {
                 rb.useGravity = true;
-                rb.AddRelativeFor​​ce(up * _jump_power * POWER * 2, ForceMode.Acceleration);
+                rb.AddRelativeFor​​ce(up * _jump_power * ACTION_POWER * 2, ForceMode.Acceleration);
                 _do_fixed_update.CancelJump();
             });
 
@@ -257,11 +264,18 @@ namespace Studio.MeowToon {
             });
 
             /// <summary>
+            /// use or not use lift spoiler.
+            /// </summary>
+            this.UpdateAsObservable().Where(_ => _a_button.wasPressedThisFrame && !_do_update.grounded).Subscribe(_ => {
+                _use_lift_spoiler = !_use_lift_spoiler;
+            });
+
+            /// <summary>
             /// rotate(yaw).
             /// </summary>
             this.UpdateAsObservable().Where(_ => _do_update.grounded).Subscribe(_ => {
                 var axis = _right_button.isPressed ? 1 : _left_button.isPressed ? -1 : 0;
-                transform.Rotate(0, axis * (_rotational_speed * Time.deltaTime) * POWER, 0);
+                transform.Rotate(0, axis * (_rotational_speed * Time.deltaTime) * ACTION_POWER, 0);
             });
 
             /// <summary>
@@ -269,7 +283,7 @@ namespace Studio.MeowToon {
             /// </summary>
             this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_up_button.isPressed || _down_button.isPressed)).Subscribe(_ => {
                 var axis = _up_button.isPressed ? 1 : _down_button.isPressed ? -1 : 0;
-                transform.Rotate(axis * (_pitch_speed * Time.deltaTime) * POWER, 0, 0);
+                transform.Rotate(axis * (_pitch_speed * Time.deltaTime) * ACTION_POWER, 0, 0);
             });
 
             /// <summary>
@@ -277,9 +291,9 @@ namespace Studio.MeowToon {
             /// </summary>
             this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_left_button.isPressed || _right_button.isPressed)).Subscribe(_ => {
                 var axis = _left_button.isPressed ? 1 : _right_button.isPressed ? -1 : 0;
-                transform.Rotate(0, 0, axis * (_roll_speed * Time.deltaTime) * POWER);
+                transform.Rotate(0, 0, axis * (_roll_speed * Time.deltaTime) * ACTION_POWER);
                 axis = _right_button.isPressed ? 1 : _left_button.isPressed ? -1 : 0;
-                transform.Rotate(0, axis * (_roll_speed * Time.deltaTime) * POWER, 0);
+                transform.Rotate(0, axis * (_roll_speed * Time.deltaTime) * ACTION_POWER, 0);
             });
 
             this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_left_button.wasReleasedThisFrame || _right_button.wasReleasedThisFrame)).Subscribe(_ => {
@@ -452,8 +466,8 @@ namespace Studio.MeowToon {
             float target_height = target.GetRenderer().bounds.size.y;
             float target_y = target.transform.position.y;
             float target_top = target_height + target_y;
-            var y = transform.position.y;
-            if (y < (target_top - ADJUST)) {
+            var position_y = transform.position.y;
+            if (position_y < (target_top - ADJUST)) {
                 return true;
             }
             else {
@@ -656,6 +670,11 @@ namespace Studio.MeowToon {
 
         class Energy {
 
+            ///////////////////////////////////////////////////////////////////////////////////////////////
+            // Constants
+
+            const float POWAR_FACTOR_VALUE = 1.5f; // easy: 1.0f, normal: 1.5f , hard: 2.0f
+
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Fields [noun, adjectives] 
 
@@ -681,16 +700,16 @@ namespace Studio.MeowToon {
                     const float AUTO_FLARE_ALTITUDE = 8.0f;
                     if (total > _threshold /*|| flightTime > 3.0f*/) {
                         if (_previous_altitudes.Peek() < _altitude) { // up
-                            _fly_power -= 0.0009375f;
+                            _fly_power -= 0.0009375f * POWAR_FACTOR_VALUE;
                         }
                         if (_previous_altitudes.Peek() > _altitude) { // down
-                            _fly_power += 0.0009375f;
+                            _fly_power += 0.0009375f * POWAR_FACTOR_VALUE;
                         }
                     }
                     if (total <= _threshold && _altitude < AUTO_FLARE_ALTITUDE) {
                         _fly_power = _default_fly_power;
                     }
-                    var result = _fly_power * 2.65f;
+                    var result = _fly_power * 2.65f * POWAR_FACTOR_VALUE;
                     return result < 0 ? 0 : result;
                 }
             }
@@ -766,11 +785,11 @@ namespace Studio.MeowToon {
             // public Methods [verb]
 
             public void Gain() {
-                _fly_power += 0.125f;
+                _fly_power += 0.125f * POWAR_FACTOR_VALUE; ;
             }
 
             public void Lose() {
-                _fly_power -= 0.125f;
+                _fly_power -= 0.125f * POWAR_FACTOR_VALUE; ;
             }
         }
 
