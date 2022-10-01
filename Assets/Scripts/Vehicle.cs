@@ -75,6 +75,10 @@ namespace Studio.MeowToon {
 
         float _vertical_speed = 0f;
 
+        Action _onGainEnergy;
+
+        Action _onLoseEnergy;
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjectives] 
 
@@ -107,6 +111,13 @@ namespace Studio.MeowToon {
         /// for development.
         /// </remarks>
         public float flightEnergy { get => _energy.total; }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // public Events [verb, verb phrase]
+
+        public event Action OnGainEnergy { add => _onGainEnergy += value; remove => _onGainEnergy -= value; }
+
+        public event Action OnLoseEnergy { add => _onLoseEnergy += value; remove => _onLoseEnergy -= value; }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -233,7 +244,7 @@ namespace Studio.MeowToon {
             /// gain energy.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _b_button.wasPressedThisFrame && !_do_update.grounded && _status_system.usePoint).Subscribe(_ => {
-                _status_system.DecrementPoints(); // spend coins.
+                _onGainEnergy();
                 _energy.Gain();
             });
 
@@ -241,7 +252,7 @@ namespace Studio.MeowToon {
             /// lose energy.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _y_button.wasPressedThisFrame && !_do_update.grounded && _status_system.usePoint).Subscribe(_ => {
-                _status_system.DecrementPoints(); // spend coins.
+                _onLoseEnergy();
                 _energy.Lose();
             });
 

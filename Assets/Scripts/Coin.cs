@@ -13,6 +13,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using System;
 using System.Linq;
 using UniRx;
 using UniRx.Triggers;
@@ -28,17 +29,15 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives] 
 
-        StatusSystem _status_system;
+        Action _onDestroy;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // public Events [verb, verb phrase]
+
+        public event Action OnDestroy { add => _onDestroy += value; remove => _onDestroy -= value; }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
-
-        // Awake is called when the script instance is being loaded.
-        new void Awake() {
-            base.Awake();
-
-            _status_system = gameObject.GetStatusSystem();
-        }
 
         // Start is called before the first frame update.
         new void Start() {
@@ -48,7 +47,7 @@ namespace Studio.MeowToon {
             /// wwhen being touched vehicle.
             /// </summary>
             this.OnCollisionEnterAsObservable().Where(x => x.LikeVehicle()).Subscribe(x => {
-                _status_system.IncrementPoints();
+                _onDestroy();
                 Destroy(gameObject);
             });
         }

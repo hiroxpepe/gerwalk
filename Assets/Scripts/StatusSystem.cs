@@ -144,6 +144,21 @@ namespace Studio.MeowToon {
         // Awake is called when the script instance is being loaded.
         void Awake() {
             _vehicle_object = gameObject.GetVehicleGameObject();
+            var vehicle = _vehicle_object.GetVehicle();
+
+            /// <summary>
+            /// spend points.
+            /// </summary>
+            vehicle.OnGainEnergy += () => {
+                DecrementPoints();
+            };
+
+            /// <summary>
+            /// spend points.
+            /// </summary>
+            vehicle.OnLoseEnergy += () => {
+                DecrementPoints();
+            };
         }
 
         // Start is called before the first frame update
