@@ -241,8 +241,13 @@ namespace Studio.MeowToon {
             });
 
             this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.fly).Subscribe(_ => {
+                const float FALL_VALUE = 5.0f; // 5.0 -> -5m/s
                 rb.useGravity = false;
                 rb.velocity = transform.forward * _energy.power;
+                if (_use_lift_spoiler) {
+                    var velocity = rb.velocity;
+                    rb.velocity = new Vector3(velocity.x, velocity.y - FALL_VALUE, velocity.z);
+                }
                 _do_fixed_update.CancelFly();
                 _flight_stopwatch.Start();
             });
@@ -340,6 +345,9 @@ namespace Studio.MeowToon {
                 Vector3 angle = transform.eulerAngles;
                 angle.x = angle.z = 0f;
                 transform.eulerAngles = angle;
+
+                // reset lift spoiler.
+                _use_lift_spoiler = false;
 
                 // reset fly power.
                 _energy.hasLanded = true;

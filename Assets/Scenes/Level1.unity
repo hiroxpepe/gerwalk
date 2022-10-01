@@ -3626,7 +3626,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Lift Spoiler: OFF'
+  m_Text: 'Spoiler: OFF'
 --- !u!222 &740603327
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4636,11 +4636,11 @@ MonoBehaviour:
   _air_speed_text: {fileID: 1002546078}
   _vertical_speed_text: {fileID: 1006831465}
   _altitude_text: {fileID: 649635140}
+  _lift_spoiler_text: {fileID: 740603326}
   _energy_text: {fileID: 1005808904}
   _power_text: {fileID: 937434671}
   _flight_text: {fileID: 268134221}
   _debug_text: {fileID: 402693588}
-  _lift_spoiler_text: {fileID: 740603326}
 --- !u!4 &1064631116
 Transform:
   m_ObjectHideFlags: 0
