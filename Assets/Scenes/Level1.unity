@@ -1400,8 +1400,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 429114643}
-  m_RootOrder: 6
+  m_Father: {fileID: 597998452}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1780,7 +1780,7 @@ GameObject:
   - component: {fileID: 331827359}
   - component: {fileID: 331827360}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: Vehicle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1934,7 +1934,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 597998452}
-  m_RootOrder: 3
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -2017,7 +2017,6 @@ RectTransform:
   - {fileID: 1006831464}
   - {fileID: 1005808906}
   - {fileID: 937434670}
-  - {fileID: 268134219}
   m_Father: {fileID: 597998452}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2278,7 +2277,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d4d6a300f14fe54bb14118ad5240fd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _player_object: {fileID: 331827354}
   _long_needle_object: {fileID: 1626747905}
   _short_needle_object: {fileID: 1972620261}
 --- !u!1 &492267920
@@ -2572,7 +2570,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5302917b30bc234593a2740746d597d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _player_object: {fileID: 331827354}
   _home_object: {fileID: 315029161}
   _home_mark_object: {fileID: 2130387294}
   _targets_object: {fileID: 744581400}
@@ -2890,6 +2887,8 @@ RectTransform:
   m_Children:
   - {fileID: 429114643}
   - {fileID: 855029983}
+  - {fileID: 268134219}
+  - {fileID: 740603325}
   - {fileID: 1317867696}
   - {fileID: 402693587}
   m_Father: {fileID: 492267924}
@@ -3556,6 +3555,86 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: POINT
+--- !u!1 &740603324
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 740603325}
+  - component: {fileID: 740603327}
+  - component: {fileID: 740603326}
+  m_Layer: 5
+  m_Name: LiftSpoiler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &740603325
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740603324}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 597998452}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 23.0921, y: 406.77637}
+  m_SizeDelta: {x: 480, y: 60}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &740603326
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740603324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: 0c6375fa622c8894f9bb66ef0a63a2f0, type: 3}
+    m_FontSize: 50
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 2
+    m_MaxSize: 50
+    m_Alignment: 3
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: 'Lift Spoiler: OFF'
+--- !u!222 &740603327
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740603324}
+  m_CullTransparentMesh: 1
 --- !u!1 &744581400
 GameObject:
   m_ObjectHideFlags: 0
@@ -3683,7 +3762,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1231e6ac32ec5dd4fa7bb124a79a3526, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _player_object: {fileID: 331827354}
   _needle_object: {fileID: 1651375468}
 --- !u!1 &795494569
 GameObject:
@@ -4562,7 +4640,7 @@ MonoBehaviour:
   _power_text: {fileID: 937434671}
   _flight_text: {fileID: 268134221}
   _debug_text: {fileID: 402693588}
-  _player_object: {fileID: 331827354}
+  _lift_spoiler_text: {fileID: 740603326}
 --- !u!4 &1064631116
 Transform:
   m_ObjectHideFlags: 0
@@ -5099,7 +5177,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 597998452}
-  m_RootOrder: 2
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -6661,7 +6739,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cd7f71177eb55b4aa2f2f145dcece5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _player_object: {fileID: 331827354}
   _needle_object: {fileID: 146417780}
 --- !u!1 &1874619763
 GameObject:

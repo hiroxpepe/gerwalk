@@ -13,6 +13,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using System;
+using System.Linq;
+using UniRx;
+using UniRx.Triggers;
+
 namespace Studio.MeowToon {
     /// <summary>
     /// item class
@@ -20,5 +25,31 @@ namespace Studio.MeowToon {
     /// </summary>
     public class Coin : Common {
 #nullable enable
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Fields [noun, adjectives] 
+
+        Action _onDestroy;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // public Events [verb, verb phrase]
+
+        public event Action OnDestroy { add => _onDestroy += value; remove => _onDestroy -= value; }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // update Methods
+
+        // Start is called before the first frame update.
+        new void Start() {
+            base.Start();
+
+            /// <summary>
+            /// wwhen being touched vehicle.
+            /// </summary>
+            this.OnCollisionEnterAsObservable().Where(x => x.LikeVehicle()).Subscribe(x => {
+                _onDestroy();
+                Destroy(gameObject);
+            });
+        }
     }
 }

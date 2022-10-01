@@ -20,13 +20,13 @@ using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
-    /// player controller.
+    /// balloon controller.
     /// @author h.adachi
     /// </summary>
     public class Balloon : MonoBehaviour {
 #nullable enable
 
-        ///////////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
         [SerializeField]
@@ -44,17 +44,7 @@ namespace Studio.MeowToon {
 
         DoFixedUpdate _do_fixed_update;
 
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        // public Methods [verb]
-
-        /// <summary>
-        /// scatter items before die.
-        /// </summary>
-        public void DestroyWithItems(Transform bullet, int numberOfPiece = 8) {
-            if (_destroyable) {
-                _do_fixed_update.explode = true;
-            }
-        }
+        StatusSystem _status_system;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -63,6 +53,7 @@ namespace Studio.MeowToon {
         void Awake() {
             _do_fixed_update = DoFixedUpdate.getInstance();
             _explode_param = ExplodeParam.getDefaultInstance();
+            _status_system = gameObject.GetStatusSystem();
             initializePiece();
         }
 
@@ -82,10 +73,26 @@ namespace Studio.MeowToon {
                     Destroy(gameObject); // delete myself
                 }
             });
+
+            /// <summary>
+            /// wwhen being touched vehicle.
+            /// </summary>
+            this.OnCollisionEnterAsObservable().Where(x => x.LikeVehicle()).Subscribe(x => {
+                destroyWithItems(x.transform);
+            });
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // private Methods [verb]
+
+        /// <summary>
+        /// scatter items before destroy.
+        /// </summary>
+        void destroyWithItems(Transform bullet, int numberOfPiece = 8) {
+            if (_destroyable) {
+                _do_fixed_update.explode = true;
+            }
+        }
 
         /// <summary>
         /// initialize pieces.
@@ -95,6 +102,10 @@ namespace Studio.MeowToon {
             var scale = _explode_param.scale;
             for (var i = 0; i < number; i++) {
                 var piece = Instantiate(_item_object);
+                var coin = piece.GetCoin();
+                coin.OnDestroy += () => {
+                    _status_system.IncrementPoints();
+                };
                 var position = transform.position;
                 var shift = i % 4;
                 piece.transform.position = new Vector3( // set shifted position.
@@ -157,7 +168,7 @@ namespace Studio.MeowToon {
 
             bool _explode;
 
-            ///////////////////////////////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjectives] 
 
             public bool explode { get => _explode; set => _explode = value; }

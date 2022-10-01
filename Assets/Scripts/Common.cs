@@ -56,14 +56,6 @@ namespace Studio.MeowToon {
             } 
         }
 
-        /// <summary>
-        /// random number of seconds to remove automatically.
-        /// </summary>
-        float getRandomLimit(float limit) {
-            var random = new System.Random();
-            return random.Next(2, (int) limit * 25); // from 2 seconds to (limit * 25) seconds.
-        }
-
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
 
@@ -89,6 +81,14 @@ namespace Studio.MeowToon {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // private Methods [verb]
+
+        /// <summary>
+        /// random number of seconds to remove automatically.
+        /// </summary>
+        float getRandomLimit(float limit) {
+            var random = new System.Random();
+            return random.Next(2, (int)limit * 25); // from 2 seconds to (limit * 25) seconds.
+        }
 
         /// <summary>
         /// automatically delete myself.

@@ -26,19 +26,30 @@ namespace Studio.MeowToon {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
+        // Constants
 
-        [SerializeField]
-        GameObject _player_object;
+        /// <summary>
+        /// number to divide the circle.
+        /// </summary>
+        const int DIVIDE_CIRCLE = 200;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
         [SerializeField]
         GameObject _needle_object;
 
-        ///////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Fields [noun, adjectives]
+
+        GameObject _vehicle_object;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
+            _vehicle_object = gameObject.GetVehicleGameObject();
         }
 
         // Start is called before the first frame update.
@@ -46,14 +57,15 @@ namespace Studio.MeowToon {
             // Update is called once per frame.
             this.UpdateAsObservable().Subscribe(_ => {
             });
-        }
 
-        // LateUpdate is called after all Update functions have been called.
-        void LateUpdate() {
-            /// <remarks>
-            /// set speed.
-            /// </remarks>
-            _needle_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (200 / _player_object.GetPlayer().flightSpeed)));
+            // LateUpdate is called after all Update functions have been called.
+            this.LateUpdateAsObservable().Subscribe(_ => {
+                /// <summary>
+                /// set speed.
+                /// </summary>
+                _needle_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (DIVIDE_CIRCLE / _vehicle_object.GetVehicle().flightSpeed)));
+                
+            });
         }
     }
 }

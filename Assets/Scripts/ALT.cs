@@ -26,10 +26,16 @@ namespace Studio.MeowToon {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
+        // Constants
 
-        [SerializeField]
-        GameObject _player_object;
+        /// <summary>
+        /// number to divide the circle.
+        /// </summary>
+        const int DIVIDE_CIRCLE_LONG = 100;
+        const int DIVIDE_CIRCLE_SHORT = 1000;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
         [SerializeField]
         GameObject _long_needle_object;
@@ -37,11 +43,17 @@ namespace Studio.MeowToon {
         [SerializeField]
         GameObject _short_needle_object;
 
-        ///////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Fields [noun, adjectives]
+
+        GameObject _vehicle_object;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
+            _vehicle_object = gameObject.GetVehicleGameObject();
         }
 
         // Start is called before the first frame update.
@@ -49,16 +61,16 @@ namespace Studio.MeowToon {
             // Update is called once per frame.
             this.UpdateAsObservable().Subscribe(_ => {
             });
-        }
 
-        // LateUpdate is called after all Update functions have been called.
-        void LateUpdate() {
-            /// <remarks>
-            /// set altitude.
-            /// </remarks>
-            float altitude = _player_object.transform.position.y - 0.5f; // 0.5 is half player height.
-            _long_needle_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (100 / altitude)));
-            _short_needle_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (1000 / altitude)));
+            // LateUpdate is called after all Update functions have been called.
+            this.LateUpdateAsObservable().Subscribe(_ => {
+                /// <summary>
+                /// set altitude.
+                /// </summary>
+                float altitude = _vehicle_object.transform.position.y - 0.5f; // 0.5 is half vehicle height.
+                _long_needle_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (DIVIDE_CIRCLE_LONG / altitude)));
+                _short_needle_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (DIVIDE_CIRCLE_SHORT / altitude)));
+            });
         }
     }
 }

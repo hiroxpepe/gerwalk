@@ -22,13 +22,13 @@ using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
-    /// player controller.
+    /// vehicle controller.
     /// @author h.adachi
     /// </summary>
-    public class Player : GamepadMaper {
+    public class Vehicle : GamepadMaper {
 #nullable enable
 
-        ///////////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
         [SerializeField]
@@ -58,7 +58,7 @@ namespace Studio.MeowToon {
         [SerializeField]
         SimpleAnimation _simple_anime;
 
-        ///////////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives] 
 
         StatusSystem _status_system;
@@ -75,20 +75,26 @@ namespace Studio.MeowToon {
 
         float _vertical_speed = 0f;
 
+        bool _use_lift_spoiler = false;
+
+        Action _onGainEnergy;
+
+        Action _onLoseEnergy;
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjectives] 
 
         /// <summary>
-        /// current speed of the player object to fly.
+        /// current speed of the vehicle object to fly.
         /// </summary>
         public float flightSpeed { get => _energy.speed; }
 
-        /// current vertical speed of the player object to fly.
+        /// current vertical speed of the vehicle object to fly.
         /// </summary>
         public float flightVerticalSpeed { get => _vertical_speed; }
 
         /// <summary>
-        /// current power of the player object to fly.
+        /// current power of the vehicle object to fly.
         /// </summary>
         public float flightPower { get => _energy.power; }
 
@@ -108,7 +114,19 @@ namespace Studio.MeowToon {
         /// </remarks>
         public float flightEnergy { get => _energy.total; }
 
-        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// use or not use lift spoiler.
+        /// </summary>
+        public bool useLiftSpoiler { get => _use_lift_spoiler; }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // public Events [verb, verb phrase]
+
+        public event Action OnGainEnergy { add => _onGainEnergy += value; remove => _onGainEnergy -= value; }
+
+        public event Action OnLoseEnergy { add => _onLoseEnergy += value; remove => _onLoseEnergy -= value; }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
 
         // Awake is called when the script instance is being loaded.
@@ -124,7 +142,7 @@ namespace Studio.MeowToon {
         new void Start() {
             base.Start();
 
-            const float POWER = 12.0f;
+            const float ACTION_POWER = 12.0f;
 
             /// <remarks>
             /// fRigidbody should be only used in FixedUpdate.
@@ -137,7 +155,7 @@ namespace Studio.MeowToon {
                 _acceleration.currentSpeed = rb.velocity.magnitude; // get speed.
             });
 
-            // get player speed for fly.
+            // get vehicle speed for fly.
             Vector3 prev_position = transform.position;
             float air_speed = 0f;
             this.FixedUpdateAsObservable().Where(_ => !Mathf.Approximately(Time.deltaTime, 0)).Subscribe(_ => {
@@ -167,7 +185,7 @@ namespace Studio.MeowToon {
             });
 
             this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.walk && _acceleration.canWalk).Subscribe(_ => {
-                rb.AddFor​​ce(transform.forward * POWER * 7.5f, ForceMode.Acceleration);
+                rb.AddFor​​ce(transform.forward * ACTION_POWER * 7.5f, ForceMode.Acceleration);
                 _do_fixed_update.CancelWalk();
             });
 
@@ -180,7 +198,7 @@ namespace Studio.MeowToon {
             });
 
             this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.run && _acceleration.canRun).Subscribe(_ => {
-                rb.AddFor​​ce(transform.forward * POWER * 7.5f, ForceMode.Acceleration);
+                rb.AddFor​​ce(transform.forward * ACTION_POWER * 7.5f, ForceMode.Acceleration);
                 _do_fixed_update.CancelRun();
             });
 
@@ -193,7 +211,7 @@ namespace Studio.MeowToon {
             });
 
             this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.backward && _acceleration.canBackward).Subscribe(_ => {
-                rb.AddFor​​ce(-transform.forward * POWER * 7.5f, ForceMode.Acceleration);
+                rb.AddFor​​ce(-transform.forward * ACTION_POWER * 7.5f, ForceMode.Acceleration);
                 _do_fixed_update.CancelBackward();
             });
 
@@ -208,7 +226,7 @@ namespace Studio.MeowToon {
 
             this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.jump).Subscribe(_ => {
                 rb.useGravity = true;
-                rb.AddRelativeFor​​ce(up * _jump_power * POWER * 2, ForceMode.Acceleration);
+                rb.AddRelativeFor​​ce(up * _jump_power * ACTION_POWER * 2, ForceMode.Acceleration);
                 _do_fixed_update.CancelJump();
             });
 
@@ -217,7 +235,7 @@ namespace Studio.MeowToon {
             /// </summary>
             this.UpdateAsObservable().Where(_ => !_do_update.grounded).Subscribe(_ => {
                 _energy.speed = air_speed;
-                _energy.altitude = transform.position.y - 0.5f; // 0.5 is half player height.
+                _energy.altitude = transform.position.y - 0.5f; // 0.5 is half vehicle height.
                 _energy.flightTime = flightTime;
                 _do_fixed_update.ApplyFly();
             });
@@ -233,7 +251,7 @@ namespace Studio.MeowToon {
             /// gain energy.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _b_button.wasPressedThisFrame && !_do_update.grounded && _status_system.usePoint).Subscribe(_ => {
-                _status_system.DecrementPoints(); // spend coins.
+                _onGainEnergy();
                 _energy.Gain();
             });
 
@@ -241,8 +259,15 @@ namespace Studio.MeowToon {
             /// lose energy.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _y_button.wasPressedThisFrame && !_do_update.grounded && _status_system.usePoint).Subscribe(_ => {
-                _status_system.DecrementPoints(); // spend coins.
+                _onLoseEnergy();
                 _energy.Lose();
+            });
+
+            /// <summary>
+            /// use or not use lift spoiler.
+            /// </summary>
+            this.UpdateAsObservable().Where(_ => _a_button.wasPressedThisFrame && !_do_update.grounded).Subscribe(_ => {
+                _use_lift_spoiler = !_use_lift_spoiler;
             });
 
             /// <summary>
@@ -250,7 +275,7 @@ namespace Studio.MeowToon {
             /// </summary>
             this.UpdateAsObservable().Where(_ => _do_update.grounded).Subscribe(_ => {
                 var axis = _right_button.isPressed ? 1 : _left_button.isPressed ? -1 : 0;
-                transform.Rotate(0, axis * (_rotational_speed * Time.deltaTime) * POWER, 0);
+                transform.Rotate(0, axis * (_rotational_speed * Time.deltaTime) * ACTION_POWER, 0);
             });
 
             /// <summary>
@@ -258,7 +283,7 @@ namespace Studio.MeowToon {
             /// </summary>
             this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_up_button.isPressed || _down_button.isPressed)).Subscribe(_ => {
                 var axis = _up_button.isPressed ? 1 : _down_button.isPressed ? -1 : 0;
-                transform.Rotate(axis * (_pitch_speed * Time.deltaTime) * POWER, 0, 0);
+                transform.Rotate(axis * (_pitch_speed * Time.deltaTime) * ACTION_POWER, 0, 0);
             });
 
             /// <summary>
@@ -266,9 +291,9 @@ namespace Studio.MeowToon {
             /// </summary>
             this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_left_button.isPressed || _right_button.isPressed)).Subscribe(_ => {
                 var axis = _left_button.isPressed ? 1 : _right_button.isPressed ? -1 : 0;
-                transform.Rotate(0, 0, axis * (_roll_speed * Time.deltaTime) * POWER);
+                transform.Rotate(0, 0, axis * (_roll_speed * Time.deltaTime) * ACTION_POWER);
                 axis = _right_button.isPressed ? 1 : _left_button.isPressed ? -1 : 0;
-                transform.Rotate(0, axis * (_roll_speed * Time.deltaTime) * POWER, 0);
+                transform.Rotate(0, axis * (_roll_speed * Time.deltaTime) * ACTION_POWER, 0);
             });
 
             this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_left_button.wasReleasedThisFrame || _right_button.wasReleasedThisFrame)).Subscribe(_ => {
@@ -339,21 +364,6 @@ namespace Studio.MeowToon {
             this.OnCollisionExitAsObservable().Where(x => x.LikeBlock()).Subscribe(x => {
                 rb.useGravity = true;
             });
-
-            /// <summary>
-            /// when touching balloon.
-            /// </summary>
-            this.OnCollisionEnterAsObservable().Where(x => x.LikeBalloon()).Subscribe(x => {
-                x.gameObject.GetBalloon().DestroyWithItems(transform);
-            });
-
-            /// <summary>
-            /// when touching coin.
-            /// </summary>
-            this.OnCollisionEnterAsObservable().Where(x => x.LikeCoin()).Subscribe(x => {
-                _status_system.IncrementPoints(); // get coins.
-                Destroy(x.gameObject);
-            });
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -367,7 +377,7 @@ namespace Studio.MeowToon {
         }
 
         /// <summary>
-        /// move top when the player hits a block.
+        /// move top when the vehicle hits a block.
         /// </summary>
         void moveTop() {
             const float SPEED = 6.0f;
@@ -379,9 +389,9 @@ namespace Studio.MeowToon {
         }
 
         /// <summary>
-        /// move aside when the player hits a block.
+        /// move aside when the vehicle hits a block.
         /// </summary>
-        /// <param name="direction">the player's direction is provided.</param>
+        /// <param name="direction">the vehicle's direction is provided.</param>
         void moveLetfOrRight(Direction direction) {
             const float SPEED = 0.3f;
             Vector3 move_position = transform.position;
@@ -424,7 +434,7 @@ namespace Studio.MeowToon {
         }
 
         /// <summary>
-        /// returns an enum of the player's direction.
+        /// returns an enum of the vehicle's direction.
         /// </summary>
         Direction getDirection(Vector3 forwardVector) {
             var forward_x = (float) Math.Round(forwardVector.x);
@@ -456,8 +466,8 @@ namespace Studio.MeowToon {
             float target_height = target.GetRenderer().bounds.size.y;
             float target_y = target.transform.position.y;
             float target_top = target_height + target_y;
-            var y = transform.position.y;
-            if (y < (target_top - ADJUST)) {
+            var position_y = transform.position.y;
+            if (position_y < (target_top - ADJUST)) {
                 return true;
             }
             else {
@@ -660,7 +670,12 @@ namespace Studio.MeowToon {
 
         class Energy {
 
-            ///////////////////////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////////////////////////////
+            // Constants
+
+            const float POWAR_FACTOR_VALUE = 1.5f; // easy: 1.0f, normal: 1.5f , hard: 2.0f
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
             // Fields [noun, adjectives] 
 
             float _fly_power;
@@ -677,7 +692,7 @@ namespace Studio.MeowToon {
 
             float _flight_time;
 
-            ///////////////////////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjectives] 
 
             public float power {
@@ -685,16 +700,16 @@ namespace Studio.MeowToon {
                     const float AUTO_FLARE_ALTITUDE = 8.0f;
                     if (total > _threshold /*|| flightTime > 3.0f*/) {
                         if (_previous_altitudes.Peek() < _altitude) { // up
-                            _fly_power -= 0.0009375f;
+                            _fly_power -= 0.0009375f * POWAR_FACTOR_VALUE;
                         }
                         if (_previous_altitudes.Peek() > _altitude) { // down
-                            _fly_power += 0.0009375f;
+                            _fly_power += 0.0009375f * POWAR_FACTOR_VALUE;
                         }
                     }
                     if (total <= _threshold && _altitude < AUTO_FLARE_ALTITUDE) {
                         _fly_power = _default_fly_power;
                     }
-                    var result = _fly_power * 2.65f;
+                    var result = _fly_power * 2.65f * POWAR_FACTOR_VALUE;
                     return result < 0 ? 0 : result;
                 }
             }
@@ -748,7 +763,7 @@ namespace Studio.MeowToon {
                 }
             }
 
-            ///////////////////////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////////////////////////
             // Constructor
 
             /// <summary>
@@ -770,11 +785,11 @@ namespace Studio.MeowToon {
             // public Methods [verb]
 
             public void Gain() {
-                _fly_power += 0.125f;
+                _fly_power += 0.125f * POWAR_FACTOR_VALUE; ;
             }
 
             public void Lose() {
-                _fly_power -= 0.125f;
+                _fly_power -= 0.125f * POWAR_FACTOR_VALUE; ;
             }
         }
 

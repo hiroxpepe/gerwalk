@@ -118,120 +118,138 @@ namespace Studio.MeowToon {
             return self.gameObject.name.Contains("Coin");
         }
 
+        /// <summary>
+        /// whether the Collision's name contains "Vehicle".
+        /// </summary>
+        public static bool LikeVehicle(this Collision self) {
+            return self.gameObject.name.Contains("Vehicle");
+        }
+
         #endregion
 
-        #region get the object.
+        #region get the gameObject.
 
         /// <summary>
-        /// get the Collider object.
+        /// get the "Vehicle" gameObject.
+        /// </summary>
+        public static GameObject GetVehicleGameObject(this GameObject self) {
+            return GameObject.Find("Vehicle");
+        }
+
+        #endregion
+
+        #region get the component.
+
+        /// <summary>
+        /// get the Collider component.
         /// </summary>
         public static Collider GetCollider(this GameObject self) {
             return self.GetComponent<Collider>();
         }
 
         /// <summary>
-        /// get the BoxCollider object.
+        /// get the BoxCollider component.
         /// </summary>
         public static BoxCollider GetBoxCollider(this GameObject self) {
             return self.GetComponent<BoxCollider>();
         }
 
         /// <summary>
-        /// get the CapsuleCollider object.
+        /// get the CapsuleCollider component.
         /// </summary>
         public static CapsuleCollider GetCapsuleCollider(this GameObject self) {
             return self.GetComponent<CapsuleCollider>();
         }
 
         /// <summary>
-        /// get the SphereCollider object.
+        /// get the SphereCollider component.
         /// </summary>
         public static SphereCollider GetSphereCollider(this GameObject self) {
             return self.GetComponent<SphereCollider>();
         }
 
         /// <summary>
-        /// get the Rigidbody object.
+        /// get the Rigidbody component.
         /// </summary>
         public static Rigidbody GetRigidbody(this GameObject self) {
             return self.GetComponent<Rigidbody>();
         }
 
         /// <summary>
-        /// get the Rigidbody object.
+        /// get the Rigidbody component.
         /// </summary>
         public static Rigidbody GetRigidbody(this Transform self) {
             return self.GetComponent<Rigidbody>();
         }
 
         /// <summary>
-        /// add a Rigidbody object.
+        /// add a Rigidbody component.
         /// </summary>
         public static Rigidbody AddRigidbody(this GameObject self) {
             return self.AddComponent<Rigidbody>();
         }
 
         /// <summary>
-        /// add a Rigidbody object.
+        /// add a Rigidbody component.
         /// </summary>
         public static Rigidbody AddRigidbody(this Transform self) {
             return self.gameObject.AddComponent<Rigidbody>();
         }
 
         /// <summary>
-        /// get the Renderer object.
+        /// get the Renderer component.
         /// </summary>
         public static Renderer GetRenderer(this GameObject self) {
             return self.GetComponent<Renderer>();
         }
 
         /// <summary>
-        /// get the MeshRenderer object.
+        /// get the MeshRenderer component.
         /// </summary>
         public static MeshRenderer GetMeshRenderer(this GameObject self) {
             return self.GetComponent<MeshRenderer>();
         }
 
         /// <summary>
-        /// get the Image object.
+        /// get the Image component.
         /// </summary>
         public static Image GetImage(this GameObject self) {
             return self.GetComponent<Image>();
         }
 
         /// <summary>
-        /// get the RectTransform object.
+        /// get the RectTransform component.
         /// </summary>
         public static RectTransform GetRectTransform(this GameObject self) {
             return self.GetComponent<RectTransform>();
         }
 
         /// <summary>
-        /// get Transform objects.
+        /// get the Transform component.
         /// </summary>
         public static IEnumerable<Transform> GetTransformsInChildren(this GameObject self) {
             return self.GetComponentsInChildren<Transform>();
         }
 
         /// <summary>
-        /// get CameraSystem component.
+        /// get the CameraSystem component.
         /// </summary>
         public static CameraSystem GetCameraSystem(this GameObject self) {
             return GameObject.Find("CameraSystem").GetComponent<CameraSystem>();
         }
 
         /// <summary>
-        /// get StatusSystem component.
+        /// get the StatusSystem component.
         /// </summary>
         public static StatusSystem GetStatusSystem(this GameObject self) {
             return GameObject.Find("StatusSystem").GetComponent<StatusSystem>();
         }
 
         /// <summary>
-        /// get the Player component.
+        /// get the Vehicle component.
         /// </summary>
-        public static Player GetPlayer(this GameObject self) {
-            return self.GetComponent<Player>();
+        public static Vehicle GetVehicle(this GameObject self) {
+            return self.GetComponent<Vehicle>();
         }
 
         /// <summary>
