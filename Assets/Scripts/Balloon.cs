@@ -45,18 +45,6 @@ namespace Studio.MeowToon {
         DoFixedUpdate _do_fixed_update;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // public Methods [verb]
-
-        /// <summary>
-        /// scatter items before die.
-        /// </summary>
-        public void DestroyWithItems(Transform bullet, int numberOfPiece = 8) {
-            if (_destroyable) {
-                _do_fixed_update.explode = true;
-            }
-        }
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
 
         // Awake is called when the script instance is being loaded.
@@ -82,10 +70,26 @@ namespace Studio.MeowToon {
                     Destroy(gameObject); // delete myself
                 }
             });
+
+            /// <summary>
+            /// wwhen being touched vehicle.
+            /// </summary>
+            this.OnCollisionEnterAsObservable().Where(x => x.LikeVehicle()).Subscribe(x => {
+                destroyWithItems(x.transform);
+            });
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // private Methods [verb]
+
+        /// <summary>
+        /// scatter items before destroy.
+        /// </summary>
+        void destroyWithItems(Transform bullet, int numberOfPiece = 8) {
+            if (_destroyable) {
+                _do_fixed_update.explode = true;
+            }
+        }
 
         /// <summary>
         /// initialize pieces.

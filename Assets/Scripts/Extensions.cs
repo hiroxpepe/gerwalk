@@ -118,6 +118,13 @@ namespace Studio.MeowToon {
             return self.gameObject.name.Contains("Coin");
         }
 
+        /// <summary>
+        /// whether the Collision's name contains "Vehicle".
+        /// </summary>
+        public static bool LikeVehicle(this Collision self) {
+            return self.gameObject.name.Contains("Vehicle");
+        }
+
         #endregion
 
         #region get the gameObject.

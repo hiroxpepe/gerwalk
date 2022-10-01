@@ -13,6 +13,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using System.Linq;
+using UniRx;
+using UniRx.Triggers;
+
 namespace Studio.MeowToon {
     /// <summary>
     /// item class
@@ -20,5 +24,33 @@ namespace Studio.MeowToon {
     /// </summary>
     public class Coin : Common {
 #nullable enable
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Fields [noun, adjectives] 
+
+        StatusSystem _status_system;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // update Methods
+
+        // Awake is called when the script instance is being loaded.
+        new void Awake() {
+            base.Awake();
+
+            _status_system = gameObject.GetStatusSystem();
+        }
+
+        // Start is called before the first frame update.
+        new void Start() {
+            base.Start();
+
+            /// <summary>
+            /// wwhen being touched vehicle.
+            /// </summary>
+            this.OnCollisionEnterAsObservable().Where(x => x.LikeVehicle()).Subscribe(x => {
+                _status_system.IncrementPoints();
+                Destroy(gameObject);
+            });
+        }
     }
 }

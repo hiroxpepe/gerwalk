@@ -339,21 +339,6 @@ namespace Studio.MeowToon {
             this.OnCollisionExitAsObservable().Where(x => x.LikeBlock()).Subscribe(x => {
                 rb.useGravity = true;
             });
-
-            /// <summary>
-            /// when touching balloon.
-            /// </summary>
-            this.OnCollisionEnterAsObservable().Where(x => x.LikeBalloon()).Subscribe(x => {
-                x.gameObject.GetBalloon().DestroyWithItems(transform);
-            });
-
-            /// <summary>
-            /// when touching coin.
-            /// </summary>
-            this.OnCollisionEnterAsObservable().Where(x => x.LikeCoin()).Subscribe(x => {
-                _status_system.IncrementPoints(); // get coins.
-                Destroy(x.gameObject);
-            });
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
