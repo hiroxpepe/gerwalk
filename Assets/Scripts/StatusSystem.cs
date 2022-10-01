@@ -53,6 +53,9 @@ namespace Studio.MeowToon {
         [SerializeField]
         Text _altitude_text;
 
+        [SerializeField]
+        Text _lift_spoiler_text;
+
         /// <remarks>
         /// for development.
         /// </remarks>
@@ -76,9 +79,6 @@ namespace Studio.MeowToon {
         /// </remarks>
         [SerializeField]
         Text _debug_text;
-
-        [SerializeField]
-        Text _lift_spoiler_text;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives] 
@@ -216,6 +216,13 @@ namespace Studio.MeowToon {
             _vertical_speed_text.text = string.Format("VSI {0:000.0}m/s", Math.Round(_vertical_speed, 1, MidpointRounding.AwayFromZero));
             _altitude = _vehicle_object.transform.position.y - 0.5f; // 0.5 is half vehicle height.
             _altitude_text.text = string.Format("ALT {0:000.0}m", Math.Round(_altitude, 1, MidpointRounding.AwayFromZero));
+            var vehicle = _vehicle_object.gameObject.GetVehicle();
+            var lift_spoiler_status = vehicle.useLiftSpoiler ? "ON" : "OFF";
+            var lift_spoiler_color_code = vehicle.useLiftSpoiler ? "#FF0000" : "#00FF00";
+            Color lift_spoiler_color;
+            ColorUtility.TryParseHtmlString(lift_spoiler_color_code, out lift_spoiler_color);
+            _lift_spoiler_text.text = $"Spoiler: {lift_spoiler_status}";
+            _lift_spoiler_text.color = lift_spoiler_color;
             /// <remarks>
             /// for development.
             /// </remarks>
