@@ -41,9 +41,6 @@ namespace Studio.MeowToon {
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
         [SerializeField]
-        GameObject _player_object;
-
-        [SerializeField]
         GameObject _home_object;
 
         [SerializeField]
@@ -61,6 +58,8 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields
 
+        GameObject _vehicle_object;
+
         float _fast_cycle = 0.25f;
 
         float _slow_cycle = 1.0f;
@@ -72,6 +71,7 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
+            _vehicle_object = gameObject.GetVehicleGameObject();
         }
 
         // Start is called before the first frame update.
@@ -92,10 +92,10 @@ namespace Studio.MeowToon {
             // LateUpdate is called after all Update functions have been called.
             this.LateUpdateAsObservable().Subscribe(_ => {
                 /// <summary>
-                /// set the player's y-axis to the radar direction's z-axis.
+                /// set the vehicle's y-axis to the radar direction's z-axis.
                 /// </summary>
-                Quaternion player_rotation = _player_object.transform.rotation;
-                _direction_object.transform.rotation = Quaternion.Euler(0f, 0f, player_rotation.eulerAngles.y);
+                Quaternion vehicle_rotation = _vehicle_object.transform.rotation;
+                _direction_object.transform.rotation = Quaternion.Euler(0f, 0f, vehicle_rotation.eulerAngles.y);
             });
         }
 
@@ -106,8 +106,8 @@ namespace Studio.MeowToon {
         /// get home position.
         /// </summary>
         void mapHomePositionsToRadar() {
-            // get home position from player point of view.
-            Vector3 home_position = _home_object.transform.position - _player_object.transform.position;
+            // get home position from vehicle point of view.
+            Vector3 home_position = _home_object.transform.position - _vehicle_object.transform.position;
             // map position to radar.
             _home_mark_object.transform.localPosition = new Vector3(home_position.x * RANGE, home_position.z * RANGE, 0);
         }
@@ -145,17 +145,17 @@ namespace Studio.MeowToon {
                     // get target mark.
                     target_mark = Find($"RadarTarget(Clone)_{idx}"); // FIXME:
                 }
-                // get target position from player point of view.
-                Vector3 target_position = target_transform.transform.position - _player_object.transform.position;
+                // get target position from vehicle point of view.
+                Vector3 target_position = target_transform.transform.position - _vehicle_object.transform.position;
                 // map positions to radar.
                 target_mark.transform.localPosition = new Vector3(target_position.x * RANGE, target_position.z * RANGE, 0);
                 target_mark.GetImage().enabled = true;
 
                 // higher altitude targets blink slowly, and lower altitude targets blink faster.
-                Vector3 player_position = _player_object.transform.position;
-                if (position.y < player_position.y - ADJUSTED_VALUE) {
+                Vector3 vehicle_position = _vehicle_object.transform.position;
+                if (position.y < vehicle_position.y - ADJUSTED_VALUE) {
                     target_mark.GetImage().enabled = fast_repeat_value >= _fast_cycle * TO_MIDDLE_VALUE;
-                } else if (position.y > player_position.y + ADJUSTED_VALUE) {
+                } else if (position.y > vehicle_position.y + ADJUSTED_VALUE) {
                     target_mark.GetImage().enabled = slow_repeat_value >= _slow_cycle * TO_MIDDLE_VALUE;
                 }
                 idx++;

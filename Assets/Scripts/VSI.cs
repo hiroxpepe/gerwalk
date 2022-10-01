@@ -37,16 +37,19 @@ namespace Studio.MeowToon {
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
         [SerializeField]
-        GameObject _player_object;
-
-        [SerializeField]
         GameObject _needle_object;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Fields [noun, adjectives]
+
+        GameObject _vehicle_object;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
+            _vehicle_object = gameObject.GetVehicleGameObject();
         }
 
         // Start is called before the first frame update.
@@ -60,7 +63,7 @@ namespace Studio.MeowToon {
                 /// <summary>
                 /// set vertical speed.
                 /// </summary>
-                _needle_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (DIVIDE_CIRCLE / _player_object.GetPlayer().flightVerticalSpeed)));
+                _needle_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (DIVIDE_CIRCLE / _vehicle_object.GetVehicle().flightVerticalSpeed)));
             });
         }
     }

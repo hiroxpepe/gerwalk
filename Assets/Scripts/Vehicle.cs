@@ -22,10 +22,10 @@ using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
-    /// player controller.
+    /// vehicle controller.
     /// @author h.adachi
     /// </summary>
-    public class Player : GamepadMaper {
+    public class Vehicle : GamepadMaper {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,16 +79,16 @@ namespace Studio.MeowToon {
         // Properties [noun, adjectives] 
 
         /// <summary>
-        /// current speed of the player object to fly.
+        /// current speed of the vehicle object to fly.
         /// </summary>
         public float flightSpeed { get => _energy.speed; }
 
-        /// current vertical speed of the player object to fly.
+        /// current vertical speed of the vehicle object to fly.
         /// </summary>
         public float flightVerticalSpeed { get => _vertical_speed; }
 
         /// <summary>
-        /// current power of the player object to fly.
+        /// current power of the vehicle object to fly.
         /// </summary>
         public float flightPower { get => _energy.power; }
 
@@ -137,7 +137,7 @@ namespace Studio.MeowToon {
                 _acceleration.currentSpeed = rb.velocity.magnitude; // get speed.
             });
 
-            // get player speed for fly.
+            // get vehicle speed for fly.
             Vector3 prev_position = transform.position;
             float air_speed = 0f;
             this.FixedUpdateAsObservable().Where(_ => !Mathf.Approximately(Time.deltaTime, 0)).Subscribe(_ => {
@@ -217,7 +217,7 @@ namespace Studio.MeowToon {
             /// </summary>
             this.UpdateAsObservable().Where(_ => !_do_update.grounded).Subscribe(_ => {
                 _energy.speed = air_speed;
-                _energy.altitude = transform.position.y - 0.5f; // 0.5 is half player height.
+                _energy.altitude = transform.position.y - 0.5f; // 0.5 is half vehicle height.
                 _energy.flightTime = flightTime;
                 _do_fixed_update.ApplyFly();
             });
@@ -367,7 +367,7 @@ namespace Studio.MeowToon {
         }
 
         /// <summary>
-        /// move top when the player hits a block.
+        /// move top when the vehicle hits a block.
         /// </summary>
         void moveTop() {
             const float SPEED = 6.0f;
@@ -379,9 +379,9 @@ namespace Studio.MeowToon {
         }
 
         /// <summary>
-        /// move aside when the player hits a block.
+        /// move aside when the vehicle hits a block.
         /// </summary>
-        /// <param name="direction">the player's direction is provided.</param>
+        /// <param name="direction">the vehicle's direction is provided.</param>
         void moveLetfOrRight(Direction direction) {
             const float SPEED = 0.3f;
             Vector3 move_position = transform.position;
@@ -424,7 +424,7 @@ namespace Studio.MeowToon {
         }
 
         /// <summary>
-        /// returns an enum of the player's direction.
+        /// returns an enum of the vehicle's direction.
         /// </summary>
         Direction getDirection(Vector3 forwardVector) {
             var forward_x = (float) Math.Round(forwardVector.x);

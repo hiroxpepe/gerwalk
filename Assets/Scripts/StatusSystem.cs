@@ -77,11 +77,10 @@ namespace Studio.MeowToon {
         [SerializeField]
         Text _debug_text;
 
-        [SerializeField]
-        GameObject _player_object;
-
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives] 
+
+        GameObject _vehicle_object;
 
         int _target_total = 0;
 
@@ -142,27 +141,34 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
 
+        // Awake is called when the script instance is being loaded.
+        void Awake() {
+            _vehicle_object = gameObject.GetVehicleGameObject();
+        }
+
         // Start is called before the first frame update
         void Start() {
             // get targets count.
             _target_total = getTargetsCount();
+
             // update text ui.
             this.UpdateAsObservable().Subscribe(_ => {
                 checkGameStatus();
                 updateGameStatus();
-                updatePlayerStatus();
+                updateVehicleStatus();
             });
-            // get player status.
+
+            // get vehicle status.
             this.FixedUpdateAsObservable().Where(_ => !Mathf.Approximately(Time.deltaTime, 0)).Subscribe(_ => {
-                var player = _player_object.gameObject.GetPlayer();
-                _air_speed = player.flightSpeed;
-                _vertical_speed = player.flightVerticalSpeed;
+                var vehicle = _vehicle_object.gameObject.GetVehicle();
+                _air_speed = vehicle.flightSpeed;
+                _vertical_speed = vehicle.flightVerticalSpeed;
                 /// <remarks>
                 /// for development.
                 /// </remarks>
-                _flight_time = player.flightTime;
-                _energy = player.flightEnergy;
-                _power = player.flightPower;
+                _flight_time = vehicle.flightTime;
+                _energy = vehicle.flightEnergy;
+                _power = vehicle.flightPower;
             });
         }
 
@@ -185,12 +191,12 @@ namespace Studio.MeowToon {
         }
 
         /// <summary>
-        /// update player status
+        /// update vehicle status
         /// </summary>
-        void updatePlayerStatus() {
+        void updateVehicleStatus() {
             _air_speed_text.text = string.Format("TAS {0:000.0}km/h", Math.Round(_air_speed, 1, MidpointRounding.AwayFromZero));
             _vertical_speed_text.text = string.Format("VSI {0:000.0}m/s", Math.Round(_vertical_speed, 1, MidpointRounding.AwayFromZero));
-            _altitude = _player_object.transform.position.y - 0.5f; // 0.5 is half player height.
+            _altitude = _vehicle_object.transform.position.y - 0.5f; // 0.5 is half vehicle height.
             _altitude_text.text = string.Format("ALT {0:000.0}m", Math.Round(_altitude, 1, MidpointRounding.AwayFromZero));
             /// <remarks>
             /// for development.

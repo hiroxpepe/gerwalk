@@ -43,7 +43,7 @@ namespace Studio.MeowToon {
         Text _message_text;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Fields
+        // Fields [noun, adjectives] 
 
         bool _use_vibration = true;
 

@@ -1780,7 +1780,7 @@ GameObject:
   - component: {fileID: 331827359}
   - component: {fileID: 331827360}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: Vehicle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2278,7 +2278,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d4d6a300f14fe54bb14118ad5240fd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _player_object: {fileID: 331827354}
   _long_needle_object: {fileID: 1626747905}
   _short_needle_object: {fileID: 1972620261}
 --- !u!1 &492267920
@@ -2572,7 +2571,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5302917b30bc234593a2740746d597d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _player_object: {fileID: 331827354}
   _home_object: {fileID: 315029161}
   _home_mark_object: {fileID: 2130387294}
   _targets_object: {fileID: 744581400}
@@ -3683,7 +3681,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1231e6ac32ec5dd4fa7bb124a79a3526, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _player_object: {fileID: 331827354}
   _needle_object: {fileID: 1651375468}
 --- !u!1 &795494569
 GameObject:
@@ -4562,7 +4559,6 @@ MonoBehaviour:
   _power_text: {fileID: 937434671}
   _flight_text: {fileID: 268134221}
   _debug_text: {fileID: 402693588}
-  _player_object: {fileID: 331827354}
 --- !u!4 &1064631116
 Transform:
   m_ObjectHideFlags: 0
@@ -6661,7 +6657,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cd7f71177eb55b4aa2f2f145dcece5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _player_object: {fileID: 331827354}
   _needle_object: {fileID: 146417780}
 --- !u!1 &1874619763
 GameObject:

@@ -20,7 +20,7 @@ using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
-    /// player controller.
+    /// balloon controller.
     /// @author h.adachi
     /// </summary>
     public class Balloon : MonoBehaviour {
