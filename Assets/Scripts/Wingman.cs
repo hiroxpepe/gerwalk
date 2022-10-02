@@ -42,6 +42,26 @@ namespace Studio.MeowToon {
         // Awake is called when the script instance is being loaded.
         void Awake() {
             _vehicle_object = gameObject.GetVehicleGameObject();
+            var vehicle = _vehicle_object.GetVehicle();
+
+            /// <remarks>
+            /// fRigidbody should be only used in FixedUpdate.
+            /// </remarks>
+            var rb = transform.GetComponent<Rigidbody>();
+
+            /// <summary>
+            /// vehicle on flight.
+            /// </summary>
+            vehicle.OnFlight += () => {
+                rb.useGravity = false;
+            };
+
+            /// <summary>
+            /// vehicle on grounded.
+            /// </summary>
+            vehicle.OnGrounded += () => {
+                rb.useGravity = true;
+            };
         }
 
         // Start is called before the first frame update.
@@ -69,7 +89,6 @@ namespace Studio.MeowToon {
             });
 
             this.FixedUpdateAsObservable().Subscribe(_ => {
-                rb.useGravity = false;
             });
         }
 
