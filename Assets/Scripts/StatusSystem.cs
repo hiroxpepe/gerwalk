@@ -14,6 +14,7 @@
  */
 
 using System;
+using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
@@ -150,6 +151,20 @@ namespace Studio.MeowToon {
             var vehicle = _vehicle_object.GetVehicle();
 
             /// <summary>
+            /// vehicle updated.
+            /// </summary>
+            vehicle.Updated += (object sender, PropertyChangedEventArgs e) => {
+                var vehicle = (Vehicle) sender;
+                if (e.PropertyName.Equals("airSpeed")) { //Debug.Log($"airSpeed: {vehicle.airSpeed}");
+                    _air_speed = vehicle.airSpeed;
+                }
+                if (e.PropertyName.Equals("verticalSpeed")) { // Debug.Log($"verticalSpeed: {vehicle.verticalSpeed}");
+                    _vertical_speed = vehicle.verticalSpeed;
+                }
+            };
+
+            /// <summary>
+            /// vehicle on gain energy.
             /// spend points.
             /// </summary>
             vehicle.OnGainEnergy += () => {
@@ -157,6 +172,7 @@ namespace Studio.MeowToon {
             };
 
             /// <summary>
+            /// vehicle on lose energy.
             /// spend points.
             /// </summary>
             vehicle.OnLoseEnergy += () => {
@@ -179,8 +195,9 @@ namespace Studio.MeowToon {
             // get vehicle status.
             this.FixedUpdateAsObservable().Where(_ => !Mathf.Approximately(Time.deltaTime, 0)).Subscribe(_ => {
                 var vehicle = _vehicle_object.gameObject.GetVehicle();
-                _air_speed = vehicle.speed;
-                _vertical_speed = vehicle.verticalSpeed;
+                //_air_speed = vehicle.airSpeed;
+                //_vertical_speed = vehicle.verticalSpeed;
+
                 /// <remarks>
                 /// for development.
                 /// </remarks>

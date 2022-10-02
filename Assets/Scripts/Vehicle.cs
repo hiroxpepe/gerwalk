@@ -74,6 +74,8 @@ namespace Studio.MeowToon {
 
         System.Diagnostics.Stopwatch _flight_stopwatch = new();
 
+        float _air_speed = 0f;
+
         float _vertical_speed = 0f;
 
         bool _use_lift_spoiler = false;
@@ -86,24 +88,29 @@ namespace Studio.MeowToon {
 
         Action _onLoseEnergy = () => { };
 
-        PropertyChangedEventHandler _onUpdated;
-
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjectives] 
 
         /// <summary>
         /// current speed of the vehicle object to flight.
         /// </summary>
-        public float speed { get => _energy.speed; }
+        public float airSpeed {
+            get => _air_speed;
+            set {
+                _air_speed = value;
+                Updated?.Invoke(this, new(nameof(airSpeed)));
+            }
+        }
 
         /// current vertical speed of the vehicle object to flight.
         /// </summary>
-        public float verticalSpeed { get => _vertical_speed; }
-
-        /// <summary>
-        /// current power of the vehicle object to flight.
-        /// </summary>
-        public float power { get => _energy.power; }
+        public float verticalSpeed { 
+            get => _vertical_speed;
+            set {
+                _vertical_speed = value;
+                Updated?.Invoke(this, new(nameof(verticalSpeed)));
+            }
+        }
 
         /// <summary>
         /// elapsed time after takeoff.
@@ -111,7 +118,12 @@ namespace Studio.MeowToon {
         /// <remarks>
         /// for development.
         /// </remarks>
-        public float flightTime { get => (float) _flight_stopwatch.Elapsed.TotalSeconds; }
+        public float flightTime { get => (float)_flight_stopwatch.Elapsed.TotalSeconds; }
+
+        /// <summary>
+        /// current power of the vehicle object to flight.
+        /// </summary>
+        public float power { get => _energy.power; }
 
         /// <summary>
         /// total energy.
@@ -137,7 +149,10 @@ namespace Studio.MeowToon {
 
         public event Action OnLoseEnergy { add => _onLoseEnergy += value; remove => _onLoseEnergy -= value; }
 
-        public event PropertyChangedEventHandler Updated { add => _onUpdated += value; remove => _onUpdated -= value; }
+        /// <summary>
+        /// implementation for INotifyPropertyChanged
+        /// </summary>
+        public event PropertyChangedEventHandler? Updated;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -170,10 +185,9 @@ namespace Studio.MeowToon {
 
             // get vehicle speed for flight.
             Vector3 prev_position = transform.position;
-            float air_speed = 0f;
             this.FixedUpdateAsObservable().Where(_ => !Mathf.Approximately(Time.deltaTime, 0)).Subscribe(_ => {
-                air_speed = ((transform.position - prev_position) / Time.deltaTime).magnitude * 3.6f; // m/s -> km/h
-                _vertical_speed = ((transform.position.y - prev_position.y) / Time.deltaTime); // m/s
+                airSpeed = ((transform.position - prev_position) / Time.deltaTime).magnitude * 3.6f; // m/s -> km/h
+                verticalSpeed = ((transform.position.y - prev_position.y) / Time.deltaTime); // m/s
                 prev_position = transform.position;
             });
 
@@ -247,9 +261,8 @@ namespace Studio.MeowToon {
             /// flight.
             /// </summary>
             this.UpdateAsObservable().Where(_ => !_do_update.grounded).Subscribe(_ => {
-                _energy.speed = air_speed;
+                _energy.speed = airSpeed;
                 _energy.altitude = transform.position.y - 0.5f; // 0.5 is half vehicle height.
-                _energy.flightTime = flightTime;
                 _do_fixed_update.ApplyFlight();
                 _onFlight(); // call event handler.
             });
@@ -493,10 +506,6 @@ namespace Studio.MeowToon {
             }
         }
 
-        void onPropertyChanged(object sender, PropertyChangedEventArgs e) {
-            _onUpdated(sender, e);
-        }
-
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // inner Classes
 
@@ -712,9 +721,9 @@ namespace Studio.MeowToon {
 
             float _speed;
 
-            float _threshold = 1f; // FIXME:
+            float _total;
 
-            float _flight_time;
+            float _threshold = 1f; // FIXME:
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjectives] 
@@ -744,7 +753,9 @@ namespace Studio.MeowToon {
             /// </summary>
             public float speed {
                 get => _speed;
-                set => _speed = value;
+                set {
+                    _speed = value;
+                }
             }
 
             /// <summary>
@@ -752,14 +763,6 @@ namespace Studio.MeowToon {
             /// </summary>
             public float total {
                 get => _altitude + _speed;
-            }
-
-            /// <summary>
-            /// elapsed time after takeoff.
-            /// </summary>
-            public float flightTime {
-                get => _flight_time;
-                set => _flight_time = value;
             }
 
             /// <summary>
@@ -773,6 +776,14 @@ namespace Studio.MeowToon {
                     }
                 }
             }
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            //internal  Events [verb, verb phrase] 
+
+            /// <summary>
+            /// implementation for INotifyPropertyChanged
+            /// </summary>
+            internal event PropertyChangedEventHandler? Updated;
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Constructor
@@ -798,7 +809,7 @@ namespace Studio.MeowToon {
             public float GetCalculatePower() {
                 const float POWAR_FACTOR_VALUE = 4.0f;
                 const float AUTO_FLARE_ALTITUDE = 8.0f;
-                if (total > _threshold /*|| flightTime > 3.0f*/) {
+                if (total > _threshold) {
                     if (_previous_altitudes.Peek() < _altitude) { // up
                         _flight_power -= 0.0009375f * POWAR_FACTOR_VALUE * TOTAL_POWAR_FACTOR_VALUE;
                     }
