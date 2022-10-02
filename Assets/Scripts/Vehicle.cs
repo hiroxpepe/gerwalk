@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 using static UnityEngine.Vector3;
 using UniRx;
@@ -44,7 +45,7 @@ namespace Studio.MeowToon {
         float _roll_speed = 5.0f;
 
         [SerializeField]
-        float _fly_power = 5.0f;
+        float _flight_power = 5.0f;
 
         [SerializeField]
         float _forward_speed_limit = 1.1f;
@@ -73,38 +74,52 @@ namespace Studio.MeowToon {
 
         System.Diagnostics.Stopwatch _flight_stopwatch = new();
 
+        float _flight_time = 0f;
+
+        float _air_speed = 0f;
+
         float _vertical_speed = 0f;
 
+        float _total = 0f;
+
+        float _power = 0;
+
         bool _use_lift_spoiler = false;
-
-        Action _onGainEnergy;
-
-        Action _onLoseEnergy;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjectives] 
 
         /// <summary>
-        /// current speed of the vehicle object to fly.
+        /// current speed of the vehicle object to flight.
         /// </summary>
-        public float flightSpeed { get => _energy.speed; }
+        public float airSpeed {
+            get => _air_speed;
+            set {
+                _air_speed = value;
+                Updated?.Invoke(this, new(nameof(airSpeed)));
+            }
+        }
 
-        /// current vertical speed of the vehicle object to fly.
+        /// current vertical speed of the vehicle object to flight.
         /// </summary>
-        public float flightVerticalSpeed { get => _vertical_speed; }
-
-        /// <summary>
-        /// current power of the vehicle object to fly.
-        /// </summary>
-        public float flightPower { get => _energy.power; }
+        public float verticalSpeed { 
+            get => _vertical_speed;
+            set {
+                _vertical_speed = value;
+                Updated?.Invoke(this, new(nameof(verticalSpeed)));
+            }
+        }
 
         /// <summary>
         /// elapsed time after takeoff.
         /// </summary>
-        /// <remarks>
-        /// for development.
-        /// </remarks>
-        public float flightTime { get => (float) _flight_stopwatch.Elapsed.TotalSeconds; }
+        public float flightTime { 
+            get => _flight_time;
+            set {
+                _flight_time = value;
+                Updated?.Invoke(this, new(nameof(flightTime)));
+            }
+        }
 
         /// <summary>
         /// total energy.
@@ -112,19 +127,54 @@ namespace Studio.MeowToon {
         /// <remarks>
         /// for development.
         /// </remarks>
-        public float flightEnergy { get => _energy.total; }
+        public float total {
+            get => _total;
+            set {
+                _total = value;
+                Updated?.Invoke(this, new(nameof(total)));
+            }
+        }
+
+        /// <summary>
+        /// current power of the vehicle to flight.
+        /// </summary>
+        /// <remarks>
+        /// for development.
+        /// </remarks>
+        public float power { 
+            get => _power;
+            set {
+                _power = value;
+                Updated?.Invoke(this, new(nameof(power)));
+            }
+        }
 
         /// <summary>
         /// use or not use lift spoiler.
         /// </summary>
-        public bool useLiftSpoiler { get => _use_lift_spoiler; }
+        public bool useLiftSpoiler { 
+            get => _use_lift_spoiler;
+            set {
+                _use_lift_spoiler = value;
+                Updated?.Invoke(this, new(nameof(useLiftSpoiler)));
+            }
+        }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Events [verb, verb phrase]
 
-        public event Action OnGainEnergy { add => _onGainEnergy += value; remove => _onGainEnergy -= value; }
+        public event Action? OnFlight;
 
-        public event Action OnLoseEnergy { add => _onLoseEnergy += value; remove => _onLoseEnergy -= value; }
+        public event Action? OnGrounded;
+
+        public event Action? OnGainEnergy;
+
+        public event Action? OnLoseEnergy;
+
+        /// <summary>
+        /// implementation for INotifyPropertyChanged
+        /// </summary>
+        public event PropertyChangedEventHandler? Updated;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -135,7 +185,8 @@ namespace Studio.MeowToon {
             _do_update = DoUpdate.GetInstance();
             _do_fixed_update = DoFixedUpdate.GetInstance();
             _acceleration = Acceleration.GetInstance(_forward_speed_limit, _run_speed_limit, _backward_speed_limit);
-            _energy = Energy.GetInstance(_fly_power);
+            _energy = Energy.GetInstance(_flight_power);
+            _energy.Updated += onPropertyChanged;
         }
 
         // Start is called before the first frame update
@@ -155,12 +206,11 @@ namespace Studio.MeowToon {
                 _acceleration.currentSpeed = rb.velocity.magnitude; // get speed.
             });
 
-            // get vehicle speed for fly.
+            // get vehicle speed for flight.
             Vector3 prev_position = transform.position;
-            float air_speed = 0f;
             this.FixedUpdateAsObservable().Where(_ => !Mathf.Approximately(Time.deltaTime, 0)).Subscribe(_ => {
-                air_speed = ((transform.position - prev_position) / Time.deltaTime).magnitude * 3.6f; // m/s -> km/h
-                _vertical_speed = ((transform.position.y - prev_position.y) / Time.deltaTime); // m/s
+                airSpeed = ((transform.position - prev_position) / Time.deltaTime).magnitude * 3.6f; // m/s -> km/h
+                verticalSpeed = ((transform.position.y - prev_position.y) / Time.deltaTime); // m/s
                 prev_position = transform.position;
             });
 
@@ -231,24 +281,24 @@ namespace Studio.MeowToon {
             });
 
             /// <summary>
-            /// fly.
+            /// flight.
             /// </summary>
             this.UpdateAsObservable().Where(_ => !_do_update.grounded).Subscribe(_ => {
-                _energy.speed = air_speed;
+                _energy.speed = airSpeed;
                 _energy.altitude = transform.position.y - 0.5f; // 0.5 is half vehicle height.
-                _energy.flightTime = flightTime;
-                _do_fixed_update.ApplyFly();
+                _do_fixed_update.ApplyFlight();
+                OnFlight(); // call event handler.
             });
 
-            this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.fly).Subscribe(_ => {
+            this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.flight).Subscribe(_ => {
                 const float FALL_VALUE = 5.0f; // 5.0 -> -5m/s
                 rb.useGravity = false;
-                rb.velocity = transform.forward * _energy.power;
-                if (_use_lift_spoiler) {
+                rb.velocity = transform.forward * _energy.GetCalculatePower();
+                if (useLiftSpoiler) {
                     var velocity = rb.velocity;
                     rb.velocity = new Vector3(velocity.x, velocity.y - FALL_VALUE, velocity.z);
                 }
-                _do_fixed_update.CancelFly();
+                _do_fixed_update.CancelFlight();
                 _flight_stopwatch.Start();
             });
 
@@ -256,7 +306,7 @@ namespace Studio.MeowToon {
             /// gain energy.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _b_button.wasPressedThisFrame && !_do_update.grounded && _status_system.usePoint).Subscribe(_ => {
-                _onGainEnergy();
+                OnGainEnergy();
                 _energy.Gain();
             });
 
@@ -264,7 +314,7 @@ namespace Studio.MeowToon {
             /// lose energy.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _y_button.wasPressedThisFrame && !_do_update.grounded && _status_system.usePoint).Subscribe(_ => {
-                _onLoseEnergy();
+                OnLoseEnergy();
                 _energy.Lose();
             });
 
@@ -272,7 +322,7 @@ namespace Studio.MeowToon {
             /// use or not use lift spoiler.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _a_button.wasPressedThisFrame && !_do_update.grounded).Subscribe(_ => {
-                _use_lift_spoiler = !_use_lift_spoiler;
+                useLiftSpoiler = !useLiftSpoiler;
             });
 
             /// <summary>
@@ -319,6 +369,11 @@ namespace Studio.MeowToon {
                 }
             });
 
+            // LateUpdate is called after all Update functions have been called.
+            this.LateUpdateAsObservable().Subscribe(_ => {
+                flightTime = (float) _flight_stopwatch.Elapsed.TotalSeconds;
+            });
+
             /// <summary>
             /// freeze.
             /// </summary>
@@ -346,14 +401,10 @@ namespace Studio.MeowToon {
                 angle.x = angle.z = 0f;
                 transform.eulerAngles = angle;
 
-                // reset lift spoiler.
-                _use_lift_spoiler = false;
-
-                // reset fly power.
-                _energy.hasLanded = true;
-
-                // reset flight time.
-                _flight_stopwatch.Reset();
+                useLiftSpoiler = false; // reset lift spoiler.
+                _energy.hasLanded = true; // reset flight power.
+                _flight_stopwatch.Reset(); // reset flight time.
+                OnGrounded(); // call event handler.
             });
 
             /// <summary>
@@ -483,6 +534,18 @@ namespace Studio.MeowToon {
             }
         }
 
+        /// <summary>
+        /// on property changed event handler for energy.
+        /// </summary>
+        void onPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if (e.PropertyName.Equals("total")) {
+                total = _energy.total;
+            }
+            if (e.PropertyName.Equals("power")) {
+                power = _energy.power;
+            }
+        }
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // inner Classes
 
@@ -543,7 +606,7 @@ namespace Studio.MeowToon {
             bool _walk;
             bool _jump;
             bool _backward;
-            bool _fly;
+            bool _flight;
 
             ///////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjectives] 
@@ -553,7 +616,7 @@ namespace Studio.MeowToon {
             public bool walk { get => _walk; }
             public bool jump { get => _jump; }
             public bool backward { get => _backward; }
-            public bool fly { get => _fly; }
+            public bool flight { get => _flight; }
 
             ///////////////////////////////////////////////////////////////////////////////////////
             // Constructor
@@ -570,11 +633,11 @@ namespace Studio.MeowToon {
 
             public void ApplyIdol() {
                 _idol = true;
-                _run = _walk = _backward = _jump = _fly = false;
+                _run = _walk = _backward = _jump = _flight = false;
             }
 
             public void ApplyRun() {
-                _idol = _walk = _backward = _fly = false;
+                _idol = _walk = _backward = _flight = false;
                 _run = true;
             }
 
@@ -583,7 +646,7 @@ namespace Studio.MeowToon {
             }
 
             public void ApplyWalk() {
-                _idol = _run = _backward = _fly = false;
+                _idol = _run = _backward = _flight = false;
                 _walk = true;
             }
 
@@ -592,7 +655,7 @@ namespace Studio.MeowToon {
             }
 
             public void ApplyBackward() {
-                _idol = _run = _walk = _fly = false;
+                _idol = _run = _walk = _flight = false;
                 _backward = true;
             }
 
@@ -608,13 +671,13 @@ namespace Studio.MeowToon {
                 _jump = false;
             }
 
-            public void ApplyFly() {
+            public void ApplyFlight() {
                 _idol = _walk = _run = _backward = false;
-                _fly = true;
+                _flight = true;
             }
 
-            public void CancelFly() {
-                _fly = false;
+            public void CancelFlight() {
+                _flight = false;
             }
         }
 
@@ -681,14 +744,16 @@ namespace Studio.MeowToon {
             ///////////////////////////////////////////////////////////////////////////////////////////////
             // Constants
 
-            const float POWAR_FACTOR_VALUE = 1.5f; // easy: 1.0f, normal: 1.5f , hard: 2.0f
+            const float TOTAL_POWAR_FACTOR_VALUE = 1.5f; // easy: 1.0f, normal: 1.5f , hard: 2.0f
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Fields [noun, adjectives] 
 
-            float _fly_power;
+            float _flight_power;
 
-            float _default_fly_power;
+            float _default_flight_power;
+
+            float _calculated_power;
 
             float _altitude;
 
@@ -696,32 +761,16 @@ namespace Studio.MeowToon {
 
             float _speed;
 
-            float _threshold = 1f; // FIXME:
+            float _total;
 
-            float _flight_time;
+            float _threshold = 1f; // FIXME:
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjectives] 
 
-            public float power {
-                get {
-                    const float AUTO_FLARE_ALTITUDE = 8.0f;
-                    if (total > _threshold /*|| flightTime > 3.0f*/) {
-                        if (_previous_altitudes.Peek() < _altitude) { // up
-                            _fly_power -= 0.0009375f * POWAR_FACTOR_VALUE;
-                        }
-                        if (_previous_altitudes.Peek() > _altitude) { // down
-                            _fly_power += 0.0009375f * POWAR_FACTOR_VALUE;
-                        }
-                    }
-                    if (total <= _threshold && _altitude < AUTO_FLARE_ALTITUDE) {
-                        _fly_power = _default_fly_power;
-                    }
-                    var result = _fly_power * 2.65f * POWAR_FACTOR_VALUE;
-                    return result < 0 ? 0 : result;
-                }
-            }
-
+            /// <summary>
+            /// altitude.
+            /// </summary>
             public float altitude {
                 set {
                     const int QUEUE_COUNT = 30;
@@ -733,15 +782,19 @@ namespace Studio.MeowToon {
                         _previous_altitudes.Enqueue(_altitude);
                     }
                     _altitude = value;
+                    Updated?.Invoke(this, new(nameof(total)));
                 }
             }
 
             /// <summary>
-            /// speed in flying.
+            /// speed in flighting.
             /// </summary>
             public float speed {
                 get => _speed;
-                set => _speed = value;
+                set {
+                    _speed = value;
+                    Updated?.Invoke(this, new(nameof(total)));
+                }
             }
 
             /// <summary>
@@ -752,11 +805,12 @@ namespace Studio.MeowToon {
             }
 
             /// <summary>
-            /// elapsed time after takeoff.
+            /// power for velocity.
             /// </summary>
-            public float flightTime {
-                get => _flight_time;
-                set => _flight_time = value;
+            public float power {
+                get {
+                    return _calculated_power;
+                }
             }
 
             /// <summary>
@@ -766,10 +820,18 @@ namespace Studio.MeowToon {
                 set {
                     if (value) {
                         _speed = 0;
-                        _fly_power = _default_fly_power;
+                        _flight_power = _default_flight_power;
                     }
                 }
             }
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            //internal  Events [verb, verb phrase] 
+
+            /// <summary>
+            /// implementation for INotifyPropertyChanged
+            /// </summary>
+            internal event PropertyChangedEventHandler? Updated;
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Constructor
@@ -777,27 +839,47 @@ namespace Studio.MeowToon {
             /// <summary>
             /// hide the constructor.
             /// </summary>
-            Energy(float flyPower) {
-                _fly_power = flyPower;
-                _default_fly_power = _fly_power;
+            Energy(float flightPower) {
+                _flight_power = flightPower;
+                _default_flight_power = _flight_power;
             }
 
             /// <summary>
             /// returns an initialized instance.
             /// </summary>
-            public static Energy GetInstance(float flyPower) {
-                return new Energy(flyPower);
+            public static Energy GetInstance(float flightPower) {
+                return new Energy(flightPower);
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // public Methods [verb]
 
+            public float GetCalculatePower() {
+                const float POWAR_FACTOR_VALUE = 4.0f;
+                const float AUTO_FLARE_ALTITUDE = 8.0f;
+                if (total > _threshold) {
+                    if (_previous_altitudes.Peek() < _altitude) { // up
+                        _flight_power -= 0.0009375f * POWAR_FACTOR_VALUE * TOTAL_POWAR_FACTOR_VALUE;
+                    }
+                    if (_previous_altitudes.Peek() > _altitude) { // down
+                        _flight_power += 0.0009375f * POWAR_FACTOR_VALUE * TOTAL_POWAR_FACTOR_VALUE;
+                    }
+                }
+                if (total <= _threshold && _altitude < AUTO_FLARE_ALTITUDE) {
+                    _flight_power = _default_flight_power;
+                }
+                var result = _flight_power * 2.65f * TOTAL_POWAR_FACTOR_VALUE;
+                _calculated_power = result < 0 ? 0 : result;
+                Updated?.Invoke(this, new(nameof(power)));
+                return _calculated_power;
+            }
+
             public void Gain() {
-                _fly_power += 0.125f * POWAR_FACTOR_VALUE; ;
+                _flight_power += 0.125f * TOTAL_POWAR_FACTOR_VALUE; ;
             }
 
             public void Lose() {
-                _fly_power -= 0.125f * POWAR_FACTOR_VALUE; ;
+                _flight_power -= 0.125f * TOTAL_POWAR_FACTOR_VALUE; ;
             }
         }
 

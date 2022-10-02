@@ -63,7 +63,7 @@ namespace Studio.MeowToon {
                 /// <summary>
                 /// set speed.
                 /// </summary>
-                _needle_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (DIVIDE_CIRCLE / _vehicle_object.GetVehicle().flightSpeed)));
+                _needle_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (DIVIDE_CIRCLE / _vehicle_object.GetVehicle().airSpeed)));
                 
             });
         }
