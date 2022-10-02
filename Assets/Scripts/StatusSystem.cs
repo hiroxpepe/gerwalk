@@ -179,14 +179,14 @@ namespace Studio.MeowToon {
             // get vehicle status.
             this.FixedUpdateAsObservable().Where(_ => !Mathf.Approximately(Time.deltaTime, 0)).Subscribe(_ => {
                 var vehicle = _vehicle_object.gameObject.GetVehicle();
-                _air_speed = vehicle.flightSpeed;
-                _vertical_speed = vehicle.flightVerticalSpeed;
+                _air_speed = vehicle.speed;
+                _vertical_speed = vehicle.verticalSpeed;
                 /// <remarks>
                 /// for development.
                 /// </remarks>
                 _flight_time = vehicle.flightTime;
-                _energy = vehicle.flightEnergy;
-                _power = vehicle.flightPower;
+                _energy = vehicle.total;
+                _power = vehicle.power;
             });
         }
 

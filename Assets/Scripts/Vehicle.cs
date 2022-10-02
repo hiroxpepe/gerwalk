@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 using static UnityEngine.Vector3;
 using UniRx;
@@ -77,7 +78,6 @@ namespace Studio.MeowToon {
 
         bool _use_lift_spoiler = false;
 
-
         Action _onFlight = () => { };
 
         Action _onGrounded = () => { };
@@ -86,22 +86,24 @@ namespace Studio.MeowToon {
 
         Action _onLoseEnergy = () => { };
 
+        PropertyChangedEventHandler _onUpdated;
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjectives] 
 
         /// <summary>
         /// current speed of the vehicle object to flight.
         /// </summary>
-        public float flightSpeed { get => _energy.speed; }
+        public float speed { get => _energy.speed; }
 
         /// current vertical speed of the vehicle object to flight.
         /// </summary>
-        public float flightVerticalSpeed { get => _vertical_speed; }
+        public float verticalSpeed { get => _vertical_speed; }
 
         /// <summary>
         /// current power of the vehicle object to flight.
         /// </summary>
-        public float flightPower { get => _energy.power; }
+        public float power { get => _energy.power; }
 
         /// <summary>
         /// elapsed time after takeoff.
@@ -117,7 +119,7 @@ namespace Studio.MeowToon {
         /// <remarks>
         /// for development.
         /// </remarks>
-        public float flightEnergy { get => _energy.total; }
+        public float total { get => _energy.total; }
 
         /// <summary>
         /// use or not use lift spoiler.
@@ -134,6 +136,8 @@ namespace Studio.MeowToon {
         public event Action OnGainEnergy { add => _onGainEnergy += value; remove => _onGainEnergy -= value; }
 
         public event Action OnLoseEnergy { add => _onLoseEnergy += value; remove => _onLoseEnergy -= value; }
+
+        public event PropertyChangedEventHandler Updated { add => _onUpdated += value; remove => _onUpdated -= value; }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -253,7 +257,7 @@ namespace Studio.MeowToon {
             this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.flight).Subscribe(_ => {
                 const float FALL_VALUE = 5.0f; // 5.0 -> -5m/s
                 rb.useGravity = false;
-                rb.velocity = transform.forward * _energy.power;
+                rb.velocity = transform.forward * _energy.GetCalculatePower();
                 if (_use_lift_spoiler) {
                     var velocity = rb.velocity;
                     rb.velocity = new Vector3(velocity.x, velocity.y - FALL_VALUE, velocity.z);
@@ -489,6 +493,10 @@ namespace Studio.MeowToon {
             }
         }
 
+        void onPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            _onUpdated(sender, e);
+        }
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // inner Classes
 
@@ -687,7 +695,7 @@ namespace Studio.MeowToon {
             ///////////////////////////////////////////////////////////////////////////////////////////////
             // Constants
 
-            const float POWAR_FACTOR_VALUE = 1.5f; // easy: 1.0f, normal: 1.5f , hard: 2.0f
+            const float TOTAL_POWAR_FACTOR_VALUE = 1.5f; // easy: 1.0f, normal: 1.5f , hard: 2.0f
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Fields [noun, adjectives] 
@@ -695,6 +703,8 @@ namespace Studio.MeowToon {
             float _flight_power;
 
             float _default_flight_power;
+
+            float _calculated_power;
 
             float _altitude;
 
@@ -711,20 +721,7 @@ namespace Studio.MeowToon {
 
             public float power {
                 get {
-                    const float AUTO_FLARE_ALTITUDE = 8.0f;
-                    if (total > _threshold /*|| flightTime > 3.0f*/) {
-                        if (_previous_altitudes.Peek() < _altitude) { // up
-                            _flight_power -= 0.0009375f * POWAR_FACTOR_VALUE;
-                        }
-                        if (_previous_altitudes.Peek() > _altitude) { // down
-                            _flight_power += 0.0009375f * POWAR_FACTOR_VALUE;
-                        }
-                    }
-                    if (total <= _threshold && _altitude < AUTO_FLARE_ALTITUDE) {
-                        _flight_power = _default_flight_power;
-                    }
-                    var result = _flight_power * 2.65f * POWAR_FACTOR_VALUE;
-                    return result < 0 ? 0 : result;
+                    return _calculated_power;
                 }
             }
 
@@ -798,12 +795,31 @@ namespace Studio.MeowToon {
             ///////////////////////////////////////////////////////////////////////////////////////////
             // public Methods [verb]
 
+            public float GetCalculatePower() {
+                const float POWAR_FACTOR_VALUE = 4.0f;
+                const float AUTO_FLARE_ALTITUDE = 8.0f;
+                if (total > _threshold /*|| flightTime > 3.0f*/) {
+                    if (_previous_altitudes.Peek() < _altitude) { // up
+                        _flight_power -= 0.0009375f * POWAR_FACTOR_VALUE * TOTAL_POWAR_FACTOR_VALUE;
+                    }
+                    if (_previous_altitudes.Peek() > _altitude) { // down
+                        _flight_power += 0.0009375f * POWAR_FACTOR_VALUE * TOTAL_POWAR_FACTOR_VALUE;
+                    }
+                }
+                if (total <= _threshold && _altitude < AUTO_FLARE_ALTITUDE) {
+                    _flight_power = _default_flight_power;
+                }
+                var result = _flight_power * 2.65f * TOTAL_POWAR_FACTOR_VALUE;
+                _calculated_power = result < 0 ? 0 : result;
+                return _calculated_power;
+            }
+
             public void Gain() {
-                _flight_power += 0.125f * POWAR_FACTOR_VALUE; ;
+                _flight_power += 0.125f * TOTAL_POWAR_FACTOR_VALUE; ;
             }
 
             public void Lose() {
-                _flight_power -= 0.125f * POWAR_FACTOR_VALUE; ;
+                _flight_power -= 0.125f * TOTAL_POWAR_FACTOR_VALUE; ;
             }
         }
 
