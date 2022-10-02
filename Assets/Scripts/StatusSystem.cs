@@ -98,6 +98,8 @@ namespace Studio.MeowToon {
 
         float _altitude = 0f;
 
+        bool _use_lift_spoiler = false;
+
         /// <remarks>
         /// for development.
         /// </remarks>
@@ -148,7 +150,7 @@ namespace Studio.MeowToon {
         // Awake is called when the script instance is being loaded.
         void Awake() {
             _vehicle_object = gameObject.GetVehicleGameObject();
-            var vehicle = _vehicle_object.GetVehicle();
+            Vehicle vehicle = _vehicle_object.GetVehicle();
 
             /// <summary>
             /// vehicle updated.
@@ -163,6 +165,15 @@ namespace Studio.MeowToon {
                 }
                 if (e.PropertyName.Equals("flightTime")) {
                     _flight_time = vehicle.flightTime;
+                }
+                if (e.PropertyName.Equals("total")) {
+                    _energy = vehicle.total;
+                }
+                if (e.PropertyName.Equals("power")) {
+                    _power = vehicle.power;
+                }
+                if (e.PropertyName.Equals("useLiftSpoiler")) {
+                    _use_lift_spoiler = vehicle.useLiftSpoiler;
                 }
             };
 
@@ -194,16 +205,6 @@ namespace Studio.MeowToon {
                 updateGameStatus();
                 updateVehicleStatus();
             });
-
-            // get vehicle status.
-            this.FixedUpdateAsObservable().Where(_ => !Mathf.Approximately(Time.deltaTime, 0)).Subscribe(_ => {
-                var vehicle = _vehicle_object.gameObject.GetVehicle();
-                /// <remarks>
-                /// for development.
-                /// </remarks>
-                _energy = vehicle.total;
-                _power = vehicle.power;
-            });
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -232,9 +233,8 @@ namespace Studio.MeowToon {
             _vertical_speed_text.text = string.Format("VSI {0:000.0}m/s", Math.Round(_vertical_speed, 1, MidpointRounding.AwayFromZero));
             _altitude = _vehicle_object.transform.position.y - 0.5f; // 0.5 is half vehicle height.
             _altitude_text.text = string.Format("ALT {0:000.0}m", Math.Round(_altitude, 1, MidpointRounding.AwayFromZero));
-            var vehicle = _vehicle_object.gameObject.GetVehicle();
-            var lift_spoiler_status = vehicle.useLiftSpoiler ? "ON" : "OFF";
-            var lift_spoiler_color_code = vehicle.useLiftSpoiler ? "#FF0000" : "#00FF00";
+            var lift_spoiler_status = _use_lift_spoiler ? "ON" : "OFF";
+            var lift_spoiler_color_code = _use_lift_spoiler ? "#FF0000" : "#00FF00";
             Color lift_spoiler_color;
             ColorUtility.TryParseHtmlString(lift_spoiler_color_code, out lift_spoiler_color);
             _lift_spoiler_text.text = $"Spoiler: {lift_spoiler_status}";
@@ -242,7 +242,7 @@ namespace Studio.MeowToon {
             /// <remarks>
             /// for development.
             /// </remarks>
-            setTotalEnergyColor(_energy);
+            setTotalEnergyColor(value: _energy);
             _energy_text.text = string.Format("ENG {0:0000.0}", Math.Round(_energy, 1, MidpointRounding.AwayFromZero));
             _power_text.text = string.Format("POW {0:0000.0}", Math.Round(_power, 1, MidpointRounding.AwayFromZero));
             _flight_text.text = string.Format("TIME {0:000.0}sec", Math.Round(_flight_time, 1, MidpointRounding.AwayFromZero));
