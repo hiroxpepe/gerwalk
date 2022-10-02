@@ -74,19 +74,13 @@ namespace Studio.MeowToon {
 
         System.Diagnostics.Stopwatch _flight_stopwatch = new();
 
+        float _flight_time = 0f;
+
         float _air_speed = 0f;
 
         float _vertical_speed = 0f;
 
         bool _use_lift_spoiler = false;
-
-        Action _onFlight = () => { };
-
-        Action _onGrounded = () => { };
-
-        Action _onGainEnergy = () => { };
-
-        Action _onLoseEnergy = () => { };
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjectives] 
@@ -115,10 +109,13 @@ namespace Studio.MeowToon {
         /// <summary>
         /// elapsed time after takeoff.
         /// </summary>
-        /// <remarks>
-        /// for development.
-        /// </remarks>
-        public float flightTime { get => (float)_flight_stopwatch.Elapsed.TotalSeconds; }
+        public float flightTime { 
+            get => _flight_time;
+            set {
+                _flight_time = value;
+                Updated?.Invoke(this, new(nameof(flightTime)));
+            }
+        }
 
         /// <summary>
         /// current power of the vehicle object to flight.
@@ -141,13 +138,13 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Events [verb, verb phrase]
 
-        public event Action OnFlight { add => _onFlight += value; remove => _onFlight -= value; }
+        public event Action? OnFlight;
 
-        public event Action OnGrounded { add => _onGrounded += value; remove => _onGrounded -= value; }
+        public event Action? OnGrounded;
 
-        public event Action OnGainEnergy { add => _onGainEnergy += value; remove => _onGainEnergy -= value; }
+        public event Action? OnGainEnergy;
 
-        public event Action OnLoseEnergy { add => _onLoseEnergy += value; remove => _onLoseEnergy -= value; }
+        public event Action? OnLoseEnergy;
 
         /// <summary>
         /// implementation for INotifyPropertyChanged
@@ -264,7 +261,7 @@ namespace Studio.MeowToon {
                 _energy.speed = airSpeed;
                 _energy.altitude = transform.position.y - 0.5f; // 0.5 is half vehicle height.
                 _do_fixed_update.ApplyFlight();
-                _onFlight(); // call event handler.
+                OnFlight(); // call event handler.
             });
 
             this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.flight).Subscribe(_ => {
@@ -283,7 +280,7 @@ namespace Studio.MeowToon {
             /// gain energy.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _b_button.wasPressedThisFrame && !_do_update.grounded && _status_system.usePoint).Subscribe(_ => {
-                _onGainEnergy();
+                OnGainEnergy();
                 _energy.Gain();
             });
 
@@ -291,7 +288,7 @@ namespace Studio.MeowToon {
             /// lose energy.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _y_button.wasPressedThisFrame && !_do_update.grounded && _status_system.usePoint).Subscribe(_ => {
-                _onLoseEnergy();
+                OnLoseEnergy();
                 _energy.Lose();
             });
 
@@ -346,6 +343,11 @@ namespace Studio.MeowToon {
                 }
             });
 
+            // LateUpdate is called after all Update functions have been called.
+            this.LateUpdateAsObservable().Subscribe(_ => {
+                flightTime = (float) _flight_stopwatch.Elapsed.TotalSeconds;
+            });
+
             /// <summary>
             /// freeze.
             /// </summary>
@@ -376,7 +378,7 @@ namespace Studio.MeowToon {
                 _use_lift_spoiler = false; // reset lift spoiler.
                 _energy.hasLanded = true; // reset flight power.
                 _flight_stopwatch.Reset(); // reset flight time.
-                _onGrounded(); // call event handler.
+                OnGrounded(); // call event handler.
             });
 
             /// <summary>

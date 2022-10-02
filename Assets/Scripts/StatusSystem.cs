@@ -155,11 +155,14 @@ namespace Studio.MeowToon {
             /// </summary>
             vehicle.Updated += (object sender, PropertyChangedEventArgs e) => {
                 var vehicle = (Vehicle) sender;
-                if (e.PropertyName.Equals("airSpeed")) { //Debug.Log($"airSpeed: {vehicle.airSpeed}");
+                if (e.PropertyName.Equals("airSpeed")) {
                     _air_speed = vehicle.airSpeed;
                 }
-                if (e.PropertyName.Equals("verticalSpeed")) { // Debug.Log($"verticalSpeed: {vehicle.verticalSpeed}");
+                if (e.PropertyName.Equals("verticalSpeed")) {
                     _vertical_speed = vehicle.verticalSpeed;
+                }
+                if (e.PropertyName.Equals("flightTime")) {
+                    _flight_time = vehicle.flightTime;
                 }
             };
 
@@ -195,13 +198,9 @@ namespace Studio.MeowToon {
             // get vehicle status.
             this.FixedUpdateAsObservable().Where(_ => !Mathf.Approximately(Time.deltaTime, 0)).Subscribe(_ => {
                 var vehicle = _vehicle_object.gameObject.GetVehicle();
-                //_air_speed = vehicle.airSpeed;
-                //_vertical_speed = vehicle.verticalSpeed;
-
                 /// <remarks>
                 /// for development.
                 /// </remarks>
-                _flight_time = vehicle.flightTime;
                 _energy = vehicle.total;
                 _power = vehicle.power;
             });
