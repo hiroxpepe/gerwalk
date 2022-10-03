@@ -3,12 +3,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- *
+ 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+  
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -70,6 +70,8 @@ namespace Studio.MeowToon {
 
         protected ButtonControl _select_button;
 
+        bool _use_vibration = true;
+
         bool _use_v_controller;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,6 +94,23 @@ namespace Studio.MeowToon {
             this.UpdateAsObservable().Subscribe(_ => {
                 mapGamepad();
             });
+
+            #region mobile phone vibration.
+
+            // vibrate the smartphone when the button is pressed.
+            this.UpdateAsObservable().Where(_ => _v_controller_object && _use_vibration &&
+                (_a_button.wasPressedThisFrame || _b_button.wasPressedThisFrame || _x_button.wasPressedThisFrame || _y_button.wasPressedThisFrame ||
+                _up_button.wasPressedThisFrame || _down_button.wasPressedThisFrame || _left_button.wasPressedThisFrame || _right_button.wasPressedThisFrame ||
+                _left_1_button.wasPressedThisFrame || _right_1_button.wasPressedThisFrame || _select_button.wasPressedThisFrame || _start_button.wasPressedThisFrame)).Subscribe(_ => {
+                    AndroidVibrator.Vibrate(50L);
+            });
+
+            // no vibration of the smartphone by pressing the start and X buttons at the same time.
+            this.UpdateAsObservable().Where(_ => (_x_button.isPressed && _start_button.wasPressedThisFrame) || (_x_button.wasPressedThisFrame && _start_button.isPressed)).Subscribe(_ => {
+                _use_vibration = !_use_vibration;
+            });
+
+            #endregion
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////

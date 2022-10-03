@@ -15,29 +15,23 @@
 
 namespace Studio.MeowToon {
     /// <summary>
-    /// an enumeration that represents the direction.
+    /// envelope class
+    /// @author h.adachi
     /// </summary>
-    public enum Direction {
+    public static class Envelope {
 #nullable enable
 
-        PositiveZ,
-        NegativeZ,
-        PositiveX,
-        NegativeX,
-        None
-    };
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Constants
 
-    #region RenderingMode
-
-    /// <summary>
-    /// enum representing the render mode of the material.
-    /// </summary>
-    public enum RenderingMode {
-        Opaque,
-        Cutout,
-        Fade,
-        Transparent,
+        public const int FPS = 30; // 30fps
+        public const string SCENE_TITLE = "Title";
+        public const string SCENE_SELECT = "Select";
+        public const string SCENE_LEVEL_1 = "Level1";
+        public const string SCENE_LEVEL_2 = "Level2";
+        public const string SCENE_LEVEL_3 = "Level3";
+        public const string MODE_EASY = "easy";
+        public const string MODE_NORMAL = "normal";
+        public const string MODE_HARD = "hard";
     }
-
-    #endregion
 }

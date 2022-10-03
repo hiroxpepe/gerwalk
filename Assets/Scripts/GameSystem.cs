@@ -13,9 +13,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using UniRx;
 using UniRx.Triggers;
 
@@ -30,31 +30,80 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constants
 
-        const int FPS = 30; // 30fps
-        const string MESSAGE_LEVEL_START = "Get items!";
-        const string MESSAGE_LEVEL_CLEAR = "Level Clear!";
-        const string MESSAGE_GAME_OVER = "Game Over!";
-        const string MESSAGE_GAME_PAUSE = "Pause";
+        const string TARGETS_OBJECT = "Balloons"; // name of target objects holder.
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
+        // static Fields [noun, adjectives] 
 
-        [SerializeField]
-        Text _message_text;
+        static string _mode = Envelope.MODE_NORMAL;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Fields [noun, adjectives] 
-
-        bool _use_vibration = true;
+        // Fields [noun, adjectives]
 
         bool _is_pausing = false;
+
+        string _active_scene_name = string.Empty;
+
+        int _point_total = 100;
+
+        int _target_total = 0;
+
+        int _target_remain = 0;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Properties [noun, adjectives] 
+
+        /// <summary>
+        /// game mode.
+        /// </summary>
+        public string mode { get => _mode; set => _mode = value; }
+
+        /// <summary>
+        /// point total.
+        /// </summary>
+        public int pointTotal { get => _point_total; set => _point_total = value; }
+
+        /// <summary>
+        /// can use points.
+        /// </summary>
+        public bool usePoint {
+            get {
+                return _point_total > 0;
+            }
+        }
+
+        /// <summary>
+        /// target total.
+        /// </summary>
+        public int targetTotal { get => _target_total; set => _target_total = value; }
+
+        /// <summary>
+        /// target remain.
+        /// </summary>
+        public int targetRemain { get => _target_remain; set => _target_remain = value; }
+
+        /// <summary>
+        /// beat the level.
+        /// </summary>
+        public bool beatLevel {
+            get {
+                return _target_remain == 0;
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // public Events [verb, verb phrase]
+
+        public event Action? OnPauseOn;
+
+        public event Action? OnPauseOff;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            Application.targetFrameRate = FPS;
+            Application.targetFrameRate = Envelope.FPS;
         }
 
         // Start is called before the first frame update
@@ -62,44 +111,60 @@ namespace Studio.MeowToon {
             base.Start();
 
             // get scene name.
-            var active_scene_name = SceneManager.GetActiveScene().name;
+            _active_scene_name = SceneManager.GetActiveScene().name;
 
-            #region mobile phone vibration.
+            // get targets count.
+            _target_total = getTargetsCount();
 
-            // vibrate the smartphone when the button is pressed.
-            this.UpdateAsObservable().Where(_ => _v_controller_object && _use_vibration &&
-                (_a_button.wasPressedThisFrame || _b_button.wasPressedThisFrame || _x_button.wasPressedThisFrame || _y_button.wasPressedThisFrame ||
-                _up_button.wasPressedThisFrame || _down_button.wasPressedThisFrame || _left_button.wasPressedThisFrame || _right_button.wasPressedThisFrame ||
-                _left_1_button.wasPressedThisFrame || _right_1_button.wasPressedThisFrame || _select_button.wasPressedThisFrame || _start_button.wasPressedThisFrame)).Subscribe(_ => {
-                AndroidVibrator.Vibrate(50L);
+            // check game status.
+            this.UpdateAsObservable().Subscribe(_ => {
+                checkGameStatus();
             });
-
-            // no vibration of the smartphone by pressing the start and X buttons at the same time.
-            this.UpdateAsObservable().Where(_ => (_x_button.isPressed && _start_button.wasPressedThisFrame) || (_x_button.wasPressedThisFrame && _start_button.isPressed)).Subscribe(_ => {
-                _use_vibration = !_use_vibration;
-            });
-
-            #endregion
 
             /// <summary>
             /// pause the game execute or cancel.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => active_scene_name.Contains("Level") && _start_button.wasPressedThisFrame).Subscribe(_ => {
+            this.UpdateAsObservable().Where(_ => _start_button.wasPressedThisFrame && isPlayLevel()).Subscribe(_ => {
                 if (_is_pausing) {
-                    Time.timeScale = 1f; _message_text.text = "";
+                    Time.timeScale = 1f;
+                    OnPauseOff?.Invoke();
                 } 
                 else {
-                    Time.timeScale = 0f; _message_text.text = MESSAGE_GAME_PAUSE; 
+                    Time.timeScale = 0f;
+                    OnPauseOn?.Invoke();
                 }
                 _is_pausing = !_is_pausing;
             });
 
             /// <summary>
-            /// restart level.
+            /// restart game.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => _select_button.wasPressedThisFrame).Subscribe(_ => {
-                SceneManager.LoadScene("Level1");
+            this.UpdateAsObservable().Where(_ => _select_button.wasPressedThisFrame && isPlayLevel()).Subscribe(_ => {
+                SceneManager.LoadScene(Envelope.SCENE_TITLE);
             });
+
+            ///////////////////////////////////////////////////////////////////////////////////////////////
+            // private Methods [verb]
+
+            bool isPlayLevel() {
+                return _active_scene_name.Contains("Level");
+            }
+
+            /// <summary>
+            /// check game status
+            /// </summary>
+            void checkGameStatus() {
+                _target_remain = getTargetsCount();
+            }
+
+            /// <summary>
+            /// get targets count.
+            /// </summary>
+            int getTargetsCount() {
+                var targets = GameObject.Find(TARGETS_OBJECT);
+                Transform targets_transform = targets.GetComponentInChildren<Transform>();
+                return targets_transform.childCount;
+            }
         }
     }
 }

@@ -3,12 +3,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- *
+ 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+  
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -136,6 +136,13 @@ namespace Studio.MeowToon {
             return GameObject.Find("Vehicle");
         }
 
+        /// <summary>
+        /// get the "Home" gameObject.
+        /// </summary>
+        public static GameObject GetHomeGameObject(this GameObject self) {
+            return GameObject.Find("Home");
+        }
+
         #endregion
 
         #region get the component.
@@ -239,6 +246,13 @@ namespace Studio.MeowToon {
         }
 
         /// <summary>
+        /// get the GameSystem component.
+        /// </summary>
+        public static GameSystem GetGameSystem(this GameObject self) {
+            return GameObject.Find("GameSystem").GetComponent<GameSystem>();
+        }
+
+        /// <summary>
         /// get the StatusSystem component.
         /// </summary>
         public static StatusSystem GetStatusSystem(this GameObject self) {
@@ -250,6 +264,13 @@ namespace Studio.MeowToon {
         /// </summary>
         public static Vehicle GetVehicle(this GameObject self) {
             return self.GetComponent<Vehicle>();
+        }
+
+        /// <summary>
+        /// get the Home component.
+        /// </summary>
+        public static Home GetHome(this GameObject self) {
+            return self.GetComponent<Home>();
         }
 
         /// <summary>
