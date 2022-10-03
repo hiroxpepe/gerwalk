@@ -94,20 +94,14 @@ namespace Studio.MeowToon {
         /// </summary>
         public float airSpeed {
             get => _air_speed;
-            set {
-                _air_speed = value;
-                Updated?.Invoke(this, new(nameof(airSpeed)));
-            }
+            set { _air_speed = value; Updated?.Invoke(this, new(nameof(airSpeed))); }
         }
 
         /// current vertical speed of the vehicle object to flight.
         /// </summary>
         public float verticalSpeed { 
             get => _vertical_speed;
-            set {
-                _vertical_speed = value;
-                Updated?.Invoke(this, new(nameof(verticalSpeed)));
-            }
+            set { _vertical_speed = value; Updated?.Invoke(this, new(nameof(verticalSpeed))); }
         }
 
         /// <summary>
@@ -115,10 +109,7 @@ namespace Studio.MeowToon {
         /// </summary>
         public float flightTime { 
             get => _flight_time;
-            set {
-                _flight_time = value;
-                Updated?.Invoke(this, new(nameof(flightTime)));
-            }
+            set { _flight_time = value; Updated?.Invoke(this, new(nameof(flightTime))); }
         }
 
         /// <summary>
@@ -129,10 +120,7 @@ namespace Studio.MeowToon {
         /// </remarks>
         public float total {
             get => _total;
-            set {
-                _total = value;
-                Updated?.Invoke(this, new(nameof(total)));
-            }
+            set { _total = value; Updated?.Invoke(this, new(nameof(total))); }
         }
 
         /// <summary>
@@ -143,10 +131,7 @@ namespace Studio.MeowToon {
         /// </remarks>
         public float power { 
             get => _power;
-            set {
-                _power = value;
-                Updated?.Invoke(this, new(nameof(power)));
-            }
+            set { _power = value; Updated?.Invoke(this, new(nameof(power))); }
         }
 
         /// <summary>
@@ -154,10 +139,7 @@ namespace Studio.MeowToon {
         /// </summary>
         public bool useLiftSpoiler { 
             get => _use_lift_spoiler;
-            set {
-                _use_lift_spoiler = value;
-                Updated?.Invoke(this, new(nameof(useLiftSpoiler)));
-            }
+            set { _use_lift_spoiler = value; Updated?.Invoke(this, new(nameof(useLiftSpoiler))); }
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -287,13 +269,13 @@ namespace Studio.MeowToon {
                 _energy.speed = airSpeed;
                 _energy.altitude = transform.position.y - 0.5f; // 0.5 is half vehicle height.
                 _do_fixed_update.ApplyFlight();
-                OnFlight(); // call event handler.
+                OnFlight?.Invoke(); // call event handler.
             });
 
             this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.flight).Subscribe(_ => {
                 const float FALL_VALUE = 5.0f; // 5.0 -> -5m/s
                 rb.useGravity = false;
-                rb.velocity = transform.forward * _energy.GetCalculatePower();
+                rb.velocity = transform.forward * _energy.GetCalculatedPower();
                 if (useLiftSpoiler) {
                     var velocity = rb.velocity;
                     rb.velocity = new Vector3(velocity.x, velocity.y - FALL_VALUE, velocity.z);
@@ -306,7 +288,7 @@ namespace Studio.MeowToon {
             /// gain energy.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _b_button.wasPressedThisFrame && !_do_update.grounded && _status_system.usePoint).Subscribe(_ => {
-                OnGainEnergy();
+                OnGainEnergy?.Invoke();
                 _energy.Gain();
             });
 
@@ -314,7 +296,7 @@ namespace Studio.MeowToon {
             /// lose energy.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _y_button.wasPressedThisFrame && !_do_update.grounded && _status_system.usePoint).Subscribe(_ => {
-                OnLoseEnergy();
+                OnLoseEnergy?.Invoke();
                 _energy.Lose();
             });
 
@@ -404,7 +386,7 @@ namespace Studio.MeowToon {
                 useLiftSpoiler = false; // reset lift spoiler.
                 _energy.hasLanded = true; // reset flight power.
                 _flight_stopwatch.Reset(); // reset flight time.
-                OnGrounded(); // call event handler.
+                OnGrounded?.Invoke(); // call event handler.
             });
 
             /// <summary>
@@ -535,25 +517,27 @@ namespace Studio.MeowToon {
         }
 
         /// <summary>
-        /// on property changed event handler for energy.
+        /// on property changed event handler from energy.
         /// </summary>
         void onPropertyChanged(object sender, PropertyChangedEventArgs e) {
-            if (e.PropertyName.Equals("total")) {
-                total = _energy.total;
-            }
-            if (e.PropertyName.Equals("power")) {
-                power = _energy.power;
+            if (sender as Energy is not null) {
+                if (e.PropertyName.Equals(nameof(Energy.total))) {
+                    total = _energy.total;
+                }
+                if (e.PropertyName.Equals(nameof(Energy.power))) {
+                    power = _energy.power;
+                }
             }
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // inner Classes
 
-        #region DoUpdate
+            #region DoUpdate
 
-        /// <summary>
-        /// class for the Update() method.
-        /// </summary>
+            /// <summary>
+            /// class for the Update() method.
+            /// </summary>
         class DoUpdate {
 
             ///////////////////////////////////////////////////////////////////////////////////////
@@ -749,9 +733,9 @@ namespace Studio.MeowToon {
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Fields [noun, adjectives] 
 
-            float _flight_power;
+            float _flight_power_base;
 
-            float _default_flight_power;
+            float _default_flight_power_base;
 
             float _calculated_power;
 
@@ -760,8 +744,6 @@ namespace Studio.MeowToon {
             Queue<float> _previous_altitudes = new();
 
             float _speed;
-
-            float _total;
 
             float _threshold = 1f; // FIXME:
 
@@ -773,7 +755,7 @@ namespace Studio.MeowToon {
             /// </summary>
             public float altitude {
                 set {
-                    const int QUEUE_COUNT = 30;
+                    const int QUEUE_COUNT = Envelope.FPS / 2; // 0.5 sec.
                     if (_previous_altitudes.Count < QUEUE_COUNT) {
                         _previous_altitudes.Enqueue(_altitude);
                     }
@@ -781,8 +763,7 @@ namespace Studio.MeowToon {
                         _previous_altitudes.Dequeue(); // keep the queue count.
                         _previous_altitudes.Enqueue(_altitude);
                     }
-                    _altitude = value;
-                    Updated?.Invoke(this, new(nameof(total)));
+                    _altitude = value; Updated?.Invoke(this, new(nameof(total)));
                 }
             }
 
@@ -791,10 +772,7 @@ namespace Studio.MeowToon {
             /// </summary>
             public float speed {
                 get => _speed;
-                set {
-                    _speed = value;
-                    Updated?.Invoke(this, new(nameof(total)));
-                }
+                set { _speed = value; Updated?.Invoke(this, new(nameof(total))); }
             }
 
             /// <summary>
@@ -820,7 +798,7 @@ namespace Studio.MeowToon {
                 set {
                     if (value) {
                         _speed = 0;
-                        _flight_power = _default_flight_power;
+                        _flight_power_base = _default_flight_power_base;
                     }
                 }
             }
@@ -840,8 +818,8 @@ namespace Studio.MeowToon {
             /// hide the constructor.
             /// </summary>
             Energy(float flightPower) {
-                _flight_power = flightPower;
-                _default_flight_power = _flight_power;
+                _flight_power_base = flightPower;
+                _default_flight_power_base = _flight_power_base;
             }
 
             /// <summary>
@@ -854,32 +832,43 @@ namespace Studio.MeowToon {
             ///////////////////////////////////////////////////////////////////////////////////////////
             // public Methods [verb]
 
-            public float GetCalculatePower() {
-                const float POWAR_FACTOR_VALUE = 4.0f;
+            /// <summary>
+            /// get the calculated power.
+            /// </summary>
+            public float GetCalculatedPower() {
+                const float ADD_OR_SUBTRACT_VALUE = 0.0009375f;
+                const float POWAR_FACTOR_VALUE = 5.0f;
+                const float ADJUSTED_VALUE = 2.65f;
                 const float AUTO_FLARE_ALTITUDE = 8.0f;
                 if (total > _threshold) {
                     if (_previous_altitudes.Peek() < _altitude) { // up
-                        _flight_power -= 0.0009375f * POWAR_FACTOR_VALUE * TOTAL_POWAR_FACTOR_VALUE;
+                        _flight_power_base -= ADD_OR_SUBTRACT_VALUE * POWAR_FACTOR_VALUE * TOTAL_POWAR_FACTOR_VALUE;
                     }
                     if (_previous_altitudes.Peek() > _altitude) { // down
-                        _flight_power += 0.0009375f * POWAR_FACTOR_VALUE * TOTAL_POWAR_FACTOR_VALUE;
+                        _flight_power_base += ADD_OR_SUBTRACT_VALUE * POWAR_FACTOR_VALUE * TOTAL_POWAR_FACTOR_VALUE;
                     }
                 }
                 if (total <= _threshold && _altitude < AUTO_FLARE_ALTITUDE) {
-                    _flight_power = _default_flight_power;
+                    _flight_power_base = _default_flight_power_base;
                 }
-                var result = _flight_power * 2.65f * TOTAL_POWAR_FACTOR_VALUE;
-                _calculated_power = result < 0 ? 0 : result;
-                Updated?.Invoke(this, new(nameof(power)));
+                float power_value = _flight_power_base * ADJUSTED_VALUE * TOTAL_POWAR_FACTOR_VALUE;
+                _calculated_power = power_value < 0 ? 0 : power_value;
+                Updated?.Invoke(this, new(nameof(power))); // call event handler.
                 return _calculated_power;
             }
 
+            /// <summary>
+            /// gain the power.
+            /// </summary>
             public void Gain() {
-                _flight_power += 0.125f * TOTAL_POWAR_FACTOR_VALUE; ;
+                _flight_power_base += 0.125f * TOTAL_POWAR_FACTOR_VALUE; ;
             }
 
+            /// <summary>
+            /// lose the power.
+            /// </summary>
             public void Lose() {
-                _flight_power -= 0.125f * TOTAL_POWAR_FACTOR_VALUE; ;
+                _flight_power_base -= 0.125f * TOTAL_POWAR_FACTOR_VALUE; ;
             }
         }
 

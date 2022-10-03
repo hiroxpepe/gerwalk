@@ -1882,7 +1882,7 @@ MonoBehaviour:
   _rotational_speed: 10
   _pitch_speed: 5
   _roll_speed: 5
-  _fly_power: 5
+  _flight_power: 5
   _forward_speed_limit: 1.1
   _run_speed_limit: 3.25
   _backward_speed_limit: 0.75
@@ -2839,7 +2839,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 09d1cb3d8307c9e43a2a76043c5b9b61, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a90f46b62a5dfa04b882eb6b13b5b7af, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

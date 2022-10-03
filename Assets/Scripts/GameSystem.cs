@@ -30,7 +30,6 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constants
 
-        const int FPS = 30; // 30fps
         const string MESSAGE_LEVEL_START = "Get items!";
         const string MESSAGE_LEVEL_CLEAR = "Level Clear!";
         const string MESSAGE_GAME_OVER = "Game Over!";
@@ -54,7 +53,7 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            Application.targetFrameRate = FPS;
+            Application.targetFrameRate = Envelope.FPS;
         }
 
         // Start is called before the first frame update

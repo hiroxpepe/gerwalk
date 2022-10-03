@@ -120,7 +120,7 @@ namespace Studio.MeowToon {
 
         public bool usePoint {
             get {
-                return _point_total > 0 ? true : false;
+                return _point_total > 0;
             }
         }
 
@@ -156,24 +156,26 @@ namespace Studio.MeowToon {
             /// vehicle updated.
             /// </summary>
             vehicle.Updated += (object sender, PropertyChangedEventArgs e) => {
-                var vehicle = (Vehicle) sender;
-                if (e.PropertyName.Equals("airSpeed")) {
-                    _air_speed = vehicle.airSpeed;
-                }
-                if (e.PropertyName.Equals("verticalSpeed")) {
-                    _vertical_speed = vehicle.verticalSpeed;
-                }
-                if (e.PropertyName.Equals("flightTime")) {
-                    _flight_time = vehicle.flightTime;
-                }
-                if (e.PropertyName.Equals("total")) {
-                    _energy = vehicle.total;
-                }
-                if (e.PropertyName.Equals("power")) {
-                    _power = vehicle.power;
-                }
-                if (e.PropertyName.Equals("useLiftSpoiler")) {
-                    _use_lift_spoiler = vehicle.useLiftSpoiler;
+                var vehicle = sender as Vehicle;
+                if (vehicle is not null) {
+                    if (e.PropertyName.Equals(nameof(Vehicle.airSpeed))) {
+                        _air_speed = vehicle.airSpeed;
+                    }
+                    if (e.PropertyName.Equals(nameof(Vehicle.verticalSpeed))) {
+                        _vertical_speed = vehicle.verticalSpeed;
+                    }
+                    if (e.PropertyName.Equals(nameof(Vehicle.flightTime))) {
+                        _flight_time = vehicle.flightTime;
+                    }
+                    if (e.PropertyName.Equals(nameof(Vehicle.total))) {
+                        _energy = vehicle.total;
+                    }
+                    if (e.PropertyName.Equals(nameof(Vehicle.power))) {
+                        _power = vehicle.power;
+                    }
+                    if (e.PropertyName.Equals(nameof(Vehicle.useLiftSpoiler))) {
+                        _use_lift_spoiler = vehicle.useLiftSpoiler;
+                    }
                 }
             };
 
