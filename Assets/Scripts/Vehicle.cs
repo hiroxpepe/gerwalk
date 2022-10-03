@@ -3,12 +3,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- *
+ 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+  
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -68,8 +68,6 @@ namespace Studio.MeowToon {
         // Fields [noun, adjectives] 
 
         GameSystem _game_system;
-
-        StatusSystem _status_system;
 
         DoUpdate _do_update;
 
@@ -171,7 +169,6 @@ namespace Studio.MeowToon {
         // Awake is called when the script instance is being loaded.
         void Awake() {
             _game_system = gameObject.GetGameSystem();
-            _status_system = gameObject.GetStatusSystem();
             _do_update = DoUpdate.GetInstance();
             _do_fixed_update = DoFixedUpdate.GetInstance();
             _acceleration = Acceleration.GetInstance(_forward_speed_limit, _run_speed_limit, _backward_speed_limit);
@@ -311,7 +308,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// gain energy.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => _b_button.wasPressedThisFrame && !_do_update.grounded && _status_system.usePoint).Subscribe(_ => {
+            this.UpdateAsObservable().Where(_ => _b_button.wasPressedThisFrame && !_do_update.grounded && _game_system.usePoint).Subscribe(_ => {
                 OnGainEnergy?.Invoke();
                 _energy.Gain();
             });
@@ -319,7 +316,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// lose energy.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => _y_button.wasPressedThisFrame && !_do_update.grounded && _status_system.usePoint).Subscribe(_ => {
+            this.UpdateAsObservable().Where(_ => _y_button.wasPressedThisFrame && !_do_update.grounded && _game_system.usePoint).Subscribe(_ => {
                 OnLoseEnergy?.Invoke();
                 _energy.Lose();
             });

@@ -33,13 +33,13 @@ namespace Studio.MeowToon {
         static string _mode = Envelope.MODE_NORMAL;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Fields [noun, adjectives] 
-
-        bool _use_vibration = true;
+        // Fields [noun, adjectives]
 
         bool _is_pausing = false;
 
         string _active_scene_name = string.Empty;
+
+        int _point_total = 100;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjectives] 
@@ -49,6 +49,19 @@ namespace Studio.MeowToon {
         /// </summary>
         public string mode { get => _mode; set => _mode = value; }
 
+        /// <summary>
+        /// point total.
+        /// </summary>
+        public int pointTotal { get => _point_total; set => _point_total = value; }
+
+        /// <summary>
+        /// can use points.
+        /// </summary>
+        public bool usePoint {
+            get {
+                return _point_total > 0;
+            }
+        }
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Events [verb, verb phrase]
 
@@ -70,37 +83,6 @@ namespace Studio.MeowToon {
 
             // get scene name.
             _active_scene_name = SceneManager.GetActiveScene().name;
-
-            #region mobile phone vibration.
-
-            // vibrate the smartphone when the button is pressed.
-            this.UpdateAsObservable().Where(_ => _v_controller_object && _use_vibration &&
-                (_a_button.wasPressedThisFrame || _b_button.wasPressedThisFrame || _x_button.wasPressedThisFrame || _y_button.wasPressedThisFrame ||
-                _up_button.wasPressedThisFrame || _down_button.wasPressedThisFrame || _left_button.wasPressedThisFrame || _right_button.wasPressedThisFrame ||
-                _left_1_button.wasPressedThisFrame || _right_1_button.wasPressedThisFrame || _select_button.wasPressedThisFrame || _start_button.wasPressedThisFrame)).Subscribe(_ => {
-                AndroidVibrator.Vibrate(50L);
-            });
-
-            // no vibration of the smartphone by pressing the start and X buttons at the same time.
-            this.UpdateAsObservable().Where(_ => (_x_button.isPressed && _start_button.wasPressedThisFrame) || (_x_button.wasPressedThisFrame && _start_button.isPressed)).Subscribe(_ => {
-                _use_vibration = !_use_vibration;
-            });
-
-            #endregion
-
-            /// <summary>
-            /// open select.
-            /// </summary>
-            this.UpdateAsObservable().Where(_ => _select_button.wasPressedThisFrame && !isPlayLevel()).Subscribe(_ => {
-                SceneManager.LoadScene(Envelope.SCENE_SELECT);
-            });
-
-            /// <summary>
-            /// start level.
-            /// </summary>
-            this.UpdateAsObservable().Where(_ => (_start_button.wasPressedThisFrame || _a_button.wasPressedThisFrame) && !isPlayLevel()).Subscribe(_ => {
-                SceneManager.LoadScene(Envelope.SCENE_LEVEL_1);
-            });
 
             /// <summary>
             /// pause the game execute or cancel.

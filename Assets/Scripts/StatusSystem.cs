@@ -61,6 +61,9 @@ namespace Studio.MeowToon {
         [SerializeField]
         Text _lift_spoiler_text;
 
+        [SerializeField]
+        Text _mode_text;
+
         /// <remarks>
         /// for development.
         /// </remarks>
@@ -79,12 +82,6 @@ namespace Studio.MeowToon {
         [SerializeField]
         Text _flight_text;
 
-        /// <remarks>
-        /// for development.
-        /// </remarks>
-        [SerializeField]
-        Text _debug_text;
-
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives] 
 
@@ -95,8 +92,6 @@ namespace Studio.MeowToon {
         int _target_total = 0;
 
         int _target_remain = 0;
-
-        int _point_total = 100;
 
         float _air_speed = 0f;
 
@@ -121,17 +116,20 @@ namespace Studio.MeowToon {
         /// </remarks>
         float _flight_time = 0;
 
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Properties [noun, adjectives] 
-
-        /// <summary>
-        /// FIXME: move to GameSystem.
-        /// </summary>
-        public bool usePoint {
-            get {
-                return _point_total > 0;
-            }
-        }
+        /// <remarks>
+        /// color.
+        /// </remarks>
+        Color _red;
+        Color _orange;
+        Color _yellow;
+        Color _lime;
+        Color _green;
+        Color _cyan;
+        Color _azure;
+        Color _blue;
+        Color _purple;
+        Color _magenta;
+        Color _white;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Methods [verb]
@@ -141,7 +139,7 @@ namespace Studio.MeowToon {
         /// </summary>
         public void IncrementPoints() {
             const int POINT_VALUE = 5;
-            _point_total += POINT_VALUE;
+            _game_system.pointTotal += POINT_VALUE;
             updateGameStatus();
         }
 
@@ -149,7 +147,7 @@ namespace Studio.MeowToon {
         /// decrement number of points.
         /// </summary>
         public void DecrementPoints() {
-            _point_total--;
+            _game_system.pointTotal--;
             updateGameStatus();
         }
 
@@ -225,6 +223,9 @@ namespace Studio.MeowToon {
             // get targets count.
             _target_total = getTargetsCount();
 
+            // create color.
+            createColor();
+
             // update text ui.
             this.UpdateAsObservable().Subscribe(_ => {
                 checkGameStatus();
@@ -248,7 +249,19 @@ namespace Studio.MeowToon {
         /// </summary>
         void updateGameStatus() {
             _targets_text.text = string.Format("TGT {0}/{1}", _target_total - _target_remain, _target_total);
-            _points_text.text = string.Format("POINT {0}", _point_total);
+            _points_text.text = string.Format("POINT {0}", _game_system.pointTotal);
+            _mode_text.text = string.Format("Mode: {0}", _game_system.mode);
+            switch (_game_system.mode) {
+                case Envelope.MODE_EASY:
+                    _mode_text.color = _yellow;
+                    break;
+                case Envelope.MODE_NORMAL:
+                    _mode_text.color = _green;
+                    break;
+                case Envelope.MODE_HARD:
+                    _mode_text.color = _purple;
+                    break;
+            }
         }
 
         /// <summary>
@@ -260,9 +273,7 @@ namespace Studio.MeowToon {
             _altitude = _vehicle_object.transform.position.y - 0.5f; // 0.5 is half vehicle height.
             _altitude_text.text = string.Format("ALT {0:000.0}m", Math.Round(_altitude, 1, MidpointRounding.AwayFromZero));
             var lift_spoiler_status = _use_lift_spoiler ? "ON" : "OFF";
-            var lift_spoiler_color_code = _use_lift_spoiler ? "#FF0000" : "#00FF00";
-            Color lift_spoiler_color;
-            ColorUtility.TryParseHtmlString(lift_spoiler_color_code, out lift_spoiler_color);
+            Color lift_spoiler_color = _use_lift_spoiler ? _red : _green;
             _lift_spoiler_text.text = $"Spoiler: {lift_spoiler_status}";
             _lift_spoiler_text.color = lift_spoiler_color;
             /// <remarks>
@@ -287,57 +298,56 @@ namespace Studio.MeowToon {
         /// for development.
         /// </remarks>
         public void setTotalEnergyColor(float value) {
-            // https://www.color-sample.com/colorschemes/rule/dominant/
             const float START_VALUE = 20.0f;
             const float ADDED_VALUE = 20.0f;
-            Color color;
             if (value is < START_VALUE) {
-                ColorUtility.TryParseHtmlString("#FF0000", out color); // red
-                _energy_text.color = color;
+                _energy_text.color = _red;
             }
             else if (value is < START_VALUE + ADDED_VALUE and >= START_VALUE) {
-                ColorUtility.TryParseHtmlString("#FF7F00", out color); // orange
-                _energy_text.color = color;
+                _energy_text.color = _orange;
             }
             else if (value is < START_VALUE + ADDED_VALUE * 2 and >= START_VALUE + ADDED_VALUE) {
-                ColorUtility.TryParseHtmlString("#FFFF00", out color); // yellow
-                _energy_text.color = color;
+                _energy_text.color = _yellow;
             }
             else if (value is < START_VALUE + ADDED_VALUE * 3 and >= START_VALUE + ADDED_VALUE * 2) {
-                ColorUtility.TryParseHtmlString("#7FFF00", out color); // lime
-                _energy_text.color = color;
+                _energy_text.color = _lime;
             }
             else if (value is < START_VALUE + ADDED_VALUE * 4 and >= START_VALUE + ADDED_VALUE * 3) {
-                ColorUtility.TryParseHtmlString("#00FF00", out color); // green
-                _energy_text.color = color;
+                _energy_text.color = _green;
             }
             else if (value is < START_VALUE + ADDED_VALUE * 5 and >= START_VALUE + ADDED_VALUE * 4) {
-                ColorUtility.TryParseHtmlString("#00FFFF", out color); // cyan
-                _energy_text.color = color;
+                _energy_text.color = _cyan;
             }
             else if (value is < START_VALUE + ADDED_VALUE * 6 and >= START_VALUE + ADDED_VALUE * 5) {
-                ColorUtility.TryParseHtmlString("#007FFF", out color); // azure
-                _energy_text.color = color;
+                _energy_text.color = _azure;
             }
             else if (value is < START_VALUE + ADDED_VALUE * 7 and >= START_VALUE + ADDED_VALUE * 6) {
-                ColorUtility.TryParseHtmlString("#002AFF", out color); // blue
-                _energy_text.color = color;
+                _energy_text.color = _blue;
             }
             else if (value is < START_VALUE + ADDED_VALUE * 8 and >= START_VALUE + ADDED_VALUE * 7) {
-                ColorUtility.TryParseHtmlString("#D400FF", out color); // purple
-                _energy_text.color = color;
+                _energy_text.color = _purple;
             }
             else {
-                ColorUtility.TryParseHtmlString("#FF007F", out color); // magenta
-                _energy_text.color = color;
+                _energy_text.color = _magenta;
             }
         }
 
         /// <summary>
-        /// debug trace
+        /// create color.
+        /// https://www.color-sample.com/colorschemes/rule/dominant/
         /// </summary>
-        public void trace(string value) {
-            _debug_text.text = value;
+        void createColor() {
+            ColorUtility.TryParseHtmlString("#FF0000", out _red);
+            ColorUtility.TryParseHtmlString("#FF7F00", out _orange);
+            ColorUtility.TryParseHtmlString("#FFFF00", out _yellow);
+            ColorUtility.TryParseHtmlString("#7FFF00", out _lime);
+            ColorUtility.TryParseHtmlString("#00FF00", out _green);
+            ColorUtility.TryParseHtmlString("#00FFFF", out _cyan);
+            ColorUtility.TryParseHtmlString("#007FFF", out _azure);
+            ColorUtility.TryParseHtmlString("#002AFF", out _blue);
+            ColorUtility.TryParseHtmlString("#D400FF", out _purple);
+            ColorUtility.TryParseHtmlString("#FF007F", out _magenta);
+            ColorUtility.TryParseHtmlString("#FFFFFF", out _white);
         }
     }
 }
