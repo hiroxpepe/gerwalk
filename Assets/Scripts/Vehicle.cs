@@ -60,7 +60,14 @@ namespace Studio.MeowToon {
         SimpleAnimation _simple_anime;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
+        // static Fields [noun, adjectives] 
+
+        static float _total_power_factor_value = 1.5f;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives] 
+
+        GameSystem _game_system;
 
         StatusSystem _status_system;
 
@@ -163,6 +170,7 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
+            _game_system = gameObject.GetGameSystem();
             _status_system = gameObject.GetStatusSystem();
             _do_update = DoUpdate.GetInstance();
             _do_fixed_update = DoFixedUpdate.GetInstance();
@@ -176,6 +184,22 @@ namespace Studio.MeowToon {
             base.Start();
 
             const float ACTION_POWER = 12.0f;
+
+            // set game mode
+            switch (_game_system.mode) {
+                case Envelope.MODE_EASY:
+                    _total_power_factor_value = 1.0f;
+                    Debug.Log($"play mode: {Envelope.MODE_EASY}");
+                    break;
+                case Envelope.MODE_NORMAL:
+                    _total_power_factor_value = 1.5f;
+                    Debug.Log($"play mode: {Envelope.MODE_NORMAL}");
+                    break;
+                case Envelope.MODE_HARD:
+                    _total_power_factor_value = 2.0f;
+                    Debug.Log($"play mode: {Envelope.MODE_HARD}");
+                    break;
+            }
 
             /// <remarks>
             /// fRigidbody should be only used in FixedUpdate.
@@ -533,11 +557,11 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // inner Classes
 
-            #region DoUpdate
+        #region DoUpdate
 
-            /// <summary>
-            /// class for the Update() method.
-            /// </summary>
+        /// <summary>
+        /// class for the Update() method.
+        /// </summary>
         class DoUpdate {
 
             ///////////////////////////////////////////////////////////////////////////////////////
@@ -728,7 +752,7 @@ namespace Studio.MeowToon {
             ///////////////////////////////////////////////////////////////////////////////////////////////
             // Constants
 
-            const float TOTAL_POWAR_FACTOR_VALUE = 1.5f; // easy: 1.0f, normal: 1.5f , hard: 2.0f
+            //const float TOTAL_POWAR_FACTOR_VALUE = 1.5f; // easy: 1.0f, normal: 1.5f , hard: 2.0f
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Fields [noun, adjectives] 
@@ -842,16 +866,16 @@ namespace Studio.MeowToon {
                 const float AUTO_FLARE_ALTITUDE = 8.0f;
                 if (total > _threshold) {
                     if (_previous_altitudes.Peek() < _altitude) { // up
-                        _flight_power_base -= ADD_OR_SUBTRACT_VALUE * POWAR_FACTOR_VALUE * TOTAL_POWAR_FACTOR_VALUE;
+                        _flight_power_base -= ADD_OR_SUBTRACT_VALUE * POWAR_FACTOR_VALUE * _total_power_factor_value;
                     }
                     if (_previous_altitudes.Peek() > _altitude) { // down
-                        _flight_power_base += ADD_OR_SUBTRACT_VALUE * POWAR_FACTOR_VALUE * TOTAL_POWAR_FACTOR_VALUE;
+                        _flight_power_base += ADD_OR_SUBTRACT_VALUE * POWAR_FACTOR_VALUE * _total_power_factor_value;
                     }
                 }
                 if (total <= _threshold && _altitude < AUTO_FLARE_ALTITUDE) {
                     _flight_power_base = _default_flight_power_base;
                 }
-                float power_value = _flight_power_base * ADJUSTED_VALUE * TOTAL_POWAR_FACTOR_VALUE;
+                float power_value = _flight_power_base * ADJUSTED_VALUE * _total_power_factor_value;
                 _calculated_power = power_value < 0 ? 0 : power_value;
                 Updated?.Invoke(this, new(nameof(power))); // call event handler.
                 return _calculated_power;
@@ -861,14 +885,14 @@ namespace Studio.MeowToon {
             /// gain the power.
             /// </summary>
             public void Gain() {
-                _flight_power_base += 0.125f * TOTAL_POWAR_FACTOR_VALUE; ;
+                _flight_power_base += 0.125f * _total_power_factor_value; ;
             }
 
             /// <summary>
             /// lose the power.
             /// </summary>
             public void Lose() {
-                _flight_power_base -= 0.125f * TOTAL_POWAR_FACTOR_VALUE; ;
+                _flight_power_base -= 0.125f * _total_power_factor_value; ;
             }
         }
 

@@ -239,6 +239,13 @@ namespace Studio.MeowToon {
         }
 
         /// <summary>
+        /// get the GameSystem component.
+        /// </summary>
+        public static GameSystem GetGameSystem(this GameObject self) {
+            return GameObject.Find("GameSystem").GetComponent<GameSystem>();
+        }
+
+        /// <summary>
         /// get the StatusSystem component.
         /// </summary>
         public static StatusSystem GetStatusSystem(this GameObject self) {

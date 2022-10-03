@@ -13,9 +13,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using UniRx;
 using UniRx.Triggers;
 
@@ -28,18 +28,9 @@ namespace Studio.MeowToon {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Constants
+        // static Fields [noun, adjectives] 
 
-        const string MESSAGE_LEVEL_START = "Get items!";
-        const string MESSAGE_LEVEL_CLEAR = "Level Clear!";
-        const string MESSAGE_GAME_OVER = "Game Over!";
-        const string MESSAGE_GAME_PAUSE = "Pause";
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
-
-        [SerializeField]
-        Text _message_text;
+        static string _mode = Envelope.MODE_NORMAL;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives] 
@@ -47,6 +38,23 @@ namespace Studio.MeowToon {
         bool _use_vibration = true;
 
         bool _is_pausing = false;
+
+        string _active_scene_name = string.Empty;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Properties [noun, adjectives] 
+
+        /// <summary>
+        /// game mode.
+        /// </summary>
+        public string mode { get => _mode; set => _mode = value; }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // public Events [verb, verb phrase]
+
+        public event Action? OnPauseOn;
+
+        public event Action? OnPauseOff;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -61,7 +69,7 @@ namespace Studio.MeowToon {
             base.Start();
 
             // get scene name.
-            var active_scene_name = SceneManager.GetActiveScene().name;
+            _active_scene_name = SceneManager.GetActiveScene().name;
 
             #region mobile phone vibration.
 
@@ -81,24 +89,47 @@ namespace Studio.MeowToon {
             #endregion
 
             /// <summary>
+            /// open select.
+            /// </summary>
+            this.UpdateAsObservable().Where(_ => _select_button.wasPressedThisFrame && !isPlayLevel()).Subscribe(_ => {
+                SceneManager.LoadScene(Envelope.SCENE_SELECT);
+            });
+
+            /// <summary>
+            /// start level.
+            /// </summary>
+            this.UpdateAsObservable().Where(_ => (_start_button.wasPressedThisFrame || _a_button.wasPressedThisFrame) && !isPlayLevel()).Subscribe(_ => {
+                SceneManager.LoadScene(Envelope.SCENE_LEVEL_1);
+            });
+
+            /// <summary>
             /// pause the game execute or cancel.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => active_scene_name.Contains("Level") && _start_button.wasPressedThisFrame).Subscribe(_ => {
+            this.UpdateAsObservable().Where(_ => _start_button.wasPressedThisFrame && isPlayLevel()).Subscribe(_ => {
                 if (_is_pausing) {
-                    Time.timeScale = 1f; _message_text.text = "";
+                    Time.timeScale = 1f;
+                    OnPauseOff?.Invoke();
                 } 
                 else {
-                    Time.timeScale = 0f; _message_text.text = MESSAGE_GAME_PAUSE; 
+                    Time.timeScale = 0f;
+                    OnPauseOn?.Invoke();
                 }
                 _is_pausing = !_is_pausing;
             });
 
             /// <summary>
-            /// restart level.
+            /// restart game.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => _select_button.wasPressedThisFrame).Subscribe(_ => {
-                SceneManager.LoadScene("Level1");
+            this.UpdateAsObservable().Where(_ => _select_button.wasPressedThisFrame && isPlayLevel()).Subscribe(_ => {
+                SceneManager.LoadScene(Envelope.SCENE_TITLE);
             });
+
+            ///////////////////////////////////////////////////////////////////////////////////////////////
+            // private Methods [verb]
+
+            bool isPlayLevel() {
+                return _active_scene_name.Contains("Level");
+            }
         }
     }
 }

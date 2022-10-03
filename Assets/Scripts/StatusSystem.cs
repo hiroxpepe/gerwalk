@@ -32,6 +32,10 @@ namespace Studio.MeowToon {
         // Constants
 
         const string TARGETS_OBJECT = "Balloons"; // name of target objects holder.
+        const string MESSAGE_LEVEL_START = "Get items!";
+        const string MESSAGE_LEVEL_CLEAR = "Level Clear!";
+        const string MESSAGE_GAME_OVER = "Game Over!";
+        const string MESSAGE_GAME_PAUSE = "Pause";
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
@@ -84,6 +88,8 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives] 
 
+        GameSystem _game_system;
+
         GameObject _vehicle_object;
 
         int _target_total = 0;
@@ -118,6 +124,9 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjectives] 
 
+        /// <summary>
+        /// FIXME: move to GameSystem.
+        /// </summary>
         public bool usePoint {
             get {
                 return _point_total > 0;
@@ -149,8 +158,23 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
+            _game_system = gameObject.GetGameSystem();
             _vehicle_object = gameObject.GetVehicleGameObject();
             Vehicle vehicle = _vehicle_object.GetVehicle();
+
+            /// <summary>
+            /// game system pause on.
+            /// </summary>
+            _game_system.OnPauseOn += () => {
+                _message_text.text = MESSAGE_GAME_PAUSE;
+            };
+
+            /// <summary>
+            /// game system pause off.
+            /// </summary>
+            _game_system.OnPauseOff += () => {
+                _message_text.text = string.Empty;
+            };
 
             /// <summary>
             /// vehicle updated.

@@ -13,9 +13,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Studio.MeowToon {
+    /// <summary>
+    /// name of Dictionary is too long, it be named Map.
+    /// </summary>
+    public class Map<K, V> : Dictionary<K, V> {
+    }
+
     /// <summary>
     /// generic utility class.
     /// @author h.adachi
