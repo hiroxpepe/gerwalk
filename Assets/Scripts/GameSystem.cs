@@ -28,6 +28,11 @@ namespace Studio.MeowToon {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Constants
+
+        const string TARGETS_OBJECT = "Balloons"; // name of target objects holder.
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Fields [noun, adjectives] 
 
         static string _mode = Envelope.MODE_NORMAL;
@@ -40,6 +45,10 @@ namespace Studio.MeowToon {
         string _active_scene_name = string.Empty;
 
         int _point_total = 100;
+
+        int _target_total = 0;
+
+        int _target_remain = 0;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjectives] 
@@ -62,6 +71,26 @@ namespace Studio.MeowToon {
                 return _point_total > 0;
             }
         }
+
+        /// <summary>
+        /// target total.
+        /// </summary>
+        public int targetTotal { get => _target_total; set => _target_total = value; }
+
+        /// <summary>
+        /// target remain.
+        /// </summary>
+        public int targetRemain { get => _target_remain; set => _target_remain = value; }
+
+        /// <summary>
+        /// beat the level.
+        /// </summary>
+        public bool beatLevel {
+            get {
+                return _target_remain == 0;
+            }
+        }
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Events [verb, verb phrase]
 
@@ -83,6 +112,14 @@ namespace Studio.MeowToon {
 
             // get scene name.
             _active_scene_name = SceneManager.GetActiveScene().name;
+
+            // get targets count.
+            _target_total = getTargetsCount();
+
+            // check game status.
+            this.UpdateAsObservable().Subscribe(_ => {
+                checkGameStatus();
+            });
 
             /// <summary>
             /// pause the game execute or cancel.
@@ -111,6 +148,22 @@ namespace Studio.MeowToon {
 
             bool isPlayLevel() {
                 return _active_scene_name.Contains("Level");
+            }
+
+            /// <summary>
+            /// check game status
+            /// </summary>
+            void checkGameStatus() {
+                _target_remain = getTargetsCount();
+            }
+
+            /// <summary>
+            /// get targets count.
+            /// </summary>
+            int getTargetsCount() {
+                var targets = GameObject.Find(TARGETS_OBJECT);
+                Transform targets_transform = targets.GetComponentInChildren<Transform>();
+                return targets_transform.childCount;
             }
         }
     }

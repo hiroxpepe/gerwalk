@@ -136,6 +136,13 @@ namespace Studio.MeowToon {
             return GameObject.Find("Vehicle");
         }
 
+        /// <summary>
+        /// get the "Home" gameObject.
+        /// </summary>
+        public static GameObject GetHomeGameObject(this GameObject self) {
+            return GameObject.Find("Home");
+        }
+
         #endregion
 
         #region get the component.
@@ -257,6 +264,13 @@ namespace Studio.MeowToon {
         /// </summary>
         public static Vehicle GetVehicle(this GameObject self) {
             return self.GetComponent<Vehicle>();
+        }
+
+        /// <summary>
+        /// get the Home component.
+        /// </summary>
+        public static Home GetHome(this GameObject self) {
+            return self.GetComponent<Home>();
         }
 
         /// <summary>

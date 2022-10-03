@@ -31,7 +31,6 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constants
 
-        const string TARGETS_OBJECT = "Balloons"; // name of target objects holder.
         const string MESSAGE_LEVEL_START = "Get items!";
         const string MESSAGE_LEVEL_CLEAR = "Level Clear!";
         const string MESSAGE_GAME_OVER = "Game Over!";
@@ -89,9 +88,7 @@ namespace Studio.MeowToon {
 
         GameObject _vehicle_object;
 
-        int _target_total = 0;
-
-        int _target_remain = 0;
+        GameObject _home_object;
 
         float _air_speed = 0f;
 
@@ -159,6 +156,8 @@ namespace Studio.MeowToon {
             _game_system = gameObject.GetGameSystem();
             _vehicle_object = gameObject.GetVehicleGameObject();
             Vehicle vehicle = _vehicle_object.GetVehicle();
+            _home_object = gameObject.GetHomeGameObject();
+            Home home = _home_object.GetHome();
 
             /// <summary>
             /// game system pause on.
@@ -216,19 +215,22 @@ namespace Studio.MeowToon {
             vehicle.OnLoseEnergy += () => {
                 DecrementPoints();
             };
+
+            /// <summary>
+            /// came back home.
+            /// </summary>
+            home.OnCameBack += () => {
+                _message_text.text = MESSAGE_LEVEL_CLEAR;
+            };
         }
 
         // Start is called before the first frame update
         void Start() {
-            // get targets count.
-            _target_total = getTargetsCount();
-
             // create color.
             createColor();
 
             // update text ui.
             this.UpdateAsObservable().Subscribe(_ => {
-                checkGameStatus();
                 updateGameStatus();
                 updateVehicleStatus();
             });
@@ -238,17 +240,10 @@ namespace Studio.MeowToon {
         // private Methods [verb]
 
         /// <summary>
-        /// check game status
-        /// </summary>
-        void checkGameStatus() {
-            _target_remain = getTargetsCount();
-        }
-
-        /// <summary>
         /// update game status
         /// </summary>
         void updateGameStatus() {
-            _targets_text.text = string.Format("TGT {0}/{1}", _target_total - _target_remain, _target_total);
+            _targets_text.text = string.Format("TGT {0}/{1}", _game_system.targetTotal - _game_system.targetRemain, _game_system.targetTotal);
             _points_text.text = string.Format("POINT {0}", _game_system.pointTotal);
             _mode_text.text = string.Format("Mode: {0}", _game_system.mode);
             switch (_game_system.mode) {
@@ -283,15 +278,6 @@ namespace Studio.MeowToon {
             _energy_text.text = string.Format("ENG {0:0000.0}", Math.Round(_energy, 1, MidpointRounding.AwayFromZero));
             _power_text.text = string.Format("POW {0:0000.0}", Math.Round(_power, 1, MidpointRounding.AwayFromZero));
             _flight_text.text = string.Format("TIME {0:000.0}sec", Math.Round(_flight_time, 1, MidpointRounding.AwayFromZero));
-        }
-
-        /// <summary>
-        /// get targets count.
-        /// </summary>
-        int getTargetsCount() {
-            var targets = GameObject.Find(TARGETS_OBJECT);
-            Transform targets_transform = targets.GetComponentInChildren<Transform>();
-            return targets_transform.childCount;
         }
 
         /// <remarks>
