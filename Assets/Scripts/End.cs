@@ -19,10 +19,10 @@ using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
-    /// title scene
+    /// end scene
     /// @author h.adachi
     /// </summary>
-    public class Title : GamepadMaper {
+    public class End: GamepadMaper {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives]
@@ -45,14 +45,13 @@ namespace Studio.MeowToon {
             /// open select.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _select_button.wasPressedThisFrame).Subscribe(_ => {
-                SceneManager.LoadScene(Envelope.SCENE_SELECT);
             });
 
             /// <summary>
             /// start level.
             /// </summary>
             this.UpdateAsObservable().Where(_ => (_start_button.wasPressedThisFrame || _a_button.wasPressedThisFrame)).Subscribe(_ => {
-                SceneManager.LoadScene(Envelope.SCENE_LEVEL_1);
+                SceneManager.LoadScene(Envelope.SCENE_TITLE);
             });
         }
     }

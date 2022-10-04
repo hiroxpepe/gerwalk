@@ -3,12 +3,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
-
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
-
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -66,16 +66,15 @@ namespace Studio.MeowToon {
                         break;
                     case Envelope.SCENE_LEVEL_3:
                         Time.timeScale = 1f;
-                        SceneManager.LoadScene(Envelope.SCENE_LEVEL_1);
+                        SceneManager.LoadScene(Envelope.SCENE_End);
                         break;
                 }
             });
 
             /// <summary>
-            /// wwhen being touched vehicle.
+            /// when being touched vehicle.
             /// </summary>
             this.OnCollisionEnterAsObservable().Where(x => x.LikeVehicle() && _game_system.beatLevel).Subscribe(x => {
-                Debug.Log($"beatLevel: {_game_system.beatLevel}");
                 OnCameBack?.Invoke();
                 _is_home = true;
                 Time.timeScale = 0f;
