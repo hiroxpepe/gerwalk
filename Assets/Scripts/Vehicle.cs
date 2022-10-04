@@ -347,12 +347,24 @@ namespace Studio.MeowToon {
             /// <summary>
             /// roll and yaw.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_left_button.isPressed || _right_button.isPressed)).Subscribe(_ => {
-                var axis = _left_button.isPressed ? 1 : _right_button.isPressed ? -1 : 0;
-                transform.Rotate(0, 0, axis * (_roll_speed * Time.deltaTime) * ACTION_POWER);
-                axis = _right_button.isPressed ? 1 : _left_button.isPressed ? -1 : 0;
-                transform.Rotate(0, axis * (_roll_speed * Time.deltaTime) * ACTION_POWER, 0);
-            });
+            if (_game_system.mode == Envelope.MODE_EASY || _game_system.mode == Envelope.MODE_NORMAL) {
+                this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_left_button.isPressed || _right_button.isPressed)).Subscribe(_ => {
+                    var axis = _left_button.isPressed ? 1 : _right_button.isPressed ? -1 : 0;
+                    transform.Rotate(0, 0, axis * (_roll_speed * Time.deltaTime) * ACTION_POWER);
+                    axis = _right_button.isPressed ? 1 : _left_button.isPressed ? -1 : 0;
+                    transform.Rotate(0, axis * (_roll_speed * Time.deltaTime) * ACTION_POWER, 0);
+                });
+            } 
+            else if (_game_system.mode == Envelope.MODE_HARD) {
+                this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_left_button.isPressed || _right_button.isPressed)).Subscribe(_ => {
+                    var axis = _left_button.isPressed ? 1 : _right_button.isPressed ? -1 : 0;
+                    transform.Rotate(0, 0, axis * (_roll_speed * 2.0f * Time.deltaTime) * ACTION_POWER);
+                });
+                this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_left_1_button.isPressed || _right_1_button.isPressed)).Subscribe(_ => {
+                    var axis = _right_1_button.isPressed ? 1 : _left_1_button.isPressed ? -1 : 0;
+                    transform.Rotate(0, axis * (_roll_speed * 0.5f * Time.deltaTime) * ACTION_POWER, 0);
+                });
+            }
 
             this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_left_button.wasReleasedThisFrame || _right_button.wasReleasedThisFrame)).Subscribe(_ => {
             });
@@ -394,6 +406,7 @@ namespace Studio.MeowToon {
 
             /// <summary>
             /// when touching grounds.
+            /// TODO: to Ground ?
             /// </summary>
             this.OnCollisionEnterAsObservable().Where(x => x.LikeGround()).Subscribe(x => {
                 _do_update.grounded = true;
@@ -412,6 +425,7 @@ namespace Studio.MeowToon {
 
             /// <summary>
             /// when touching blocks.
+            /// TODO: to Block ?
             /// </summary>
             this.OnCollisionEnterAsObservable().Where(x => x.LikeBlock()).Subscribe(x => {
                 if (!isHitSide(x.gameObject)) {
@@ -422,6 +436,7 @@ namespace Studio.MeowToon {
 
             /// <summary>
             /// when leaving blocks.
+            /// TODO: to Block ?
             /// </summary>
             this.OnCollisionExitAsObservable().Where(x => x.LikeBlock()).Subscribe(x => {
                 rb.useGravity = true;
