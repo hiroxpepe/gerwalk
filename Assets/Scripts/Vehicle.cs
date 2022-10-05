@@ -23,7 +23,7 @@ using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
-    /// vehicle controller.
+    /// vehicle controller
     /// @author h.adachi
     /// </summary>
     public class Vehicle : InputMaper {

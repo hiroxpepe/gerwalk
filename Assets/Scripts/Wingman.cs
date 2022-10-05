@@ -20,7 +20,7 @@ using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
-    /// Wingman controller.
+    /// Wingman class
     /// @author h.adachi
     /// </summary>
     public class Wingman : MonoBehaviour {

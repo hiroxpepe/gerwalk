@@ -19,7 +19,7 @@ using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
-    /// common processing of objects.
+    /// common processing of objects
     /// @author h.adachi
     /// </summary>
     public class Common : MonoBehaviour {

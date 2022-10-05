@@ -103,6 +103,7 @@ namespace Studio.MeowToon {
         public void IncrementPoints() {
             const int POINT_VALUE = 5;
             pointTotal += POINT_VALUE;
+            OnIncrementPoints?.Invoke();
         }
 
         /// <summary>
@@ -110,6 +111,7 @@ namespace Studio.MeowToon {
         /// </summary>
         public void DecrementPoints() {
             pointTotal--;
+            OnDecrementPoints?.Invoke();
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
