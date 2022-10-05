@@ -40,6 +40,8 @@ namespace Studio.MeowToon {
 
         GameObject _level_object;
 
+        GameObject _vehicle_object;
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjectives] 
 
@@ -88,6 +90,28 @@ namespace Studio.MeowToon {
 
         public event Action? OnPauseOff;
 
+        public event Action? OnIncrementPoints;
+
+        public event Action? OnDecrementPoints;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // public Methods [verb]
+
+        /// <summary>
+        /// increment number of points.
+        /// </summary>
+        public void IncrementPoints() {
+            const int POINT_VALUE = 5;
+            pointTotal += POINT_VALUE;
+        }
+
+        /// <summary>
+        /// decrement number of points.
+        /// </summary>
+        public void DecrementPoints() {
+            pointTotal--;
+        }
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
 
@@ -114,6 +138,28 @@ namespace Studio.MeowToon {
                     OnPauseOff?.Invoke();
                 };
             }
+
+            // vehicle
+            if (hasVehicle()) {
+                _vehicle_object = gameObject.GetVehicleGameObject();
+                Vehicle vehicle = _vehicle_object.GetVehicle();
+
+                /// <summary>
+                /// vehicle on gain energy.
+                /// spend points.
+                /// </summary>
+                vehicle.OnGainEnergy += () => {
+                    DecrementPoints();
+                };
+
+                /// <summary>
+                /// vehicle on lose energy.
+                /// spend points.
+                /// </summary>
+                vehicle.OnLoseEnergy += () => {
+                    DecrementPoints();
+                };
+            }
         }
 
         // Start is called before the first frame update
@@ -130,6 +176,17 @@ namespace Studio.MeowToon {
         bool hasLevel() {
             GameObject level_object = GameObject.Find("Level");
             if (level_object is not null) {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// has vehicle.
+        /// </summary>
+        bool hasVehicle() {
+            GameObject vehicle_object = GameObject.Find("Vehicle");
+            if (vehicle_object is not null) {
                 return true;
             }
             return false;

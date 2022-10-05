@@ -119,26 +119,6 @@ namespace Studio.MeowToon {
         Color _red, _orange, _yellow, _lime, _green, _cyan, _azure, _blue, _purple, _magenta, _white;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // public Methods [verb]
-
-        /// <summary>
-        /// increment number of points.
-        /// </summary>
-        public void IncrementPoints() {
-            const int POINT_VALUE = 5;
-            _game_system.pointTotal += POINT_VALUE;
-            updateGameStatus();
-        }
-
-        /// <summary>
-        /// decrement number of points.
-        /// </summary>
-        public void DecrementPoints() {
-            _game_system.pointTotal--;
-            updateGameStatus();
-        }
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
 
         // Awake is called when the script instance is being loaded.
@@ -161,6 +141,20 @@ namespace Studio.MeowToon {
             /// </summary>
             _game_system.OnPauseOff += () => {
                 _message_text.text = string.Empty;
+            };
+
+            /// <summary>
+            /// game system increment points.
+            /// </summary>
+            _game_system.OnIncrementPoints += () => {
+                updateGameStatus();
+            };
+
+            /// <summary>
+            /// game system decrement points.
+            /// </summary>
+            _game_system.OnDecrementPoints += () => {
+                updateGameStatus();
             };
 
             /// <summary>
@@ -188,22 +182,6 @@ namespace Studio.MeowToon {
                         _use_lift_spoiler = vehicle.useLiftSpoiler;
                     }
                 }
-            };
-
-            /// <summary>
-            /// vehicle on gain energy.
-            /// spend points.
-            /// </summary>
-            vehicle.OnGainEnergy += () => {
-                DecrementPoints();
-            };
-
-            /// <summary>
-            /// vehicle on lose energy.
-            /// spend points.
-            /// </summary>
-            vehicle.OnLoseEnergy += () => {
-                DecrementPoints();
             };
 
             /// <summary>

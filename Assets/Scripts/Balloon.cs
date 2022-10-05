@@ -44,7 +44,7 @@ namespace Studio.MeowToon {
 
         DoFixedUpdate _do_fixed_update;
 
-        NoticeSystem _notice_system;
+        GameSystem _game_system;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -53,7 +53,7 @@ namespace Studio.MeowToon {
         void Awake() {
             _do_fixed_update = DoFixedUpdate.getInstance();
             _explode_param = ExplodeParam.getDefaultInstance();
-            _notice_system = gameObject.GetNoticeSystem();
+            _game_system = gameObject.GetGameSystem();
             initializePiece();
         }
 
@@ -104,7 +104,7 @@ namespace Studio.MeowToon {
                 var piece = Instantiate(_item_object);
                 var coin = piece.GetCoin();
                 coin.OnDestroy += () => {
-                    _notice_system.IncrementPoints();
+                    _game_system.IncrementPoints();
                 };
                 var position = transform.position;
                 var shift = i % 4;
