@@ -15,22 +15,14 @@
 
 using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UniRx;
-using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
     /// game system
     /// @author h.adachi
     /// </summary>
-    public class GameSystem : GamepadMaper {
+    public class GameSystem : InputMaper {
 #nullable enable
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Constants
-
-        const string TARGETS_OBJECT = "Balloons"; // name of target objects holder.
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Fields [noun, adjectives] 
@@ -40,15 +32,13 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives]
 
-        bool _is_pausing = false;
-
-        string _active_scene_name = string.Empty;
-
         int _point_total = 100;
 
         int _target_total = 0;
 
         int _target_remain = 0;
+
+        GameObject _level_object;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjectives] 
@@ -104,68 +94,45 @@ namespace Studio.MeowToon {
         // Awake is called when the script instance is being loaded.
         void Awake() {
             Application.targetFrameRate = Envelope.FPS;
+
+            // level
+            if (hasLevel()) {
+                _level_object = gameObject.GetLevelGameObject();
+                Level level = _level_object.GetLevel();
+
+                /// <summary>
+                /// level pause on.
+                /// </summary>
+                level.OnPauseOn += () => {
+                    OnPauseOn?.Invoke();
+                };
+
+                /// <summary>
+                /// level pause off.
+                /// </summary>
+                level.OnPauseOff += () => {
+                    OnPauseOff?.Invoke();
+                };
+            }
         }
 
         // Start is called before the first frame update
         new void Start() {
             base.Start();
+        }
 
-            // get scene name.
-            _active_scene_name = SceneManager.GetActiveScene().name;
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // private Methods [verb]
 
-            // get targets count.
-            _target_total = getTargetsCount();
-
-            // check game status.
-            this.UpdateAsObservable().Subscribe(_ => {
-                checkGameStatus();
-            });
-
-            /// <summary>
-            /// pause the game execute or cancel.
-            /// </summary>
-            this.UpdateAsObservable().Where(_ => _start_button.wasPressedThisFrame && isPlayLevel()).Subscribe(_ => {
-                if (_is_pausing) {
-                    Time.timeScale = 1f;
-                    OnPauseOff?.Invoke();
-                } 
-                else {
-                    Time.timeScale = 0f;
-                    OnPauseOn?.Invoke();
-                }
-                _is_pausing = !_is_pausing;
-            });
-
-            /// <summary>
-            /// restart game.
-            /// </summary>
-            this.UpdateAsObservable().Where(_ => _select_button.wasPressedThisFrame && isPlayLevel()).Subscribe(_ => {
-                SceneManager.LoadScene(Envelope.SCENE_TITLE);
-            });
-
-            ///////////////////////////////////////////////////////////////////////////////////////////////
-            // private Methods [verb]
-
-            bool isPlayLevel() {
-                return _active_scene_name.Contains("Level");
+        /// <summary>
+        /// has level.
+        /// </summary>
+        bool hasLevel() {
+            GameObject level_object = GameObject.Find("Level");
+            if (level_object is not null) {
+                return true;
             }
-
-            /// <summary>
-            /// check game status
-            /// </summary>
-            void checkGameStatus() {
-                _target_remain = getTargetsCount();
-            }
-
-            /// <summary>
-            /// get targets count.
-            /// </summary>
-            int getTargetsCount() {
-                if (!isPlayLevel()) return 0;
-                var targets = GameObject.Find(TARGETS_OBJECT);
-                Transform targets_transform = targets.GetComponentInChildren<Transform>();
-                return targets_transform.childCount;
-            }
+            return false;
         }
     }
 }

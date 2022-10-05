@@ -24,7 +24,7 @@ namespace Studio.MeowToon {
     /// select scene
     /// @author h.adachi
     /// </summary>
-    public class Select : GamepadMaper {
+    public class Select : InputMaper {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constants

@@ -24,7 +24,7 @@ namespace Studio.MeowToon {
     /// to map physical Gamepad.
     /// @author h.adachi
     /// </summary>
-    public class GamepadMaper : MonoBehaviour {
+    public class InputMaper : MonoBehaviour {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////

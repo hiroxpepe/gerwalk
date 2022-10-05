@@ -14,8 +14,6 @@
  */
 
 using System;
-using UnityEngine;
-using UnityEngine.SceneManagement;
 using UniRx;
 using UniRx.Triggers;
 
@@ -24,15 +22,13 @@ namespace Studio.MeowToon {
     /// home class
     /// @author h.adachi
     /// </summary>
-    public class Home : GamepadMaper {
+    public class Home : InputMaper {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives]
 
         GameSystem _game_system;
-
-        bool _is_home = false;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Events [verb, verb phrase]
@@ -52,32 +48,10 @@ namespace Studio.MeowToon {
             base.Start();
 
             /// <summary>
-            /// next level.
-            /// </summary>
-            this.UpdateAsObservable().Where(_ => (_a_button.wasPressedThisFrame) && _game_system.beatLevel && _is_home).Subscribe(_ => {
-                switch (SceneManager.GetActiveScene().name) {
-                    case Envelope.SCENE_LEVEL_1:
-                        Time.timeScale = 1f;
-                        SceneManager.LoadScene(Envelope.SCENE_LEVEL_2);
-                        break;
-                    case Envelope.SCENE_LEVEL_2:
-                        Time.timeScale = 1f;
-                        SceneManager.LoadScene(Envelope.SCENE_LEVEL_3);
-                        break;
-                    case Envelope.SCENE_LEVEL_3:
-                        Time.timeScale = 1f;
-                        SceneManager.LoadScene(Envelope.SCENE_End);
-                        break;
-                }
-            });
-
-            /// <summary>
             /// when being touched vehicle.
             /// </summary>
             this.OnCollisionEnterAsObservable().Where(x => x.LikeVehicle() && _game_system.beatLevel).Subscribe(x => {
                 OnCameBack?.Invoke();
-                _is_home = true;
-                Time.timeScale = 0f;
             });
         }
     }

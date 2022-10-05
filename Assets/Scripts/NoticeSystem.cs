@@ -25,7 +25,7 @@ namespace Studio.MeowToon {
     /// status system
     /// @author h.adachi
     /// </summary>
-    public class StatusSystem : MonoBehaviour {
+    public class NoticeSystem : MonoBehaviour {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
