@@ -14,6 +14,7 @@
  */
 
 using System;
+using UnityEngine;
 using UniRx;
 using UniRx.Triggers;
 
@@ -22,7 +23,7 @@ namespace Studio.MeowToon {
     /// home class
     /// @author h.adachi
     /// </summary>
-    public class Home : InputMaper {
+    public class Home : MonoBehaviour {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,9 +45,7 @@ namespace Studio.MeowToon {
         }
 
         // Start is called before the first frame update
-        new void Start() {
-            base.Start();
-
+        void Start() {
             /// <summary>
             /// when being touched vehicle.
             /// </summary>

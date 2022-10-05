@@ -21,7 +21,7 @@ namespace Studio.MeowToon {
     /// game system
     /// @author h.adachi
     /// </summary>
-    public class GameSystem : InputMaper {
+    public class GameSystem : MonoBehaviour {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -160,11 +160,6 @@ namespace Studio.MeowToon {
                     DecrementPoints();
                 };
             }
-        }
-
-        // Start is called before the first frame update
-        new void Start() {
-            base.Start();
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
