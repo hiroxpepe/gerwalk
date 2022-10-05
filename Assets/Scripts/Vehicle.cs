@@ -23,10 +23,10 @@ using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
-    /// vehicle controller.
+    /// vehicle controller
     /// @author h.adachi
     /// </summary>
-    public class Vehicle : GamepadMaper {
+    public class Vehicle : InputMaper {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -199,7 +199,7 @@ namespace Studio.MeowToon {
             }
 
             /// <remarks>
-            /// fRigidbody should be only used in FixedUpdate.
+            /// Rigidbody should be only used in FixedUpdate.
             /// </remarks>
             var rb = transform.GetComponent<Rigidbody>();
 

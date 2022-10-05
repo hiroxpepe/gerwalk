@@ -143,6 +143,13 @@ namespace Studio.MeowToon {
             return GameObject.Find("Home");
         }
 
+        /// <summary>
+        /// get the "Level" gameObject.
+        /// </summary>
+        public static GameObject GetLevelGameObject(this GameObject self) {
+            return GameObject.Find("Level");
+        }
+
         #endregion
 
         #region get the component.
@@ -253,10 +260,17 @@ namespace Studio.MeowToon {
         }
 
         /// <summary>
-        /// get the StatusSystem component.
+        /// get the NoticeSystem component.
         /// </summary>
-        public static StatusSystem GetStatusSystem(this GameObject self) {
-            return GameObject.Find("StatusSystem").GetComponent<StatusSystem>();
+        public static NoticeSystem GetNoticeSystem(this GameObject self) {
+            return GameObject.Find("NoticeSystem").GetComponent<NoticeSystem>();
+        }
+
+        /// <summary>
+        /// get the Level component.
+        /// </summary>
+        public static Level GetLevel(this GameObject self) {
+            return self.GetComponent<Level>();
         }
 
         /// <summary>

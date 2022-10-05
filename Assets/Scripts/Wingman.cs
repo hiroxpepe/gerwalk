@@ -20,7 +20,7 @@ using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
-    /// Wingman controller.
+    /// Wingman class
     /// @author h.adachi
     /// </summary>
     public class Wingman : MonoBehaviour {
@@ -45,7 +45,7 @@ namespace Studio.MeowToon {
             var vehicle = _vehicle_object.GetVehicle();
 
             /// <remarks>
-            /// fRigidbody should be only used in FixedUpdate.
+            /// Rigidbody should be only used in FixedUpdate.
             /// </remarks>
             var rb = transform.GetComponent<Rigidbody>();
 
@@ -68,7 +68,7 @@ namespace Studio.MeowToon {
         void Start() {
 
             /// <remarks>
-            /// fRigidbody should be only used in FixedUpdate.
+            /// Rigidbody should be only used in FixedUpdate.
             /// </remarks>
             var rb = transform.GetComponent<Rigidbody>();
 

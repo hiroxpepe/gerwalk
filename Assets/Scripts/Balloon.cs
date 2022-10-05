@@ -20,7 +20,7 @@ using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
-    /// balloon controller.
+    /// balloon class
     /// @author h.adachi
     /// </summary>
     public class Balloon : MonoBehaviour {
@@ -44,7 +44,7 @@ namespace Studio.MeowToon {
 
         DoFixedUpdate _do_fixed_update;
 
-        StatusSystem _status_system;
+        GameSystem _game_system;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -53,7 +53,7 @@ namespace Studio.MeowToon {
         void Awake() {
             _do_fixed_update = DoFixedUpdate.getInstance();
             _explode_param = ExplodeParam.getDefaultInstance();
-            _status_system = gameObject.GetStatusSystem();
+            _game_system = gameObject.GetGameSystem();
             initializePiece();
         }
 
@@ -104,7 +104,7 @@ namespace Studio.MeowToon {
                 var piece = Instantiate(_item_object);
                 var coin = piece.GetCoin();
                 coin.OnDestroy += () => {
-                    _status_system.IncrementPoints();
+                    _game_system.IncrementPoints();
                 };
                 var position = transform.position;
                 var shift = i % 4;

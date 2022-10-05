@@ -20,21 +20,16 @@ using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
-    /// item class
+    /// item coin class
     /// @author h.adachi
     /// </summary>
     public class Coin : Common {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Fields [noun, adjectives] 
-
-        Action _onDestroy = () => { };
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Events [verb, verb phrase]
 
-        public event Action OnDestroy { add => _onDestroy += value; remove => _onDestroy -= value; }
+        public event Action? OnDestroy;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -47,7 +42,7 @@ namespace Studio.MeowToon {
             /// wwhen being touched vehicle.
             /// </summary>
             this.OnCollisionEnterAsObservable().Where(x => x.LikeVehicle()).Subscribe(x => {
-                _onDestroy();
+                OnDestroy?.Invoke();
                 Destroy(gameObject);
             });
         }

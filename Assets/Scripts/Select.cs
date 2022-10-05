@@ -24,7 +24,7 @@ namespace Studio.MeowToon {
     /// select scene
     /// @author h.adachi
     /// </summary>
-    public class Select : GamepadMaper {
+    public class Select : InputMaper {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constants
@@ -83,7 +83,6 @@ namespace Studio.MeowToon {
                 }
                 _selected = _focus[_idx];
                 _game_system.mode = _selected;
-                Debug.Log($"selsect mode: {_selected}");
                 changeSelectedColor();
             });
 
@@ -97,7 +96,6 @@ namespace Studio.MeowToon {
                 }
                 _selected = _focus[_idx];
                 _game_system.mode = _selected;
-                Debug.Log($"selsect mode: {_selected}");
                 changeSelectedColor();
             });
 

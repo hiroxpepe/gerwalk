@@ -22,7 +22,7 @@ namespace Studio.MeowToon {
     /// title scene
     /// @author h.adachi
     /// </summary>
-    public class Title : GamepadMaper {
+    public class Title : InputMaper {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives]

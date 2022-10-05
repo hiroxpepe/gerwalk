@@ -24,7 +24,7 @@ namespace Studio.MeowToon {
     /// camera controller.
     /// @author h.adachi
     /// </summary>
-    public class CameraSystem : GamepadMaper {
+    public class CameraSystem : InputMaper {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////

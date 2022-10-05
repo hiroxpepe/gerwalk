@@ -30,7 +30,7 @@ namespace Studio.MeowToon {
         public const string SCENE_LEVEL_1 = "Level1";
         public const string SCENE_LEVEL_2 = "Level2";
         public const string SCENE_LEVEL_3 = "Level3";
-        public const string SCENE_End = "End";
+        public const string SCENE_ENDING = "Ending";
         public const string MODE_EASY = "easy";
         public const string MODE_NORMAL = "normal";
         public const string MODE_HARD = "hard";
