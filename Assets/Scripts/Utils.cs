@@ -46,8 +46,48 @@ namespace Studio.MeowToon {
     public static class Utils {
 #nullable enable
 
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        // public Methods [verb]
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // static Fields [noun, adjectives] 
+
+        /// <summary>
+        /// color.
+        /// </summary>
+        static Color _red, _orange, _yellow, _lime, _green, _cyan, _azure, _blue, _purple, _magenta, _white;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // static Constructor
+
+        static Utils() {
+            ColorUtility.TryParseHtmlString(Envelope.COLOR_RED, out _red);
+            ColorUtility.TryParseHtmlString(Envelope.COLOR_ORANGE, out _orange);
+            ColorUtility.TryParseHtmlString(Envelope.COLOR_YELLOW, out _yellow);
+            ColorUtility.TryParseHtmlString(Envelope.COLOR_LIME, out _lime);
+            ColorUtility.TryParseHtmlString(Envelope.COLOR_GREEN, out _green);
+            ColorUtility.TryParseHtmlString(Envelope.COLOR_CYAN, out _cyan);
+            ColorUtility.TryParseHtmlString(Envelope.COLOR_AZURE, out _azure);
+            ColorUtility.TryParseHtmlString(Envelope.COLOR_BLUE, out _blue);
+            ColorUtility.TryParseHtmlString(Envelope.COLOR_PURPLE, out _purple);
+            ColorUtility.TryParseHtmlString(Envelope.COLOR_MAGENTA, out _magenta);
+            ColorUtility.TryParseHtmlString(Envelope.COLOR_WHITE, out _white);
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // public static Properties [noun, noun phrase, adjective]
+
+        public static Color red { get => _red; }
+        public static Color orange { get => _orange; }
+        public static Color yellow { get => _yellow; }
+        public static Color lime { get => _lime; }
+        public static Color green { get => _green; }
+        public static Color cyan { get => _cyan; }
+        public static Color azure { get => _azure; }
+        public static Color blue { get => _blue; }
+        public static Color purple { get => _purple; }
+        public static Color magenta { get => _magenta; }
+        public static Color white { get => _white; }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // public static Methods [verb]
 
         #region has the component.
 
@@ -55,7 +95,7 @@ namespace Studio.MeowToon {
         /// has level.
         /// </summary>
         public static bool HasLevel() {
-            GameObject game_object = GameObject.Find("Level");
+            GameObject game_object = GameObject.Find(Envelope.LEVEL_TYPE);
             if (game_object is not null) {
                 return true;
             }
@@ -66,7 +106,7 @@ namespace Studio.MeowToon {
         /// has vehicle.
         /// </summary>
         public static bool HasVehicle() {
-            GameObject game_object = GameObject.Find("Vehicle");
+            GameObject game_object = GameObject.Find(Envelope.VEHICLE_TYPE);
             if (game_object is not null) {
                 return true;
             }

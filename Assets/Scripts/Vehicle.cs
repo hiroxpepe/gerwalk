@@ -185,15 +185,12 @@ namespace Studio.MeowToon {
             switch (_game_system.mode) {
                 case Envelope.MODE_EASY:
                     _total_power_factor_value = 1.0f;
-                    Debug.Log($"play mode: {Envelope.MODE_EASY}");
                     break;
                 case Envelope.MODE_NORMAL:
                     _total_power_factor_value = 1.5f;
-                    Debug.Log($"play mode: {Envelope.MODE_NORMAL}");
                     break;
                 case Envelope.MODE_HARD:
                     _total_power_factor_value = 2.0f;
-                    Debug.Log($"play mode: {Envelope.MODE_HARD}");
                     break;
             }
 
@@ -370,7 +367,7 @@ namespace Studio.MeowToon {
             /// </summary>
             this.UpdateAsObservable().Where(_ => !_do_update.grounded && _energy.power < 1.0f && flightTime > 0.5f).Subscribe(_ => {
                 Debug.Log($"stall");
-                var ground_object = GameObject.Find("Ground");
+                var ground_object = GameObject.Find(Envelope.GROUND_TYPE);
                 Quaternion ground_rotation = Quaternion.LookRotation(ground_object.transform.position);
                 float speed = 2.5f;
                 float step = speed * Time.deltaTime;
@@ -617,12 +614,7 @@ namespace Studio.MeowToon {
             ///////////////////////////////////////////////////////////////////////////////////////
             // Fields [noun, adjectives] 
 
-            bool _idol;
-            bool _run;
-            bool _walk;
-            bool _jump;
-            bool _backward;
-            bool _flight;
+            bool _idol, _run, _walk, _jump, _backward, _flight;
 
             ///////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjectives] 

@@ -31,98 +31,98 @@ namespace Studio.MeowToon {
         /// whether the GameObject's name contains "Block".
         /// </summary>
         public static bool LikeBlock(this GameObject self) {
-            return self.name.Contains("Block");
+            return self.name.Contains(Envelope.BLOCK_TYPE);
         }
 
         /// <summary>
         /// whether the Transform's name contains "Block".
         /// </summary>
         public static bool LikeBlock(this Transform self) {
-            return self.name.Contains("Block");
+            return self.name.Contains(Envelope.BLOCK_TYPE);
         }
 
         /// <summary>
         /// whether the Collider's name contains "Block".
         /// </summary>
         public static bool LikeBlock(this Collider self) {
-            return self.name.Contains("Block");
+            return self.name.Contains(Envelope.BLOCK_TYPE);
         }
 
         /// <summary>
         /// whether the Collision's name contains "Block".
         /// </summary>
         public static bool LikeBlock(this Collision self) {
-            return self.gameObject.name.Contains("Block");
+            return self.gameObject.name.Contains(Envelope.BLOCK_TYPE);
         }
 
         /// <summary>
         /// whether the GameObject's name contains "Ground".
         /// </summary>
         public static bool LikeGround(this GameObject self) {
-            return self.name.Contains("Ground");
+            return self.name.Contains(Envelope.GROUND_TYPE);
         }
 
         /// <summary>
         /// whether the Transform's name contains "Ground".
         /// </summary>
         public static bool LikeGround(this Transform self) {
-            return self.name.Contains("Ground");
+            return self.name.Contains(Envelope.GROUND_TYPE);
         }
 
         /// <summary>
         /// whether the Collision's name contains "Ground".
         /// </summary>
         public static bool LikeGround(this Collision self) {
-            return self.gameObject.name.Contains("Ground");
+            return self.gameObject.name.Contains(Envelope.GROUND_TYPE);
         }
 
         /// <summary>
         /// whether the GameObject's name contains "Wall".
         /// </summary>
         public static bool LikeWall(this GameObject self) {
-            return self.name.Contains("Wall");
+            return self.name.Contains(Envelope.WALL_TYPE);
         }
 
         /// <summary>
         /// whether the Transform's name contains "Wall".
         /// </summary>
         public static bool LikeWall(this Transform self) {
-            return self.name.Contains("Wall");
+            return self.name.Contains(Envelope.WALL_TYPE);
         }
 
         /// <summary>
         /// whether the Collider's name contains "Wall".
         /// </summary>
         public static bool LikeWall(this Collider self) {
-            return self.name.Contains("Wall");
+            return self.name.Contains(Envelope.WALL_TYPE);
         }
 
         /// <summary>
         /// whether the Collision's name contains "Wall".
         /// </summary>
         public static bool LikeWall(this Collision self) {
-            return self.gameObject.name.Contains("Wall");
+            return self.gameObject.name.Contains(Envelope.WALL_TYPE);
         }
 
         /// <summary>
         /// whether the Collision's name contains "Balloon".
         /// </summary>
         public static bool LikeBalloon(this Collision self) {
-            return self.gameObject.name.Contains("Balloon");
+            return self.gameObject.name.Contains(Envelope.BALLOON_TYPE);
         }
 
         /// <summary>
         /// whether the Collision's name contains "Coin".
         /// </summary>
         public static bool LikeCoin(this Collision self) {
-            return self.gameObject.name.Contains("Coin");
+            return self.gameObject.name.Contains(Envelope.COIN_TYPE);
         }
 
         /// <summary>
         /// whether the Collision's name contains "Vehicle".
         /// </summary>
         public static bool LikeVehicle(this Collision self) {
-            return self.gameObject.name.Contains("Vehicle");
+            return self.gameObject.name.Contains(Envelope.VEHICLE_TYPE);
         }
 
         #endregion
@@ -133,21 +133,21 @@ namespace Studio.MeowToon {
         /// get the "Vehicle" gameObject.
         /// </summary>
         public static GameObject GetVehicleGameObject(this GameObject self) {
-            return GameObject.Find("Vehicle");
+            return GameObject.Find(Envelope.VEHICLE_TYPE);
         }
 
         /// <summary>
         /// get the "Home" gameObject.
         /// </summary>
         public static GameObject GetHomeGameObject(this GameObject self) {
-            return GameObject.Find("Home");
+            return GameObject.Find(Envelope.HOME_TYPE);
         }
 
         /// <summary>
         /// get the "Level" gameObject.
         /// </summary>
         public static GameObject GetLevelGameObject(this GameObject self) {
-            return GameObject.Find("Level");
+            return GameObject.Find(Envelope.LEVEL_TYPE);
         }
 
         #endregion
@@ -249,21 +249,21 @@ namespace Studio.MeowToon {
         /// get the CameraSystem component.
         /// </summary>
         public static CameraSystem GetCameraSystem(this GameObject self) {
-            return GameObject.Find("CameraSystem").GetComponent<CameraSystem>();
+            return GameObject.Find(Envelope.CAMERA_SYSTEM).GetComponent<CameraSystem>();
         }
 
         /// <summary>
         /// get the GameSystem component.
         /// </summary>
         public static GameSystem GetGameSystem(this GameObject self) {
-            return GameObject.Find("GameSystem").GetComponent<GameSystem>();
+            return GameObject.Find(Envelope.GAME_SYSTEM).GetComponent<GameSystem>();
         }
 
         /// <summary>
         /// get the NoticeSystem component.
         /// </summary>
         public static NoticeSystem GetNoticeSystem(this GameObject self) {
-            return GameObject.Find("NoticeSystem").GetComponent<NoticeSystem>();
+            return GameObject.Find(Envelope.NOTICE_SYSTEM).GetComponent<NoticeSystem>();
         }
 
         /// <summary>
