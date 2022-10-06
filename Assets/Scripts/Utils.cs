@@ -13,6 +13,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,6 +23,21 @@ namespace Studio.MeowToon {
     /// </summary>
     public class Map<K, V> : Dictionary<K, V> {
     }
+
+    /// <summary>
+    /// changed event args.
+    /// </summary>
+    public class EvtArgs : EventArgs {
+        public EvtArgs(string name) {
+            Name = name;
+        }
+        public string Name { get; }
+    }
+
+    /// <summary>
+    /// changed event handler.
+    /// </summary>
+    public delegate void Changed(object sender, EvtArgs e);
 
     /// <summary>
     /// generic utility class.

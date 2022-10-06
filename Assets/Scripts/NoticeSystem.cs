@@ -14,7 +14,6 @@
  */
 
 using System;
-using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
@@ -160,25 +159,25 @@ namespace Studio.MeowToon {
             /// <summary>
             /// vehicle updated.
             /// </summary>
-            vehicle.Updated += (object sender, PropertyChangedEventArgs e) => {
+            vehicle.Updated += (object sender, EvtArgs e) => {
                 var vehicle = sender as Vehicle;
                 if (vehicle is not null) {
-                    if (e.PropertyName.Equals(nameof(Vehicle.airSpeed))) {
+                    if (e.Name.Equals(nameof(Vehicle.airSpeed))) {
                         _air_speed = vehicle.airSpeed;
                     }
-                    if (e.PropertyName.Equals(nameof(Vehicle.verticalSpeed))) {
+                    if (e.Name.Equals(nameof(Vehicle.verticalSpeed))) {
                         _vertical_speed = vehicle.verticalSpeed;
                     }
-                    if (e.PropertyName.Equals(nameof(Vehicle.flightTime))) {
+                    if (e.Name.Equals(nameof(Vehicle.flightTime))) {
                         _flight_time = vehicle.flightTime;
                     }
-                    if (e.PropertyName.Equals(nameof(Vehicle.total))) {
+                    if (e.Name.Equals(nameof(Vehicle.total))) {
                         _energy = vehicle.total;
                     }
-                    if (e.PropertyName.Equals(nameof(Vehicle.power))) {
+                    if (e.Name.Equals(nameof(Vehicle.power))) {
                         _power = vehicle.power;
                     }
-                    if (e.PropertyName.Equals(nameof(Vehicle.useLiftSpoiler))) {
+                    if (e.Name.Equals(nameof(Vehicle.useLiftSpoiler))) {
                         _use_lift_spoiler = vehicle.useLiftSpoiler;
                     }
                 }

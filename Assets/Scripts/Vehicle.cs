@@ -15,7 +15,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
 using static UnityEngine.Vector3;
 using UniRx;
@@ -159,9 +158,9 @@ namespace Studio.MeowToon {
         public event Action? OnLoseEnergy;
 
         /// <summary>
-        /// implementation for INotifyPropertyChanged
+        /// changed event handler.
         /// </summary>
-        public event PropertyChangedEventHandler? Updated;
+        public event Changed? Updated;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -173,7 +172,7 @@ namespace Studio.MeowToon {
             _do_fixed_update = DoFixedUpdate.GetInstance();
             _acceleration = Acceleration.GetInstance(_forward_speed_limit, _run_speed_limit, _backward_speed_limit);
             _energy = Energy.GetInstance(_flight_power);
-            _energy.Updated += onPropertyChanged;
+            _energy.Updated += onChanged;
         }
 
         // Start is called before the first frame update
@@ -553,14 +552,14 @@ namespace Studio.MeowToon {
         }
 
         /// <summary>
-        /// on property changed event handler from energy.
+        /// changed event handler from energy.
         /// </summary>
-        void onPropertyChanged(object sender, PropertyChangedEventArgs e) {
+        void onChanged(object sender, EvtArgs  e) {
             if (sender as Energy is not null) {
-                if (e.PropertyName.Equals(nameof(Energy.total))) {
+                if (e.Name.Equals(nameof(Energy.total))) {
                     total = _energy.total;
                 }
-                if (e.PropertyName.Equals(nameof(Energy.power))) {
+                if (e.Name.Equals(nameof(Energy.power))) {
                     power = _energy.power;
                 }
             }
@@ -843,9 +842,9 @@ namespace Studio.MeowToon {
             //internal  Events [verb, verb phrase] 
 
             /// <summary>
-            /// implementation for INotifyPropertyChanged
+            /// changed event handler.
             /// </summary>
-            internal event PropertyChangedEventHandler? Updated;
+            internal event Changed? Updated;
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Constructor

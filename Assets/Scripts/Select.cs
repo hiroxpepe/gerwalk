@@ -64,7 +64,7 @@ namespace Studio.MeowToon {
             _focus.Add(0, Envelope.MODE_EASY);
             _focus.Add(1, Envelope.MODE_NORMAL);
             _focus.Add(2, Envelope.MODE_HARD);
-            _idx = 1;
+            _idx = 1; // FIXME:
             _selected = _focus[_idx];
             changeSelectedColor();
         }
