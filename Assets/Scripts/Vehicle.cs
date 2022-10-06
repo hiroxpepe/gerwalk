@@ -78,15 +78,7 @@ namespace Studio.MeowToon {
 
         System.Diagnostics.Stopwatch _flight_stopwatch = new();
 
-        float _flight_time = 0f;
-
-        float _air_speed = 0f;
-
-        float _vertical_speed = 0f;
-
-        float _total = 0f;
-
-        float _power = 0;
+        float _flight_time, _air_speed, _vertical_speed, _total, _power = 0f;
 
         bool _use_lift_spoiler = false;
 

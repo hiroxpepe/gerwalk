@@ -43,11 +43,37 @@ namespace Studio.MeowToon {
     /// generic utility class.
     /// @author h.adachi
     /// </summary>
-    public class Utils {
+    public static class Utils {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // public Methods [verb]
+
+        #region has the component.
+
+        /// <summary>
+        /// has level.
+        /// </summary>
+        public static bool HasLevel() {
+            GameObject level_object = GameObject.Find("Level");
+            if (level_object is not null) {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// has vehicle.
+        /// </summary>
+        public static bool HasVehicle() {
+            GameObject vehicle_object = GameObject.Find("Vehicle");
+            if (vehicle_object is not null) {
+                return true;
+            }
+            return false;
+        }
+
+        #endregion
 
         /// <summary>
         /// set the rendering mode of the material.

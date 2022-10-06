@@ -15,6 +15,7 @@
 
 using System;
 using UnityEngine;
+using static Studio.MeowToon.Utils;
 
 namespace Studio.MeowToon {
     /// <summary>
@@ -99,7 +100,7 @@ namespace Studio.MeowToon {
         void Awake() {
             Application.targetFrameRate = Envelope.FPS;
 
-            if (hasLevel()) {
+            if (HasLevel()) {
                 // get level.
                 Level level = gameObject.GetLevelGameObject().GetLevel();
 
@@ -118,7 +119,7 @@ namespace Studio.MeowToon {
                 };
             }
 
-            if (hasVehicle()) {
+            if (HasVehicle()) {
                 // get vehicle.
                 Vehicle vehicle = gameObject.GetVehicleGameObject().GetVehicle();
 
@@ -138,31 +139,6 @@ namespace Studio.MeowToon {
                     DecrementPoints();
                 };
             }
-        }
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        // private Methods [verb]
-
-        /// <summary>
-        /// has level.
-        /// </summary>
-        bool hasLevel() {
-            GameObject level_object = GameObject.Find("Level");
-            if (level_object is not null) {
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// has vehicle.
-        /// </summary>
-        bool hasVehicle() {
-            GameObject vehicle_object = GameObject.Find("Vehicle");
-            if (vehicle_object is not null) {
-                return true;
-            }
-            return false;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
