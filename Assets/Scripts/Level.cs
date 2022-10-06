@@ -36,8 +36,6 @@ namespace Studio.MeowToon {
 
         GameSystem _game_system;
 
-        GameObject _home_object;
-
         bool _is_pausing = false;
 
         bool _is_home = false;
@@ -55,8 +53,9 @@ namespace Studio.MeowToon {
         // Awake is called when the script instance is being loaded.
         void Awake() {
             _game_system = gameObject.GetGameSystem();
-            _home_object = gameObject.GetHomeGameObject();
-            Home home = _home_object.GetHome();
+            
+            // get home.
+            Home home = gameObject.GetHomeGameObject().GetHome();
 
             /// <summary>
             /// came back home.

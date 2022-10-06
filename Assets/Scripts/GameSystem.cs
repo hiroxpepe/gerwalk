@@ -15,6 +15,7 @@
 
 using System;
 using UnityEngine;
+using static Studio.MeowToon.Utils;
 
 namespace Studio.MeowToon {
     /// <summary>
@@ -25,62 +26,40 @@ namespace Studio.MeowToon {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // static Fields [noun, adjectives] 
-
-        static string _mode = Envelope.MODE_NORMAL;
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Fields [noun, adjectives]
-
-        int _point_total = 100;
-
-        int _target_total = 0;
-
-        int _target_remain = 0;
-
-        GameObject _level_object;
-
-        GameObject _vehicle_object;
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjectives] 
 
         /// <summary>
         /// game mode.
         /// </summary>
-        public string mode { get => _mode; set => _mode = value; }
+        public string mode { get => Status.mode; set => Status.mode = value; }
 
         /// <summary>
         /// point total.
         /// </summary>
-        public int pointTotal { get => _point_total; set => _point_total = value; }
+        public int pointTotal { get => Status.pointTotal; set => Status.pointTotal = value; }
 
         /// <summary>
         /// can use points.
         /// </summary>
         public bool usePoint {
-            get {
-                return _point_total > 0;
-            }
+            get => Status.pointTotal > 0;
         }
 
         /// <summary>
         /// target total.
         /// </summary>
-        public int targetTotal { get => _target_total; set => _target_total = value; }
+        public int targetTotal { get => Status.targetTotal; set => Status.targetTotal = value; }
 
         /// <summary>
         /// target remain.
         /// </summary>
-        public int targetRemain { get => _target_remain; set => _target_remain = value; }
+        public int targetRemain { get => Status.targetRemain; set => Status.targetRemain = value; }
 
         /// <summary>
         /// beat the level.
         /// </summary>
         public bool beatLevel {
-            get {
-                return _target_remain == 0;
-            }
+            get => Status.targetRemain == 0;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -121,10 +100,9 @@ namespace Studio.MeowToon {
         void Awake() {
             Application.targetFrameRate = Envelope.FPS;
 
-            // level
-            if (hasLevel()) {
-                _level_object = gameObject.GetLevelGameObject();
-                Level level = _level_object.GetLevel();
+            if (HasLevel()) {
+                // get level.
+                Level level = gameObject.GetLevelGameObject().GetLevel();
 
                 /// <summary>
                 /// level pause on.
@@ -141,10 +119,9 @@ namespace Studio.MeowToon {
                 };
             }
 
-            // vehicle
-            if (hasVehicle()) {
-                _vehicle_object = gameObject.GetVehicleGameObject();
-                Vehicle vehicle = _vehicle_object.GetVehicle();
+            if (HasVehicle()) {
+                // get vehicle.
+                Vehicle vehicle = gameObject.GetVehicleGameObject().GetVehicle();
 
                 /// <summary>
                 /// vehicle on gain energy.
@@ -165,28 +142,50 @@ namespace Studio.MeowToon {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // private Methods [verb]
+        // inner Classes
 
-        /// <summary>
-        /// has level.
-        /// </summary>
-        bool hasLevel() {
-            GameObject level_object = GameObject.Find("Level");
-            if (level_object is not null) {
-                return true;
+        #region Status
+
+        static class Status {
+#nullable enable
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // static Fields [nouns, noun phrases]
+
+            static string _mode;
+
+            static int _point_total, _target_total, _target_remain;
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // static Constructor
+
+            static Status() {
+                _mode = Envelope.MODE_NORMAL;
+                _point_total = 100;
+                _target_total = 0;
+                _target_remain = 0;
             }
-            return false;
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // public static Properties [noun, noun phrase, adjective]
+
+            public static string mode {
+                get => _mode; set => _mode = value;
+            }
+
+            public static int pointTotal {
+                get => _point_total; set => _point_total = value;
+            }
+
+            public static int targetTotal {
+                get => _target_total; set => _target_total = value;
+            }
+
+            public static int targetRemain {
+                get => _target_remain; set => _target_remain = value;
+            }
         }
 
-        /// <summary>
-        /// has vehicle.
-        /// </summary>
-        bool hasVehicle() {
-            GameObject vehicle_object = GameObject.Find("Vehicle");
-            if (vehicle_object is not null) {
-                return true;
-            }
-            return false;
-        }
+        #endregion
     }
 }

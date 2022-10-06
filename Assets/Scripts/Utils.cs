@@ -13,6 +13,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -24,14 +25,55 @@ namespace Studio.MeowToon {
     }
 
     /// <summary>
+    /// changed event args.
+    /// </summary>
+    public class EvtArgs : EventArgs {
+        public EvtArgs(string name) {
+            Name = name;
+        }
+        public string Name { get; }
+    }
+
+    /// <summary>
+    /// changed event handler.
+    /// </summary>
+    public delegate void Changed(object sender, EvtArgs e);
+
+    /// <summary>
     /// generic utility class.
     /// @author h.adachi
     /// </summary>
-    public class Utils {
+    public static class Utils {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // public Methods [verb]
+
+        #region has the component.
+
+        /// <summary>
+        /// has level.
+        /// </summary>
+        public static bool HasLevel() {
+            GameObject game_object = GameObject.Find("Level");
+            if (game_object is not null) {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// has vehicle.
+        /// </summary>
+        public static bool HasVehicle() {
+            GameObject game_object = GameObject.Find("Vehicle");
+            if (game_object is not null) {
+                return true;
+            }
+            return false;
+        }
+
+        #endregion
 
         /// <summary>
         /// set the rendering mode of the material.

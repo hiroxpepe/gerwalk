@@ -15,7 +15,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
 using static UnityEngine.Vector3;
 using UniRx;
@@ -79,15 +78,7 @@ namespace Studio.MeowToon {
 
         System.Diagnostics.Stopwatch _flight_stopwatch = new();
 
-        float _flight_time = 0f;
-
-        float _air_speed = 0f;
-
-        float _vertical_speed = 0f;
-
-        float _total = 0f;
-
-        float _power = 0;
+        float _flight_time, _air_speed, _vertical_speed, _total, _power = 0f;
 
         bool _use_lift_spoiler = false;
 
@@ -147,6 +138,14 @@ namespace Studio.MeowToon {
             set { _use_lift_spoiler = value; Updated?.Invoke(this, new(nameof(useLiftSpoiler))); }
         }
 
+        /// <summary>
+        /// transform position.
+        /// </summary>
+        public Vector3 position {
+            get => transform.position;
+            set { transform.position = value; Updated?.Invoke(this, new(nameof(position))); }
+        }
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Events [verb, verb phrase]
 
@@ -159,9 +158,9 @@ namespace Studio.MeowToon {
         public event Action? OnLoseEnergy;
 
         /// <summary>
-        /// implementation for INotifyPropertyChanged
+        /// changed event handler.
         /// </summary>
-        public event PropertyChangedEventHandler? Updated;
+        public event Changed? Updated;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -173,7 +172,7 @@ namespace Studio.MeowToon {
             _do_fixed_update = DoFixedUpdate.GetInstance();
             _acceleration = Acceleration.GetInstance(_forward_speed_limit, _run_speed_limit, _backward_speed_limit);
             _energy = Energy.GetInstance(_flight_power);
-            _energy.Updated += onPropertyChanged;
+            _energy.Updated += onChanged;
         }
 
         // Start is called before the first frame update
@@ -366,9 +365,6 @@ namespace Studio.MeowToon {
                 });
             }
 
-            this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_left_button.wasReleasedThisFrame || _right_button.wasReleasedThisFrame)).Subscribe(_ => {
-            });
-
             /// <summary>
             /// stall.
             /// </summary>
@@ -386,6 +382,7 @@ namespace Studio.MeowToon {
 
             // LateUpdate is called after all Update functions have been called.
             this.LateUpdateAsObservable().Subscribe(_ => {
+                position = transform.position;
                 flightTime = (float) _flight_stopwatch.Elapsed.TotalSeconds;
             });
 
@@ -394,7 +391,6 @@ namespace Studio.MeowToon {
             /// </summary>
             this.OnCollisionStayAsObservable().Where(x => x.LikeBlock() && (_up_button.isPressed || _down_button.isPressed) && _acceleration.freeze).Subscribe(_ => {
                 var reach = getReach();
-                //Debug.Log("reach: " + Math.Round(transform.position.y, 2) % 1); // FIXME:
                 if (_do_update.grounded && (reach < 0.5d || reach >= 0.99d)) {
                     moveLetfOrRight(getDirection(transform.forward));
                 }
@@ -553,14 +549,14 @@ namespace Studio.MeowToon {
         }
 
         /// <summary>
-        /// on property changed event handler from energy.
+        /// changed event handler from energy.
         /// </summary>
-        void onPropertyChanged(object sender, PropertyChangedEventArgs e) {
+        void onChanged(object sender, EvtArgs  e) {
             if (sender as Energy is not null) {
-                if (e.PropertyName.Equals(nameof(Energy.total))) {
+                if (e.Name.Equals(nameof(Energy.total))) {
                     total = _energy.total;
                 }
-                if (e.PropertyName.Equals(nameof(Energy.power))) {
+                if (e.Name.Equals(nameof(Energy.power))) {
                     power = _energy.power;
                 }
             }
@@ -761,11 +757,6 @@ namespace Studio.MeowToon {
 
         class Energy {
 
-            ///////////////////////////////////////////////////////////////////////////////////////////////
-            // Constants
-
-            //const float TOTAL_POWAR_FACTOR_VALUE = 1.5f; // easy: 1.0f, normal: 1.5f , hard: 2.0f
-
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Fields [noun, adjectives] 
 
@@ -843,9 +834,9 @@ namespace Studio.MeowToon {
             //internal  Events [verb, verb phrase] 
 
             /// <summary>
-            /// implementation for INotifyPropertyChanged
+            /// changed event handler.
             /// </summary>
-            internal event PropertyChangedEventHandler? Updated;
+            internal event Changed? Updated;
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Constructor
