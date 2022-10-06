@@ -146,6 +146,14 @@ namespace Studio.MeowToon {
             set { _use_lift_spoiler = value; Updated?.Invoke(this, new(nameof(useLiftSpoiler))); }
         }
 
+        /// <summary>
+        /// transform position.
+        /// </summary>
+        public Vector3 position {
+            get => transform.position;
+            set { transform.position = value; Updated?.Invoke(this, new(nameof(position))); }
+        }
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Events [verb, verb phrase]
 
@@ -365,9 +373,6 @@ namespace Studio.MeowToon {
                 });
             }
 
-            this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_left_button.wasReleasedThisFrame || _right_button.wasReleasedThisFrame)).Subscribe(_ => {
-            });
-
             /// <summary>
             /// stall.
             /// </summary>
@@ -385,6 +390,7 @@ namespace Studio.MeowToon {
 
             // LateUpdate is called after all Update functions have been called.
             this.LateUpdateAsObservable().Subscribe(_ => {
+                position = transform.position;
                 flightTime = (float) _flight_stopwatch.Elapsed.TotalSeconds;
             });
 
@@ -393,7 +399,6 @@ namespace Studio.MeowToon {
             /// </summary>
             this.OnCollisionStayAsObservable().Where(x => x.LikeBlock() && (_up_button.isPressed || _down_button.isPressed) && _acceleration.freeze).Subscribe(_ => {
                 var reach = getReach();
-                //Debug.Log("reach: " + Math.Round(transform.position.y, 2) % 1); // FIXME:
                 if (_do_update.grounded && (reach < 0.5d || reach >= 0.99d)) {
                     moveLetfOrRight(getDirection(transform.forward));
                 }

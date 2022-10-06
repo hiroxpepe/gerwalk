@@ -85,10 +85,6 @@ namespace Studio.MeowToon {
 
         GameSystem _game_system;
 
-        GameObject _vehicle_object;
-
-        GameObject _home_object;
-
         float _air_speed = 0f;
 
         float _vertical_speed = 0f;
@@ -97,24 +93,24 @@ namespace Studio.MeowToon {
 
         bool _use_lift_spoiler = false;
 
-        /// <remarks>
+        /// <summary>
         /// for development.
-        /// </remarks>
+        /// </summary>
         float _energy = 0f;
 
-        /// <remarks>
+        /// <summary>
         /// for development.
-        /// </remarks>
+        /// </summary>
         float _power = 0;
 
-        /// <remarks>
+        /// <summary>
         /// for development.
-        /// </remarks>
+        /// </summary>
         float _flight_time = 0;
 
-        /// <remarks>
+        /// <summary>
         /// color.
-        /// </remarks>
+        /// </summary>
         Color _red, _orange, _yellow, _lime, _green, _cyan, _azure, _blue, _purple, _magenta, _white;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,10 +119,6 @@ namespace Studio.MeowToon {
         // Awake is called when the script instance is being loaded.
         void Awake() {
             _game_system = gameObject.GetGameSystem();
-            _vehicle_object = gameObject.GetVehicleGameObject();
-            Vehicle vehicle = _vehicle_object.GetVehicle();
-            _home_object = gameObject.GetHomeGameObject();
-            Home home = _home_object.GetHome();
 
             /// <summary>
             /// game system pause on.
@@ -159,6 +151,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// vehicle updated.
             /// </summary>
+            Vehicle vehicle = gameObject.GetVehicleGameObject().GetVehicle();
             vehicle.Updated += (object sender, EvtArgs e) => {
                 var vehicle = sender as Vehicle;
                 if (vehicle is not null) {
@@ -180,12 +173,16 @@ namespace Studio.MeowToon {
                     if (e.Name.Equals(nameof(Vehicle.useLiftSpoiler))) {
                         _use_lift_spoiler = vehicle.useLiftSpoiler;
                     }
+                    if (e.Name.Equals(nameof(Vehicle.position))) {
+                        _altitude = vehicle.position.y -0.5f; // 0.5 is half vehicle height.
+                    }
                 }
             };
 
             /// <summary>
             /// came back home.
             /// </summary>
+            Home home = gameObject.GetHomeGameObject().GetHome();
             home.OnCameBack += () => {
                 _message_text.text = MESSAGE_LEVEL_CLEAR;
             };
@@ -232,7 +229,6 @@ namespace Studio.MeowToon {
         void updateVehicleStatus() {
             _air_speed_text.text = string.Format("TAS {0:000.0}km/h", Math.Round(_air_speed, 1, MidpointRounding.AwayFromZero));
             _vertical_speed_text.text = string.Format("VSI {0:000.0}m/s", Math.Round(_vertical_speed, 1, MidpointRounding.AwayFromZero));
-            _altitude = _vehicle_object.transform.position.y - 0.5f; // 0.5 is half vehicle height.
             _altitude_text.text = string.Format("ALT {0:000.0}m", Math.Round(_altitude, 1, MidpointRounding.AwayFromZero));
             var lift_spoiler_status = _use_lift_spoiler ? "ON" : "OFF";
             Color lift_spoiler_color = _use_lift_spoiler ? _red : _green;
