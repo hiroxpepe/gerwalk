@@ -55,8 +55,8 @@ namespace Studio.MeowToon {
         /// has level.
         /// </summary>
         public static bool HasLevel() {
-            GameObject level_object = GameObject.Find("Level");
-            if (level_object is not null) {
+            GameObject game_object = GameObject.Find("Level");
+            if (game_object is not null) {
                 return true;
             }
             return false;
@@ -66,8 +66,8 @@ namespace Studio.MeowToon {
         /// has vehicle.
         /// </summary>
         public static bool HasVehicle() {
-            GameObject vehicle_object = GameObject.Find("Vehicle");
-            if (vehicle_object is not null) {
+            GameObject game_object = GameObject.Find("Vehicle");
+            if (game_object is not null) {
                 return true;
             }
             return false;
