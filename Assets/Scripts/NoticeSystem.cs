@@ -148,10 +148,12 @@ namespace Studio.MeowToon {
                 updateGameStatus();
             };
 
+            // get vehicle.
+            Vehicle vehicle = gameObject.GetVehicleGameObject().GetVehicle();
+
             /// <summary>
             /// vehicle updated.
             /// </summary>
-            Vehicle vehicle = gameObject.GetVehicleGameObject().GetVehicle();
             vehicle.Updated += (object sender, EvtArgs e) => {
                 var vehicle = sender as Vehicle;
                 if (vehicle is not null) {
@@ -179,10 +181,12 @@ namespace Studio.MeowToon {
                 }
             };
 
+            // get home.
+            Home home = gameObject.GetHomeGameObject().GetHome();
+
             /// <summary>
             /// came back home.
             /// </summary>
-            Home home = gameObject.GetHomeGameObject().GetHome();
             home.OnCameBack += () => {
                 _message_text.text = MESSAGE_LEVEL_CLEAR;
             };

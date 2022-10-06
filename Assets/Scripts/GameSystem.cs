@@ -38,10 +38,6 @@ namespace Studio.MeowToon {
 
         int _target_remain = 0;
 
-        GameObject _level_object;
-
-        GameObject _vehicle_object;
-
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjectives] 
 
@@ -123,8 +119,8 @@ namespace Studio.MeowToon {
 
             // level
             if (hasLevel()) {
-                _level_object = gameObject.GetLevelGameObject();
-                Level level = _level_object.GetLevel();
+                // get level.
+                Level level = gameObject.GetLevelGameObject().GetLevel();
 
                 /// <summary>
                 /// level pause on.
@@ -143,8 +139,8 @@ namespace Studio.MeowToon {
 
             // vehicle
             if (hasVehicle()) {
-                _vehicle_object = gameObject.GetVehicleGameObject();
-                Vehicle vehicle = _vehicle_object.GetVehicle();
+                // get vehicle.
+                Vehicle vehicle = gameObject.GetVehicleGameObject().GetVehicle();
 
                 /// <summary>
                 /// vehicle on gain energy.
