@@ -205,7 +205,7 @@ namespace Studio.MeowToon {
             _air_speed_text.text = string.Format("TAS {0:000.0}km/h", Math.Round(_air_speed, 1, MidpointRounding.AwayFromZero));
             _vertical_speed_text.text = string.Format("VSI {0:000.0}m/s", Math.Round(_vertical_speed, 1, MidpointRounding.AwayFromZero));
             _altitude_text.text = string.Format("ALT {0:000.0}m", Math.Round(_altitude, 1, MidpointRounding.AwayFromZero));
-            _lift_spoiler_text.text = "Spoiler: " + (_use_lift_spoiler ? "OFF" : "ON");
+            _lift_spoiler_text.text = "Spoiler: " + (_use_lift_spoiler ? "ON" : "OFF");
             _lift_spoiler_text.color = _use_lift_spoiler ? red : green;
             /// <remarks>
             /// for development.
