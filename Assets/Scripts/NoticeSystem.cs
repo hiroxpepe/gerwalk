@@ -131,27 +131,13 @@ namespace Studio.MeowToon {
             vehicle.Updated += (object sender, EvtArgs e) => {
                 var vehicle = sender as Vehicle;
                 if (vehicle is not null) {
-                    if (e.Name.Equals(nameof(Vehicle.airSpeed))) {
-                        _air_speed = vehicle.airSpeed;
-                    }
-                    if (e.Name.Equals(nameof(Vehicle.verticalSpeed))) {
-                        _vertical_speed = vehicle.verticalSpeed;
-                    }
-                    if (e.Name.Equals(nameof(Vehicle.flightTime))) {
-                        _flight_time = vehicle.flightTime;
-                    }
-                    if (e.Name.Equals(nameof(Vehicle.total))) {
-                        _energy = vehicle.total;
-                    }
-                    if (e.Name.Equals(nameof(Vehicle.power))) {
-                        _power = vehicle.power;
-                    }
-                    if (e.Name.Equals(nameof(Vehicle.useLiftSpoiler))) {
-                        _use_lift_spoiler = vehicle.useLiftSpoiler;
-                    }
-                    if (e.Name.Equals(nameof(Vehicle.position))) {
-                        _altitude = vehicle.position.y -0.5f; // 0.5 is half vehicle height.
-                    }
+                    if (e.Name.Equals(nameof(Vehicle.airSpeed))) { _air_speed = vehicle.airSpeed; return; }
+                    if (e.Name.Equals(nameof(Vehicle.verticalSpeed))) { _vertical_speed = vehicle.verticalSpeed; return; }
+                    if (e.Name.Equals(nameof(Vehicle.flightTime))) { _flight_time = vehicle.flightTime; return; }
+                    if (e.Name.Equals(nameof(Vehicle.total))) { _energy = vehicle.total; return; }
+                    if (e.Name.Equals(nameof(Vehicle.power))) { _power = vehicle.power; return; }
+                    if (e.Name.Equals(nameof(Vehicle.useLiftSpoiler))) { _use_lift_spoiler = vehicle.useLiftSpoiler; return; }
+                    if (e.Name.Equals(nameof(Vehicle.position))) { _altitude = vehicle.position.y - 0.5f; return; } // 0.5 is half vehicle height.
                 }
             };
 
@@ -186,15 +172,9 @@ namespace Studio.MeowToon {
             _points_text.text = string.Format("POINT {0}", _game_system.pointTotal);
             _mode_text.text = string.Format("Mode: {0}", _game_system.mode);
             switch (_game_system.mode) {
-                case Envelope.MODE_EASY:
-                    _mode_text.color = yellow;
-                    break;
-                case Envelope.MODE_NORMAL:
-                    _mode_text.color = green;
-                    break;
-                case Envelope.MODE_HARD:
-                    _mode_text.color = purple;
-                    break;
+                case Envelope.MODE_EASY: _mode_text.color = yellow; break;
+                case Envelope.MODE_NORMAL: _mode_text.color = green; break;
+                case Envelope.MODE_HARD: _mode_text.color = purple; break;
             }
         }
 
@@ -222,36 +202,16 @@ namespace Studio.MeowToon {
         public void setTotalEnergyColor(float value) {
             const float START_VALUE = 20.0f;
             const float ADDED_VALUE = 20.0f;
-            if (value is < START_VALUE) {
-                _energy_text.color = red;
-            }
-            else if (value is < START_VALUE + ADDED_VALUE and >= START_VALUE) {
-                _energy_text.color = orange;
-            }
-            else if (value is < START_VALUE + ADDED_VALUE * 2 and >= START_VALUE + ADDED_VALUE) {
-                _energy_text.color = yellow;
-            }
-            else if (value is < START_VALUE + ADDED_VALUE * 3 and >= START_VALUE + ADDED_VALUE * 2) {
-                _energy_text.color = lime;
-            }
-            else if (value is < START_VALUE + ADDED_VALUE * 4 and >= START_VALUE + ADDED_VALUE * 3) {
-                _energy_text.color = green;
-            }
-            else if (value is < START_VALUE + ADDED_VALUE * 5 and >= START_VALUE + ADDED_VALUE * 4) {
-                _energy_text.color = cyan;
-            }
-            else if (value is < START_VALUE + ADDED_VALUE * 6 and >= START_VALUE + ADDED_VALUE * 5) {
-                _energy_text.color = azure;
-            }
-            else if (value is < START_VALUE + ADDED_VALUE * 7 and >= START_VALUE + ADDED_VALUE * 6) {
-                _energy_text.color = blue;
-            }
-            else if (value is < START_VALUE + ADDED_VALUE * 8 and >= START_VALUE + ADDED_VALUE * 7) {
-                _energy_text.color = purple;
-            }
-            else {
-                _energy_text.color = magenta;
-            }
+            if (value is < START_VALUE) { _energy_text.color = red; return; }
+            if (value is < START_VALUE + ADDED_VALUE and >= START_VALUE) { _energy_text.color = orange; return; }
+            if (value is < START_VALUE + ADDED_VALUE * 2 and >= START_VALUE + ADDED_VALUE) { _energy_text.color = yellow; return; }
+            if (value is < START_VALUE + ADDED_VALUE * 3 and >= START_VALUE + ADDED_VALUE * 2) { _energy_text.color = lime; return; }
+            if (value is < START_VALUE + ADDED_VALUE * 4 and >= START_VALUE + ADDED_VALUE * 3) { _energy_text.color = green; return; }
+            if (value is < START_VALUE + ADDED_VALUE * 5 and >= START_VALUE + ADDED_VALUE * 4) { _energy_text.color = cyan; return; }
+            if (value is < START_VALUE + ADDED_VALUE * 6 and >= START_VALUE + ADDED_VALUE * 5) { _energy_text.color = azure; return; }
+            if (value is < START_VALUE + ADDED_VALUE * 7 and >= START_VALUE + ADDED_VALUE * 6) { _energy_text.color = blue; return; }
+            if (value is < START_VALUE + ADDED_VALUE * 8 and >= START_VALUE + ADDED_VALUE * 7) { _energy_text.color = purple; return; }
+             _energy_text.color = magenta; return;
         }
     }
 }

@@ -179,19 +179,13 @@ namespace Studio.MeowToon {
         new void Start() {
             base.Start();
 
-            const float ACTION_POWER = 12.0f;
+            const float ADD_FORCE_VALUE = 12.0f;
 
             // set game mode
             switch (_game_system.mode) {
-                case Envelope.MODE_EASY:
-                    _total_power_factor_value = 1.0f;
-                    break;
-                case Envelope.MODE_NORMAL:
-                    _total_power_factor_value = 1.5f;
-                    break;
-                case Envelope.MODE_HARD:
-                    _total_power_factor_value = 2.0f;
-                    break;
+                case Envelope.MODE_EASY: _total_power_factor_value = 1.0f; break;
+                case Envelope.MODE_NORMAL: _total_power_factor_value = 1.5f; break;
+                case Envelope.MODE_HARD: _total_power_factor_value = 2.0f; break;
             }
 
             /// <remarks>
@@ -208,7 +202,8 @@ namespace Studio.MeowToon {
             // get vehicle speed for flight.
             Vector3 prev_position = transform.position;
             this.FixedUpdateAsObservable().Where(_ => !Mathf.Approximately(Time.deltaTime, 0)).Subscribe(_ => {
-                airSpeed = ((transform.position - prev_position) / Time.deltaTime).magnitude * 3.6f; // m/s -> km/h
+                const float VALUE_MS_TO_KMH = 3.6f; // m/s -> km/h
+                airSpeed = ((transform.position - prev_position) / Time.deltaTime).magnitude * VALUE_MS_TO_KMH; 
                 verticalSpeed = ((transform.position.y - prev_position.y) / Time.deltaTime); // m/s
                 prev_position = transform.position;
             });
@@ -234,7 +229,8 @@ namespace Studio.MeowToon {
             });
 
             this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.walk && _acceleration.canWalk).Subscribe(_ => {
-                rb.AddFor​​ce(transform.forward * ACTION_POWER * 7.5f, ForceMode.Acceleration);
+                const float ADJUST_VALUE = 7.5f;
+                rb.AddFor​​ce(transform.forward * ADD_FORCE_VALUE * ADJUST_VALUE, ForceMode.Acceleration);
                 _do_fixed_update.CancelWalk();
             });
 
@@ -247,7 +243,8 @@ namespace Studio.MeowToon {
             });
 
             this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.run && _acceleration.canRun).Subscribe(_ => {
-                rb.AddFor​​ce(transform.forward * ACTION_POWER * 7.5f, ForceMode.Acceleration);
+                const float ADJUST_VALUE = 7.5f;
+                rb.AddFor​​ce(transform.forward * ADD_FORCE_VALUE * ADJUST_VALUE, ForceMode.Acceleration);
                 _do_fixed_update.CancelRun();
             });
 
@@ -260,7 +257,8 @@ namespace Studio.MeowToon {
             });
 
             this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.backward && _acceleration.canBackward).Subscribe(_ => {
-                rb.AddFor​​ce(-transform.forward * ACTION_POWER * 7.5f, ForceMode.Acceleration);
+                const float ADJUST_VALUE = 7.5f;
+                rb.AddFor​​ce(-transform.forward * ADD_FORCE_VALUE * ADJUST_VALUE, ForceMode.Acceleration);
                 _do_fixed_update.CancelBackward();
             });
 
@@ -274,8 +272,9 @@ namespace Studio.MeowToon {
             });
 
             this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.jump).Subscribe(_ => {
+                const float ADJUST_VALUE = 2.0f;
                 rb.useGravity = true;
-                rb.AddRelativeFor​​ce(up * _jump_power * ACTION_POWER * 2, ForceMode.Acceleration);
+                rb.AddRelativeFor​​ce(up * _jump_power * ADD_FORCE_VALUE * ADJUST_VALUE, ForceMode.Acceleration);
                 _do_fixed_update.CancelJump();
             });
 
@@ -329,7 +328,7 @@ namespace Studio.MeowToon {
             /// </summary>
             this.UpdateAsObservable().Where(_ => _do_update.grounded).Subscribe(_ => {
                 var axis = _right_button.isPressed ? 1 : _left_button.isPressed ? -1 : 0;
-                transform.Rotate(0, axis * (_rotational_speed * Time.deltaTime) * ACTION_POWER, 0);
+                transform.Rotate(0, axis * (_rotational_speed * Time.deltaTime) * ADD_FORCE_VALUE, 0);
             });
 
             /// <summary>
@@ -337,7 +336,7 @@ namespace Studio.MeowToon {
             /// </summary>
             this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_up_button.isPressed || _down_button.isPressed)).Subscribe(_ => {
                 var axis = _up_button.isPressed ? 1 : _down_button.isPressed ? -1 : 0;
-                transform.Rotate(axis * (_pitch_speed * Time.deltaTime) * ACTION_POWER, 0, 0);
+                transform.Rotate(axis * (_pitch_speed * Time.deltaTime) * ADD_FORCE_VALUE, 0, 0);
             });
 
             /// <summary>
@@ -346,19 +345,19 @@ namespace Studio.MeowToon {
             if (_game_system.mode == Envelope.MODE_EASY || _game_system.mode == Envelope.MODE_NORMAL) {
                 this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_left_button.isPressed || _right_button.isPressed)).Subscribe(_ => {
                     var axis = _left_button.isPressed ? 1 : _right_button.isPressed ? -1 : 0;
-                    transform.Rotate(0, 0, axis * (_roll_speed * Time.deltaTime) * ACTION_POWER);
+                    transform.Rotate(0, 0, axis * (_roll_speed * Time.deltaTime) * ADD_FORCE_VALUE);
                     axis = _right_button.isPressed ? 1 : _left_button.isPressed ? -1 : 0;
-                    transform.Rotate(0, axis * (_roll_speed * Time.deltaTime) * ACTION_POWER, 0);
+                    transform.Rotate(0, axis * (_roll_speed * Time.deltaTime) * ADD_FORCE_VALUE, 0);
                 });
             } 
             else if (_game_system.mode == Envelope.MODE_HARD) {
                 this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_left_button.isPressed || _right_button.isPressed)).Subscribe(_ => {
                     var axis = _left_button.isPressed ? 1 : _right_button.isPressed ? -1 : 0;
-                    transform.Rotate(0, 0, axis * (_roll_speed * 2.0f * Time.deltaTime) * ACTION_POWER);
+                    transform.Rotate(0, 0, axis * (_roll_speed * 2.0f * Time.deltaTime) * ADD_FORCE_VALUE);
                 });
                 this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_left_1_button.isPressed || _right_1_button.isPressed)).Subscribe(_ => {
                     var axis = _right_1_button.isPressed ? 1 : _left_1_button.isPressed ? -1 : 0;
-                    transform.Rotate(0, axis * (_roll_speed * 0.5f * Time.deltaTime) * ACTION_POWER, 0);
+                    transform.Rotate(0, axis * (_roll_speed * 0.5f * Time.deltaTime) * ADD_FORCE_VALUE, 0);
                 });
             }
 
@@ -450,10 +449,10 @@ namespace Studio.MeowToon {
         /// move top when the vehicle hits a block.
         /// </summary>
         void moveTop() {
-            const float SPEED = 6.0f;
+            const float MOVE_VALUE = 6.0f;
             transform.position = new(
                 transform.position.x,
-                transform.position.y + SPEED * Time.deltaTime,
+                transform.position.y + MOVE_VALUE * Time.deltaTime,
                 transform.position.z
             );
         }
@@ -463,20 +462,20 @@ namespace Studio.MeowToon {
         /// </summary>
         /// <param name="direction">the vehicle's direction is provided.</param>
         void moveLetfOrRight(Direction direction) {
-            const float SPEED = 0.3f;
+            const float MOVE_VALUE = 0.3f;
             Vector3 move_position = transform.position;
             // z-axis positive and negative.
             if (direction == Direction.PositiveZ || direction == Direction.NegativeZ) {
                 if (transform.forward.x < 0f) {
                     move_position = new(
-                        transform.position.x - SPEED * Time.deltaTime,
+                        transform.position.x - MOVE_VALUE * Time.deltaTime,
                         transform.position.y,
                         transform.position.z
                     );
                 }
                 else if (transform.forward.x >= 0f) {
                     move_position = new(
-                        transform.position.x + SPEED * Time.deltaTime,
+                        transform.position.x + MOVE_VALUE * Time.deltaTime,
                         transform.position.y,
                         transform.position.z
                     );
@@ -488,14 +487,14 @@ namespace Studio.MeowToon {
                     move_position = new(
                         transform.position.x,
                         transform.position.y,
-                        transform.position.z - SPEED * Time.deltaTime
+                        transform.position.z - MOVE_VALUE * Time.deltaTime
                     );
                 }
                 else if (transform.forward.z >= 0f) {
                     move_position = new(
                         transform.position.x,
                         transform.position.y,
-                        transform.position.z + SPEED * Time.deltaTime
+                        transform.position.z + MOVE_VALUE * Time.deltaTime
                     );
                 }
             }
@@ -880,14 +879,16 @@ namespace Studio.MeowToon {
             /// gain the power.
             /// </summary>
             public void Gain() {
-                _flight_power_base += 0.125f * _total_power_factor_value; ;
+                const float ADD_VALUE = 0.125f;
+                _flight_power_base += ADD_VALUE * _total_power_factor_value; ;
             }
 
             /// <summary>
             /// lose the power.
             /// </summary>
             public void Lose() {
-                _flight_power_base -= 0.125f * _total_power_factor_value; ;
+                const float SUBTRACT_VALUE = 0.125f;
+                _flight_power_base -= SUBTRACT_VALUE * _total_power_factor_value; ;
             }
         }
 
