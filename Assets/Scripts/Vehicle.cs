@@ -146,6 +146,14 @@ namespace Studio.MeowToon {
             set { transform.position = value; Updated?.Invoke(this, new(nameof(position))); }
         }
 
+        /// <summary>
+        /// transform rotation.
+        /// </summary>
+        public Quaternion rotation {
+            get => transform.rotation;
+            set { transform.rotation = value; Updated?.Invoke(this, new(nameof(rotation))); }
+        }
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Events [verb, verb phrase]
 
@@ -379,6 +387,7 @@ namespace Studio.MeowToon {
             // LateUpdate is called after all Update functions have been called.
             this.LateUpdateAsObservable().Subscribe(_ => {
                 position = transform.position;
+                rotation = transform.rotation;
                 flightTime = (float) _flight_stopwatch.Elapsed.TotalSeconds;
             });
 
