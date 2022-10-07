@@ -27,11 +27,6 @@ namespace Studio.MeowToon {
     public class Level : InputMaper {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Constants
-
-        const string TARGETS_OBJECT = "Balloons"; // name of target objects holder.
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives]
 
         GameSystem _game_system;
@@ -134,7 +129,7 @@ namespace Studio.MeowToon {
             /// get targets count.
             /// </summary>
             int getTargetsCount() {
-                var targets = GameObject.Find(TARGETS_OBJECT);
+                var targets = GameObject.Find(Envelope.TARGETS_OBJECT);
                 Transform targets_transform = targets.GetComponentInChildren<Transform>();
                 return targets_transform.childCount;
             }

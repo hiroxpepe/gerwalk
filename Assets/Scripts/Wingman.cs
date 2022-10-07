@@ -81,7 +81,6 @@ namespace Studio.MeowToon {
                 Direction vehicle_direction = getDirection(_vehicle_object.transform.forward);
                 Vector3 move_position = getWingmanPosition(vehicle_direction);
                 if (vehicle_direction != _vehicle_previous_direction) {
-                    //Debug.Log($"Changed! vehicle_direction: {vehicle_direction}");
                     _vehicle_previous_direction = vehicle_direction;
                 }
                 moveWingmanPosition(move_position);
@@ -99,46 +98,46 @@ namespace Studio.MeowToon {
         /// get new position.
         /// </summary>
         Vector3 getWingmanPosition(Direction direction) {
-            const float SHIFT = 2.5f;
+            const float OFFSET_VALUE = 2.5f;
             Vector3 move_position = new(0f, 0f, 0f);
             // z-axis positive.
             if (direction == Direction.PositiveZ ) {
                 move_position = new(
-                    _vehicle_object.transform.position.x + SHIFT,
+                    _vehicle_object.transform.position.x + OFFSET_VALUE,
                     _vehicle_object.transform.position.y,
-                    _vehicle_object.transform.position.z - SHIFT
+                    _vehicle_object.transform.position.z - OFFSET_VALUE
                 );
             }
             // z-axis negative.
             if (direction == Direction.NegativeZ) {
                 move_position = new(
-                    _vehicle_object.transform.position.x - SHIFT,
+                    _vehicle_object.transform.position.x - OFFSET_VALUE,
                     _vehicle_object.transform.position.y,
-                    _vehicle_object.transform.position.z + SHIFT
+                    _vehicle_object.transform.position.z + OFFSET_VALUE
                 );
             }
             // x-axis positive.
             if (direction == Direction.PositiveX) {
                 move_position = new(
-                    _vehicle_object.transform.position.x - SHIFT,
+                    _vehicle_object.transform.position.x - OFFSET_VALUE,
                     _vehicle_object.transform.position.y,
-                    _vehicle_object.transform.position.z - SHIFT
+                    _vehicle_object.transform.position.z - OFFSET_VALUE
                 );
             }
             // x-axis negative.
             if (direction == Direction.NegativeX) {
                 move_position = new(
-                    _vehicle_object.transform.position.x + SHIFT,
+                    _vehicle_object.transform.position.x + OFFSET_VALUE,
                     _vehicle_object.transform.position.y,
-                    _vehicle_object.transform.position.z + SHIFT
+                    _vehicle_object.transform.position.z + OFFSET_VALUE
                 );
             }
             // none.
             if (direction == Direction.None) {
                 move_position = new(
-                    _vehicle_object.transform.position.x + SHIFT,
+                    _vehicle_object.transform.position.x + OFFSET_VALUE,
                     _vehicle_object.transform.position.y,
-                    _vehicle_object.transform.position.z - SHIFT
+                    _vehicle_object.transform.position.z - OFFSET_VALUE
                 );
             }
             return move_position;

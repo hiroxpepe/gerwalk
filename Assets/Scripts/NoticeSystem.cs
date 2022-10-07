@@ -18,6 +18,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
 using UniRx.Triggers;
+using static Studio.MeowToon.Utils;
 
 namespace Studio.MeowToon {
     /// <summary>
@@ -26,14 +27,6 @@ namespace Studio.MeowToon {
     /// </summary>
     public class NoticeSystem : MonoBehaviour {
 #nullable enable
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Constants
-
-        const string MESSAGE_LEVEL_START = "Get items!";
-        const string MESSAGE_LEVEL_CLEAR = "Level Clear!";
-        const string MESSAGE_GAME_OVER = "Game Over!";
-        const string MESSAGE_GAME_PAUSE = "Pause";
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
@@ -55,6 +48,9 @@ namespace Studio.MeowToon {
 
         [SerializeField]
         Text _altitude_text;
+
+        [SerializeField]
+        Text _heading_text;
 
         [SerializeField]
         Text _lift_spoiler_text;
@@ -85,33 +81,16 @@ namespace Studio.MeowToon {
 
         GameSystem _game_system;
 
-        float _air_speed = 0f;
-
-        float _vertical_speed = 0f;
-
-        float _altitude = 0f;
+        float _air_speed, _vertical_speed, _altitude = 0f;
 
         bool _use_lift_spoiler = false;
 
         /// <summary>
         /// for development.
         /// </summary>
-        float _energy = 0f;
+        float _energy, _power, _flight_time = 0f;
 
-        /// <summary>
-        /// for development.
-        /// </summary>
-        float _power = 0;
-
-        /// <summary>
-        /// for development.
-        /// </summary>
-        float _flight_time = 0;
-
-        /// <summary>
-        /// color.
-        /// </summary>
-        Color _red, _orange, _yellow, _lime, _green, _cyan, _azure, _blue, _purple, _magenta, _white;
+        float _heading, _pitch, _roll = 0f;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -124,7 +103,7 @@ namespace Studio.MeowToon {
             /// game system pause on.
             /// </summary>
             _game_system.OnPauseOn += () => {
-                _message_text.text = MESSAGE_GAME_PAUSE;
+                _message_text.text = Envelope.MESSAGE_GAME_PAUSE;
             };
 
             /// <summary>
@@ -157,26 +136,33 @@ namespace Studio.MeowToon {
             vehicle.Updated += (object sender, EvtArgs e) => {
                 var vehicle = sender as Vehicle;
                 if (vehicle is not null) {
-                    if (e.Name.Equals(nameof(Vehicle.airSpeed))) {
-                        _air_speed = vehicle.airSpeed;
-                    }
-                    if (e.Name.Equals(nameof(Vehicle.verticalSpeed))) {
-                        _vertical_speed = vehicle.verticalSpeed;
-                    }
-                    if (e.Name.Equals(nameof(Vehicle.flightTime))) {
-                        _flight_time = vehicle.flightTime;
-                    }
-                    if (e.Name.Equals(nameof(Vehicle.total))) {
-                        _energy = vehicle.total;
-                    }
-                    if (e.Name.Equals(nameof(Vehicle.power))) {
-                        _power = vehicle.power;
-                    }
-                    if (e.Name.Equals(nameof(Vehicle.useLiftSpoiler))) {
-                        _use_lift_spoiler = vehicle.useLiftSpoiler;
-                    }
-                    if (e.Name.Equals(nameof(Vehicle.position))) {
-                        _altitude = vehicle.position.y -0.5f; // 0.5 is half vehicle height.
+                    if (e.Name.Equals(nameof(Vehicle.airSpeed))) { _air_speed = vehicle.airSpeed; return; }
+                    if (e.Name.Equals(nameof(Vehicle.verticalSpeed))) { _vertical_speed = vehicle.verticalSpeed; return; }
+                    if (e.Name.Equals(nameof(Vehicle.flightTime))) { _flight_time = vehicle.flightTime; return; }
+                    if (e.Name.Equals(nameof(Vehicle.total))) { _energy = vehicle.total; return; }
+                    if (e.Name.Equals(nameof(Vehicle.power))) { _power = vehicle.power; return; }
+                    if (e.Name.Equals(nameof(Vehicle.useLiftSpoiler))) { _use_lift_spoiler = vehicle.useLiftSpoiler; return; }
+                    if (e.Name.Equals(nameof(Vehicle.position))) { _altitude = vehicle.position.y - 0.5f; return; } // 0.5 is half vehicle height.
+                    if (e.Name.Equals(nameof(Vehicle.rotation))) {
+                        Vector3 angle = vehicle.transform.localEulerAngles;
+                        // vector.y
+                        _heading = angle.y;
+                        // vector.x
+                        //   pos: 360 -> 270 = 270 -> 360
+                        //   neg:   0 ->  90 =  90 ->   0
+                        //     to pitch
+                        //   pos:   0 ->  90 =  90 ->   0
+                        //   neg:  -0 -> -90 = -90 ->  -0
+                        if (angle.x >= 270) {
+                            _pitch = 360f - angle.x;
+                        } else if (angle.x <= 90) {
+                            _pitch = -angle.x;
+                        }
+                        // vector.z
+                        //   rig: 360 -> 180
+                        //   lef:   0 -> 180
+                        _roll = angle.z;
+                        Debug.Log($"_heading: {_heading} _pitch: {_pitch} _roll: {_roll}");
                     }
                 }
             };
@@ -188,15 +174,12 @@ namespace Studio.MeowToon {
             /// came back home.
             /// </summary>
             home.OnCameBack += () => {
-                _message_text.text = MESSAGE_LEVEL_CLEAR;
+                _message_text.text = Envelope.MESSAGE_LEVEL_CLEAR;
             };
         }
 
         // Start is called before the first frame update
         void Start() {
-            // create color.
-            createColor();
-
             // update text ui.
             this.UpdateAsObservable().Subscribe(_ => {
                 updateGameStatus();
@@ -215,15 +198,9 @@ namespace Studio.MeowToon {
             _points_text.text = string.Format("POINT {0}", _game_system.pointTotal);
             _mode_text.text = string.Format("Mode: {0}", _game_system.mode);
             switch (_game_system.mode) {
-                case Envelope.MODE_EASY:
-                    _mode_text.color = _yellow;
-                    break;
-                case Envelope.MODE_NORMAL:
-                    _mode_text.color = _green;
-                    break;
-                case Envelope.MODE_HARD:
-                    _mode_text.color = _purple;
-                    break;
+                case Envelope.MODE_EASY: _mode_text.color = yellow; break;
+                case Envelope.MODE_NORMAL: _mode_text.color = green; break;
+                case Envelope.MODE_HARD: _mode_text.color = purple; break;
             }
         }
 
@@ -234,10 +211,9 @@ namespace Studio.MeowToon {
             _air_speed_text.text = string.Format("TAS {0:000.0}km/h", Math.Round(_air_speed, 1, MidpointRounding.AwayFromZero));
             _vertical_speed_text.text = string.Format("VSI {0:000.0}m/s", Math.Round(_vertical_speed, 1, MidpointRounding.AwayFromZero));
             _altitude_text.text = string.Format("ALT {0:000.0}m", Math.Round(_altitude, 1, MidpointRounding.AwayFromZero));
-            var lift_spoiler_status = _use_lift_spoiler ? "ON" : "OFF";
-            Color lift_spoiler_color = _use_lift_spoiler ? _red : _green;
-            _lift_spoiler_text.text = $"Spoiler: {lift_spoiler_status}";
-            _lift_spoiler_text.color = lift_spoiler_color;
+            _heading_text.text = string.Format("HEAD {0:000.0}", Math.Round(_heading, 1, MidpointRounding.AwayFromZero));
+            _lift_spoiler_text.text = "Spoiler: " + (_use_lift_spoiler ? "ON" : "OFF");
+            _lift_spoiler_text.color = _use_lift_spoiler ? red : green;
             /// <remarks>
             /// for development.
             /// </remarks>
@@ -253,54 +229,16 @@ namespace Studio.MeowToon {
         public void setTotalEnergyColor(float value) {
             const float START_VALUE = 20.0f;
             const float ADDED_VALUE = 20.0f;
-            if (value is < START_VALUE) {
-                _energy_text.color = _red;
-            }
-            else if (value is < START_VALUE + ADDED_VALUE and >= START_VALUE) {
-                _energy_text.color = _orange;
-            }
-            else if (value is < START_VALUE + ADDED_VALUE * 2 and >= START_VALUE + ADDED_VALUE) {
-                _energy_text.color = _yellow;
-            }
-            else if (value is < START_VALUE + ADDED_VALUE * 3 and >= START_VALUE + ADDED_VALUE * 2) {
-                _energy_text.color = _lime;
-            }
-            else if (value is < START_VALUE + ADDED_VALUE * 4 and >= START_VALUE + ADDED_VALUE * 3) {
-                _energy_text.color = _green;
-            }
-            else if (value is < START_VALUE + ADDED_VALUE * 5 and >= START_VALUE + ADDED_VALUE * 4) {
-                _energy_text.color = _cyan;
-            }
-            else if (value is < START_VALUE + ADDED_VALUE * 6 and >= START_VALUE + ADDED_VALUE * 5) {
-                _energy_text.color = _azure;
-            }
-            else if (value is < START_VALUE + ADDED_VALUE * 7 and >= START_VALUE + ADDED_VALUE * 6) {
-                _energy_text.color = _blue;
-            }
-            else if (value is < START_VALUE + ADDED_VALUE * 8 and >= START_VALUE + ADDED_VALUE * 7) {
-                _energy_text.color = _purple;
-            }
-            else {
-                _energy_text.color = _magenta;
-            }
-        }
-
-        /// <summary>
-        /// create color.
-        /// https://www.color-sample.com/colorschemes/rule/dominant/
-        /// </summary>
-        void createColor() {
-            ColorUtility.TryParseHtmlString("#FF0000", out _red);
-            ColorUtility.TryParseHtmlString("#FF7F00", out _orange);
-            ColorUtility.TryParseHtmlString("#FFFF00", out _yellow);
-            ColorUtility.TryParseHtmlString("#7FFF00", out _lime);
-            ColorUtility.TryParseHtmlString("#00FF00", out _green);
-            ColorUtility.TryParseHtmlString("#00FFFF", out _cyan);
-            ColorUtility.TryParseHtmlString("#007FFF", out _azure);
-            ColorUtility.TryParseHtmlString("#002AFF", out _blue);
-            ColorUtility.TryParseHtmlString("#D400FF", out _purple);
-            ColorUtility.TryParseHtmlString("#FF007F", out _magenta);
-            ColorUtility.TryParseHtmlString("#FFFFFF", out _white);
+            if (value is < START_VALUE) { _energy_text.color = red; return; }
+            if (value is < START_VALUE + ADDED_VALUE and >= START_VALUE) { _energy_text.color = orange; return; }
+            if (value is < START_VALUE + ADDED_VALUE * 2 and >= START_VALUE + ADDED_VALUE) { _energy_text.color = yellow; return; }
+            if (value is < START_VALUE + ADDED_VALUE * 3 and >= START_VALUE + ADDED_VALUE * 2) { _energy_text.color = lime; return; }
+            if (value is < START_VALUE + ADDED_VALUE * 4 and >= START_VALUE + ADDED_VALUE * 3) { _energy_text.color = green; return; }
+            if (value is < START_VALUE + ADDED_VALUE * 5 and >= START_VALUE + ADDED_VALUE * 4) { _energy_text.color = cyan; return; }
+            if (value is < START_VALUE + ADDED_VALUE * 6 and >= START_VALUE + ADDED_VALUE * 5) { _energy_text.color = azure; return; }
+            if (value is < START_VALUE + ADDED_VALUE * 7 and >= START_VALUE + ADDED_VALUE * 6) { _energy_text.color = blue; return; }
+            if (value is < START_VALUE + ADDED_VALUE * 8 and >= START_VALUE + ADDED_VALUE * 7) { _energy_text.color = purple; return; }
+             _energy_text.color = magenta; return;
         }
     }
 }
