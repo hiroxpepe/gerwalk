@@ -16,6 +16,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.GameObject;
 using UniRx;
 using UniRx.Triggers;
 using static Studio.MeowToon.Utils;
@@ -134,7 +135,7 @@ namespace Studio.MeowToon {
             };
 
             // get vehicle.
-            Vehicle vehicle = gameObject.GetVehicleGameObject().GetVehicle();
+            Vehicle vehicle = Find(Envelope.VEHICLE_TYPE).GetVehicle();
 
             /// <summary>
             /// vehicle updated.
@@ -151,13 +152,12 @@ namespace Studio.MeowToon {
                     if (e.Name.Equals(nameof(Vehicle.position))) { _altitude = vehicle.position.y - 0.5f; return; } // 0.5 is half vehicle height.
                     if (e.Name.Equals(nameof(Vehicle.rotation))) {
                         _heading = vehicle.heading; _pitch = vehicle.pitch; _roll = vehicle.roll; _bank = vehicle.bank; return;
-                        Debug.Log($"_heading: {vehicle.heading} _pitch: {vehicle.pitch} _roll: {vehicle.roll}");
                     }
                 }
             };
 
             // get home.
-            Home home = gameObject.GetHomeGameObject().GetHome();
+            Home home = Find(Envelope.HOME_TYPE).GetHome();
 
             /// <summary>
             /// came back home.

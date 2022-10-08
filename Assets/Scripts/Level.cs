@@ -16,6 +16,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static UnityEngine.GameObject;
 using UniRx;
 using UniRx.Triggers;
 
@@ -50,7 +51,7 @@ namespace Studio.MeowToon {
             _game_system = gameObject.GetGameSystem();
             
             // get home.
-            Home home = gameObject.GetHomeGameObject().GetHome();
+            Home home = Find(Envelope.HOME_TYPE).GetHome();
 
             /// <summary>
             /// came back home.

@@ -15,6 +15,7 @@
 
 using System;
 using UnityEngine;
+using static UnityEngine.GameObject;
 using static Studio.MeowToon.Utils;
 
 namespace Studio.MeowToon {
@@ -102,7 +103,7 @@ namespace Studio.MeowToon {
 
             if (HasLevel()) {
                 // get level.
-                Level level = gameObject.GetLevelGameObject().GetLevel();
+                Level level = Find(Envelope.LEVEL_TYPE).GetLevel();
 
                 /// <summary>
                 /// level pause on.
@@ -121,7 +122,7 @@ namespace Studio.MeowToon {
 
             if (HasVehicle()) {
                 // get vehicle.
-                Vehicle vehicle = gameObject.GetVehicleGameObject().GetVehicle();
+                Vehicle vehicle = Find(Envelope.VEHICLE_TYPE).GetVehicle();
 
                 /// <summary>
                 /// vehicle on gain energy.

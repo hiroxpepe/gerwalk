@@ -202,11 +202,11 @@ namespace Studio.MeowToon {
         public float pitch {
             get {
                 // vector.x
-                //   pos: 360 -> 270 = 270 -> 360
-                //   neg:   0 ->  90 =  90 ->   0
+                //   positive: 360 -> 270 = 270 -> 360
+                //   negative:   0 ->  90 =  90 ->   0
                 //     to pitch
-                //   pos:   0 ->  90 =  90 ->   0
-                //   neg:  -0 -> -90 = -90 ->  -0
+                //   positive:   0 ->  90 =  90 ->   0
+                //   negative:  -0 -> -90 = -90 ->  -0
                 Vector3 angle = transform.localEulerAngles;
                 if (angle.x >= 270) {
                     return 360f - angle.x;
@@ -263,7 +263,7 @@ namespace Studio.MeowToon {
             /// <remarks>
             /// Rigidbody should be only used in FixedUpdate.
             /// </remarks>
-            var rb = transform.GetComponent<Rigidbody>();
+            Rigidbody rb = transform.GetRigidbody();
 
             // FIXME: to integrate with Energy function.
             this.FixedUpdateAsObservable().Subscribe(_ => {
@@ -432,6 +432,13 @@ namespace Studio.MeowToon {
                     transform.Rotate(0, axis * (_roll_speed * 0.5f * Time.deltaTime) * ADD_FORCE_VALUE, 0);
                 });
             }
+            this.UpdateAsObservable().Where(_ => !_do_update.grounded && _do_update.banking).Subscribe(_ => {
+                float angle = bank > 90 ? 90 - (bank - 90) : bank;
+                float power = (float)(angle * (airSpeed / 2) * 0.001f);
+                // yaw against the world.
+                var axis = roll >= 180 ? 1 : roll < 180 ? -1 : 0;
+                transform.Rotate(new Vector3(0, axis * (_roll_speed * Time.deltaTime) * power, 0), Space.World);
+            });
 
             /// <summary>
             /// stall.
@@ -453,6 +460,12 @@ namespace Studio.MeowToon {
                 position = transform.position;
                 rotation = transform.rotation;
                 flightTime = (float) _flight_stopwatch.Elapsed.TotalSeconds;
+                if (bank > 1.5f) { // FIXME:
+                    _do_update.banking = true;
+                } else {
+                    _do_update.banking = false;
+                }
+                Debug.Log($"banking: {_do_update.banking}");
             });
 
             /// <summary>
@@ -644,7 +657,7 @@ namespace Studio.MeowToon {
             ///////////////////////////////////////////////////////////////////////////////////////
             // Fields [noun, adjectives] 
 
-            bool _grounded;
+            bool _grounded, _banking;
 
             ///////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjectives] 
@@ -652,6 +665,11 @@ namespace Studio.MeowToon {
             public bool grounded {
                 get => _grounded;
                 set => _grounded = value;
+            }
+
+            public bool banking {
+                get => _banking;
+                set => _banking = value;
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////

@@ -127,31 +127,6 @@ namespace Studio.MeowToon {
 
         #endregion
 
-        #region get the gameObject.
-
-        /// <summary>
-        /// get the "Vehicle" gameObject.
-        /// </summary>
-        public static GameObject GetVehicleGameObject(this GameObject self) {
-            return GameObject.Find(Envelope.VEHICLE_TYPE);
-        }
-
-        /// <summary>
-        /// get the "Home" gameObject.
-        /// </summary>
-        public static GameObject GetHomeGameObject(this GameObject self) {
-            return GameObject.Find(Envelope.HOME_TYPE);
-        }
-
-        /// <summary>
-        /// get the "Level" gameObject.
-        /// </summary>
-        public static GameObject GetLevelGameObject(this GameObject self) {
-            return GameObject.Find(Envelope.LEVEL_TYPE);
-        }
-
-        #endregion
-
         #region get the component.
 
         /// <summary>
