@@ -499,15 +499,22 @@ namespace Studio.MeowToon {
             /// <summary>
             /// stall.
             /// </summary>
+            float stall_time_count = 0f;
             this.UpdateAsObservable().Where(_ => !_do_update.grounded && _energy.power < 1.0f && flightTime > 0.5f).Subscribe(_ => {
                 Debug.Log($"stall");
+                _do_update.stall = true;
+                stall_time_count = 0f;
+            });
+            this.UpdateAsObservable().Where(_ => _do_update.stall).Subscribe(_ => {
                 var ground_object = Find(Envelope.GROUND_TYPE);
                 Quaternion ground_rotation = Quaternion.LookRotation(ground_object.transform.position);
-                float speed = 0.25f;
-                float step = speed * Time.deltaTime;
-                transform.rotation = Quaternion.Slerp(transform.rotation, ground_rotation, step);
+                stall_time_count += Time.deltaTime;
+                transform.rotation = Quaternion.Slerp(transform.rotation, ground_rotation, stall_time_count);
                 if (_energy.power < 10.0f || _energy.total < 10.0f || _energy.speed < 10.0f) {
                     _energy.Gain();
+                }
+                if (stall_time_count >= 1) {
+                    _do_update.stall = false;
                 }
             });
 
@@ -712,7 +719,7 @@ namespace Studio.MeowToon {
             ///////////////////////////////////////////////////////////////////////////////////////
             // Fields [noun, adjectives] 
 
-            bool _grounded, _banking, _need_left_quick_roll, _need_right_quick_roll;
+            bool _grounded, _stall, _banking, _need_left_quick_roll, _need_right_quick_roll;
 
             ///////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjectives] 
@@ -720,6 +727,11 @@ namespace Studio.MeowToon {
             public bool grounded {
                 get => _grounded;
                 set => _grounded = value;
+            }
+
+            public bool stall {
+                get => _stall;
+                set => _stall = value;
             }
 
             public bool banking {
@@ -753,7 +765,7 @@ namespace Studio.MeowToon {
             // public Methods [verb]
 
             public void ResetState() {
-                _grounded = false;
+                _grounded = _stall = _banking = _need_left_quick_roll = _need_right_quick_roll = false;
             }
         }
 
