@@ -421,19 +421,6 @@ namespace Studio.MeowToon {
                     axis = _right_button.isPressed ? 1 : _left_button.isPressed ? -1 : 0;
                     transform.Rotate(0, axis * (_roll_speed * Time.deltaTime) * ADD_FORCE_VALUE, 0);
                 });
-                this.UpdateAsObservable().Where(_ => !_do_update.grounded && _do_update.banking).Subscribe(_ => {
-                    float power = (float) (bank * 0.035f);
-                    // roll
-                    //   right: 360 -> 180
-                    //   left :   0 -> 180
-                    var axis = roll < 180 ? 1 : roll >= 180 ? -1 : 0;
-                    transform.Rotate(0, 0, axis * (_roll_speed * Time.deltaTime) * 0.075f * (power * 0.075f));
-                    // yaw
-                    axis = roll >= 180 ? 1 : roll < 180 ? -1 : 0;
-                    transform.Rotate(0, axis * (_roll_speed * Time.deltaTime) * 1.0f * (power * 1.0f), 0);
-                    // pitch
-                    transform.Rotate(-1 * (_pitch_speed * Time.deltaTime) * 0.5f * (power * 0.5f), 0, 0);
-                });
             } 
             else if (_game_system.mode == Envelope.MODE_HARD) {
                 this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_left_button.isPressed || _right_button.isPressed)).Subscribe(_ => {
@@ -445,6 +432,13 @@ namespace Studio.MeowToon {
                     transform.Rotate(0, axis * (_roll_speed * 0.5f * Time.deltaTime) * ADD_FORCE_VALUE, 0);
                 });
             }
+            this.UpdateAsObservable().Where(_ => !_do_update.grounded && _do_update.banking).Subscribe(_ => {
+                float angle = bank > 90 ? 90 - (bank - 90) : bank;
+                float power = (float)(angle * (airSpeed / 2) * 0.001f);
+                // yaw against the world.
+                var axis = roll >= 180 ? 1 : roll < 180 ? -1 : 0;
+                transform.Rotate(new Vector3(0, axis * (_roll_speed * Time.deltaTime) * power, 0), Space.World);
+            });
 
             /// <summary>
             /// stall.
