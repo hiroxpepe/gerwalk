@@ -41,13 +41,7 @@ namespace Studio.MeowToon {
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
         [SerializeField]
-        GameObject _home_object;
-
-        [SerializeField]
         GameObject _home_mark_object;
-
-        [SerializeField]
-        GameObject _targets_object;
 
         [SerializeField]
         GameObject _target_mark_object;
@@ -59,6 +53,10 @@ namespace Studio.MeowToon {
         // Fields
 
         GameObject _vehicle_object;
+
+        GameObject _home_object;
+
+        GameObject _targets_object;
 
         float _fast_cycle = 0.25f;
 
@@ -72,6 +70,8 @@ namespace Studio.MeowToon {
         // Awake is called when the script instance is being loaded.
         void Awake() {
             _vehicle_object = gameObject.GetVehicleGameObject();
+            _home_object = gameObject.GetHomeGameObject();
+            _targets_object = GameObject.Find(Envelope.TARGETS_OBJECT);
         }
 
         // Start is called before the first frame update.
