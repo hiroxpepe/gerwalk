@@ -202,11 +202,11 @@ namespace Studio.MeowToon {
         public float pitch {
             get {
                 // vector.x
-                //   pos: 360 -> 270 = 270 -> 360
-                //   neg:   0 ->  90 =  90 ->   0
+                //   positive: 360 -> 270 = 270 -> 360
+                //   negative:   0 ->  90 =  90 ->   0
                 //     to pitch
-                //   pos:   0 ->  90 =  90 ->   0
-                //   neg:  -0 -> -90 = -90 ->  -0
+                //   positive:   0 ->  90 =  90 ->   0
+                //   negative:  -0 -> -90 = -90 ->  -0
                 Vector3 angle = transform.localEulerAngles;
                 if (angle.x >= 270) {
                     return 360f - angle.x;
@@ -421,6 +421,19 @@ namespace Studio.MeowToon {
                     axis = _right_button.isPressed ? 1 : _left_button.isPressed ? -1 : 0;
                     transform.Rotate(0, axis * (_roll_speed * Time.deltaTime) * ADD_FORCE_VALUE, 0);
                 });
+                this.UpdateAsObservable().Where(_ => !_do_update.grounded && _do_update.banking).Subscribe(_ => {
+                    float power = (float) (bank * 0.035f);
+                    // roll
+                    //   right: 360 -> 180
+                    //   left :   0 -> 180
+                    var axis = roll < 180 ? 1 : roll >= 180 ? -1 : 0;
+                    transform.Rotate(0, 0, axis * (_roll_speed * Time.deltaTime) * 0.075f * (power * 0.075f));
+                    // yaw
+                    axis = roll >= 180 ? 1 : roll < 180 ? -1 : 0;
+                    transform.Rotate(0, axis * (_roll_speed * Time.deltaTime) * 1.0f * (power * 1.0f), 0);
+                    // pitch
+                    transform.Rotate(-1 * (_pitch_speed * Time.deltaTime) * 0.5f * (power * 0.5f), 0, 0);
+                });
             } 
             else if (_game_system.mode == Envelope.MODE_HARD) {
                 this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_left_button.isPressed || _right_button.isPressed)).Subscribe(_ => {
@@ -453,6 +466,12 @@ namespace Studio.MeowToon {
                 position = transform.position;
                 rotation = transform.rotation;
                 flightTime = (float) _flight_stopwatch.Elapsed.TotalSeconds;
+                if (bank > 1.5f) { // FIXME:
+                    _do_update.banking = true;
+                } else {
+                    _do_update.banking = false;
+                }
+                Debug.Log($"banking: {_do_update.banking}");
             });
 
             /// <summary>
@@ -644,7 +663,7 @@ namespace Studio.MeowToon {
             ///////////////////////////////////////////////////////////////////////////////////////
             // Fields [noun, adjectives] 
 
-            bool _grounded;
+            bool _grounded, _banking;
 
             ///////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjectives] 
@@ -652,6 +671,11 @@ namespace Studio.MeowToon {
             public bool grounded {
                 get => _grounded;
                 set => _grounded = value;
+            }
+
+            public bool banking {
+                get => _banking;
+                set => _banking = value;
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////

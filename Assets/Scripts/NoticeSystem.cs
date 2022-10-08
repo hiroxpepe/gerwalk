@@ -152,7 +152,6 @@ namespace Studio.MeowToon {
                     if (e.Name.Equals(nameof(Vehicle.position))) { _altitude = vehicle.position.y - 0.5f; return; } // 0.5 is half vehicle height.
                     if (e.Name.Equals(nameof(Vehicle.rotation))) {
                         _heading = vehicle.heading; _pitch = vehicle.pitch; _roll = vehicle.roll; _bank = vehicle.bank; return;
-                        Debug.Log($"_heading: {vehicle.heading} _pitch: {vehicle.pitch} _roll: {vehicle.roll}");
                     }
                 }
             };
