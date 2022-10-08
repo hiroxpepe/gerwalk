@@ -53,6 +53,12 @@ namespace Studio.MeowToon {
         Text _heading_text;
 
         [SerializeField]
+        Text _pitch_text;
+
+        [SerializeField]
+        Text _roll_text;
+
+        [SerializeField]
         Text _lift_spoiler_text;
 
         [SerializeField]
@@ -90,7 +96,7 @@ namespace Studio.MeowToon {
         /// </summary>
         float _energy, _power, _flight_time = 0f;
 
-        float _heading, _pitch, _roll = 0f;
+        float _heading, _pitch, _roll, _bank = 0f;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
@@ -144,25 +150,8 @@ namespace Studio.MeowToon {
                     if (e.Name.Equals(nameof(Vehicle.useLiftSpoiler))) { _use_lift_spoiler = vehicle.useLiftSpoiler; return; }
                     if (e.Name.Equals(nameof(Vehicle.position))) { _altitude = vehicle.position.y - 0.5f; return; } // 0.5 is half vehicle height.
                     if (e.Name.Equals(nameof(Vehicle.rotation))) {
-                        Vector3 angle = vehicle.transform.localEulerAngles;
-                        // vector.y
-                        _heading = angle.y;
-                        // vector.x
-                        //   pos: 360 -> 270 = 270 -> 360
-                        //   neg:   0 ->  90 =  90 ->   0
-                        //     to pitch
-                        //   pos:   0 ->  90 =  90 ->   0
-                        //   neg:  -0 -> -90 = -90 ->  -0
-                        if (angle.x >= 270) {
-                            _pitch = 360f - angle.x;
-                        } else if (angle.x <= 90) {
-                            _pitch = -angle.x;
-                        }
-                        // vector.z
-                        //   rig: 360 -> 180
-                        //   lef:   0 -> 180
-                        _roll = angle.z;
-                        Debug.Log($"_heading: {_heading} _pitch: {_pitch} _roll: {_roll}");
+                        _heading = vehicle.heading; _pitch = vehicle.pitch; _roll = vehicle.roll; _bank = vehicle.bank; return;
+                        Debug.Log($"_heading: {vehicle.heading} _pitch: {vehicle.pitch} _roll: {vehicle.roll}");
                     }
                 }
             };
@@ -211,7 +200,9 @@ namespace Studio.MeowToon {
             _air_speed_text.text = string.Format("TAS {0:000.0}km/h", Math.Round(_air_speed, 1, MidpointRounding.AwayFromZero));
             _vertical_speed_text.text = string.Format("VSI {0:000.0}m/s", Math.Round(_vertical_speed, 1, MidpointRounding.AwayFromZero));
             _altitude_text.text = string.Format("ALT {0:000.0}m", Math.Round(_altitude, 1, MidpointRounding.AwayFromZero));
-            _heading_text.text = string.Format("HEAD {0:000.0}", Math.Round(_heading, 1, MidpointRounding.AwayFromZero));
+            _heading_text.text = string.Format("HEADING {0:000.0}", Math.Round(_heading, 1, MidpointRounding.AwayFromZero));
+            _pitch_text.text = string.Format("PITCH {0:000.0}", Math.Round(_pitch, 1, MidpointRounding.AwayFromZero));
+            _roll_text.text = string.Format("BANK {0:000.0}", Math.Round(_bank, 1, MidpointRounding.AwayFromZero));
             _lift_spoiler_text.text = "Spoiler: " + (_use_lift_spoiler ? "ON" : "OFF");
             _lift_spoiler_text.color = _use_lift_spoiler ? red : green;
             /// <remarks>

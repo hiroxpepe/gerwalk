@@ -154,6 +154,70 @@ namespace Studio.MeowToon {
             set { transform.rotation = value; Updated?.Invoke(this, new(nameof(rotation))); }
         }
 
+        /// <summary>
+        /// value of heading angle.
+        /// </summary>
+        public float heading {
+            get {
+                // vector.y
+                //   0 -> 360
+                Vector3 angle = transform.localEulerAngles;
+                return angle.y;
+            }
+        }
+
+        /// <summary>
+        /// value of roll angle.
+        /// </summary>
+        public float roll {
+            get {
+                // vector.z
+                //   right: 360 -> 180
+                //   left :   0 -> 180
+                Vector3 angle = transform.localEulerAngles;
+                return angle.z;
+            }
+        }
+
+        /// <summary>
+        /// value of bank angle.
+        /// </summary>
+        public float bank {
+            get {
+                // roll
+                //   right: 360 -> 180
+                //   left :   0 -> 180
+                if (roll <= 180) {
+                    return roll;
+                } else if (roll > 180) {
+                    return -(roll - 360f);
+                }
+                return 0f;
+            }
+        }
+
+        /// <summary>
+        /// value of pitch angle.
+        /// </summary>
+        public float pitch {
+            get {
+                // vector.x
+                //   pos: 360 -> 270 = 270 -> 360
+                //   neg:   0 ->  90 =  90 ->   0
+                //     to pitch
+                //   pos:   0 ->  90 =  90 ->   0
+                //   neg:  -0 -> -90 = -90 ->  -0
+                Vector3 angle = transform.localEulerAngles;
+                if (angle.x >= 270) {
+                    return 360f - angle.x;
+                }
+                else if (angle.x <= 90) {
+                    return -angle.x;
+                }
+                return 0f;
+            }
+        }
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Events [verb, verb phrase]
 
@@ -327,7 +391,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// use or not use lift spoiler.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => _a_button.wasPressedThisFrame && !_do_update.grounded).Subscribe(_ => {
+            this.UpdateAsObservable().Where(_ => _x_button.wasPressedThisFrame && !_do_update.grounded).Subscribe(_ => {
                 useLiftSpoiler = !useLiftSpoiler;
             });
 
