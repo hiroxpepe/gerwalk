@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.GameObject;
 using static UnityEngine.Vector3;
 using UniRx;
 using UniRx.Triggers;
@@ -434,10 +435,65 @@ namespace Studio.MeowToon {
             }
             this.UpdateAsObservable().Where(_ => !_do_update.grounded && _do_update.banking).Subscribe(_ => {
                 float angle = bank > 90 ? 90 - (bank - 90) : bank;
-                float power = (float)(angle * (airSpeed / 2) * 0.001f);
+                float power = (float) (angle * (airSpeed / 2) * 0.001f);
                 // yaw against the world.
                 var axis = roll >= 180 ? 1 : roll < 180 ? -1 : 0;
                 transform.Rotate(new Vector3(0, axis * (_roll_speed * Time.deltaTime) * power, 0), Space.World);
+            });
+
+            /// <summary>
+            /// left quick roll.
+            /// </summary>
+            const float WAIT_FOR_DOUBLE_CLICK = 250f;
+            float left_quick_roll_time_count = 0f;
+            Vector3 left_quick_roll_angle = new(0f, 0f, 0f);
+            var left_double_click = this.UpdateAsObservable().Where(_ => _left_button.wasPressedThisFrame);
+            left_double_click.Buffer(left_double_click.Throttle(TimeSpan.FromMilliseconds(WAIT_FOR_DOUBLE_CLICK))).Where(x => x.Count == 2).Subscribe(_ => {
+                Debug.Log($"left button double click. {roll}");
+                _do_update.needLeftQuickRoll = true;
+                left_quick_roll_time_count = 0f;
+                left_quick_roll_angle = transform.rotation.eulerAngles;
+                float roll_to = roll >= 180 ? left_quick_roll_angle.z - 180f : -(left_quick_roll_angle.z - 180f);
+                left_quick_roll_angle = new Vector3(
+                    left_quick_roll_angle.x, 
+                    left_quick_roll_angle.y,
+                    roll_to
+                );
+            });
+            this.UpdateAsObservable().Where(_ => _do_update.needLeftQuickRoll).Subscribe(_ => {
+                Quaternion quick_roll_rotation = Quaternion.Euler(left_quick_roll_angle);
+                left_quick_roll_time_count += Time.deltaTime;
+                transform.rotation = Quaternion.Slerp(transform.rotation, quick_roll_rotation, left_quick_roll_time_count);
+                if (left_quick_roll_time_count >= 1) {
+                    _do_update.needLeftQuickRoll = false;
+                }
+            });
+
+            /// <summary>
+            /// right quick roll.
+            /// </summary>
+            float right_quick_roll_time_count = 0f;
+            Vector3 right_quick_roll_angle = new(0f, 0f, 0f);
+            var right_double_click = this.UpdateAsObservable().Where(_ => _right_button.wasPressedThisFrame);
+            right_double_click.Buffer(right_double_click.Throttle(TimeSpan.FromMilliseconds(WAIT_FOR_DOUBLE_CLICK))).Where(x => x.Count == 2).Subscribe(_ => {
+                Debug.Log($"right button double click. {roll}");
+                _do_update.needRightQuickRoll = true;
+                right_quick_roll_time_count = 0f;
+                right_quick_roll_angle = transform.rotation.eulerAngles;
+                float roll_to = roll < 180 ? right_quick_roll_angle.z - 180f : -(right_quick_roll_angle.z - 180f);
+                right_quick_roll_angle = new Vector3(
+                    right_quick_roll_angle.x,
+                    right_quick_roll_angle.y,
+                    roll_to
+                );
+            });
+            this.UpdateAsObservable().Where(_ => _do_update.needRightQuickRoll).Subscribe(_ => {
+                Quaternion quick_roll_rotation = Quaternion.Euler(right_quick_roll_angle);
+                right_quick_roll_time_count += Time.deltaTime;
+                transform.rotation = Quaternion.Slerp(transform.rotation, quick_roll_rotation, right_quick_roll_time_count);
+                if (right_quick_roll_time_count >= 1) {
+                    _do_update.needRightQuickRoll = false;
+                }
             });
 
             /// <summary>
@@ -445,9 +501,9 @@ namespace Studio.MeowToon {
             /// </summary>
             this.UpdateAsObservable().Where(_ => !_do_update.grounded && _energy.power < 1.0f && flightTime > 0.5f).Subscribe(_ => {
                 Debug.Log($"stall");
-                var ground_object = GameObject.Find(Envelope.GROUND_TYPE);
+                var ground_object = Find(Envelope.GROUND_TYPE);
                 Quaternion ground_rotation = Quaternion.LookRotation(ground_object.transform.position);
-                float speed = 2.5f;
+                float speed = 0.25f;
                 float step = speed * Time.deltaTime;
                 transform.rotation = Quaternion.Slerp(transform.rotation, ground_rotation, step);
                 if (_energy.power < 10.0f || _energy.total < 10.0f || _energy.speed < 10.0f) {
@@ -465,7 +521,6 @@ namespace Studio.MeowToon {
                 } else {
                     _do_update.banking = false;
                 }
-                Debug.Log($"banking: {_do_update.banking}");
             });
 
             /// <summary>
@@ -657,7 +712,7 @@ namespace Studio.MeowToon {
             ///////////////////////////////////////////////////////////////////////////////////////
             // Fields [noun, adjectives] 
 
-            bool _grounded, _banking;
+            bool _grounded, _banking, _need_left_quick_roll, _need_right_quick_roll;
 
             ///////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjectives] 
@@ -670,6 +725,16 @@ namespace Studio.MeowToon {
             public bool banking {
                 get => _banking;
                 set => _banking = value;
+            }
+
+            public bool needLeftQuickRoll {
+                get => _need_left_quick_roll;
+                set => _need_left_quick_roll = value;
+            }
+
+            public bool needRightQuickRoll {
+                get => _need_right_quick_roll;
+                set => _need_right_quick_roll = value;
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////
