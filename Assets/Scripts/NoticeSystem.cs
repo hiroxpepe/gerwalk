@@ -16,6 +16,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.GameObject;
 using UniRx;
 using UniRx.Triggers;
 using static Studio.MeowToon.Utils;
@@ -134,7 +135,7 @@ namespace Studio.MeowToon {
             };
 
             // get vehicle.
-            Vehicle vehicle = gameObject.GetVehicleGameObject().GetVehicle();
+            Vehicle vehicle = Find(Envelope.VEHICLE_TYPE).GetVehicle();
 
             /// <summary>
             /// vehicle updated.
@@ -157,7 +158,7 @@ namespace Studio.MeowToon {
             };
 
             // get home.
-            Home home = gameObject.GetHomeGameObject().GetHome();
+            Home home = Find(Envelope.HOME_TYPE).GetHome();
 
             /// <summary>
             /// came back home.

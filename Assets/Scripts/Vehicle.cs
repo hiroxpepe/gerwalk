@@ -263,7 +263,7 @@ namespace Studio.MeowToon {
             /// <remarks>
             /// Rigidbody should be only used in FixedUpdate.
             /// </remarks>
-            var rb = transform.GetComponent<Rigidbody>();
+            Rigidbody rb = transform.GetRigidbody();
 
             // FIXME: to integrate with Energy function.
             this.FixedUpdateAsObservable().Subscribe(_ => {

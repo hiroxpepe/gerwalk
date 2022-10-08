@@ -13,8 +13,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using static UnityEngine.GameObject;
 using UnityEngine;
+using static UnityEngine.GameObject;
 using UniRx;
 using UniRx.Triggers;
 
@@ -52,7 +52,7 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            _vehicle_object = gameObject.GetVehicleGameObject();
+            _vehicle_object = Find(Envelope.VEHICLE_TYPE);
         }
 
         // Start is called before the first frame update.

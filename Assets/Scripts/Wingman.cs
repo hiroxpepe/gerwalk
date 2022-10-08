@@ -15,6 +15,7 @@
 
 using System;
 using UnityEngine;
+using static UnityEngine.GameObject;
 using UniRx;
 using UniRx.Triggers;
 
@@ -41,13 +42,13 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            _vehicle_object = gameObject.GetVehicleGameObject();
+            _vehicle_object = Find(Envelope.VEHICLE_TYPE);
             var vehicle = _vehicle_object.GetVehicle();
 
             /// <remarks>
             /// Rigidbody should be only used in FixedUpdate.
             /// </remarks>
-            var rb = transform.GetComponent<Rigidbody>();
+            Rigidbody rb = transform.GetRigidbody();
 
             /// <summary>
             /// vehicle on flight.
@@ -70,7 +71,7 @@ namespace Studio.MeowToon {
             /// <remarks>
             /// Rigidbody should be only used in FixedUpdate.
             /// </remarks>
-            var rb = transform.GetComponent<Rigidbody>();
+            Rigidbody rb = transform.GetRigidbody();
 
             // FIXME: no use.
             _vehicle_previous_direction = getDirection(_vehicle_object.transform.forward);
