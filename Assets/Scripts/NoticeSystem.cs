@@ -156,6 +156,16 @@ namespace Studio.MeowToon {
                 }
             };
 
+            /// <summary>
+            /// vehicle on stall.
+            /// </summary>
+            vehicle.OnStall += () => {
+                _message_text.text = Envelope.MESSAGE_STALL;
+                Observable.Timer(TimeSpan.FromSeconds(2)).Subscribe(_ => {
+                    _message_text.text = string.Empty;
+                }).AddTo(this);
+            };
+
             // get home.
             Home home = Find(Envelope.HOME_TYPE).GetHome();
 

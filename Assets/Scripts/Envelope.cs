@@ -56,6 +56,7 @@ namespace Studio.MeowToon {
         public const string MESSAGE_LEVEL_CLEAR = "Level Clear!";
         public const string MESSAGE_GAME_OVER = "Game Over!";
         public const string MESSAGE_GAME_PAUSE = "Pause";
+        public const string MESSAGE_STALL = "Stall";
 
         /// https://www.color-sample.com/colorschemes/rule/dominant/
         public const string COLOR_RED = "#FF0000";
