@@ -30,7 +30,7 @@ namespace Studio.MeowToon {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
+        #region References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
         [SerializeField]
         float _jump_power = 15.0f;
@@ -59,13 +59,17 @@ namespace Studio.MeowToon {
         [SerializeField]
         SimpleAnimation _simple_anime;
 
+        #endregion
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // static Fields [noun, adjectives] 
+        #region static Fields [noun, adjectives] 
 
         static float _total_power_factor_value = 1.5f;
 
+        #endregion
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Fields [noun, adjectives] 
+        #region Fields [noun, adjectives] 
 
         GameSystem _game_system;
 
@@ -83,8 +87,10 @@ namespace Studio.MeowToon {
 
         bool _use_lift_spoiler = false;
 
+        #endregion
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Properties [noun, adjectives] 
+        #region Properties [noun, adjectives] 
 
         /// <summary>
         /// current speed of the vehicle object to flight.
@@ -219,8 +225,10 @@ namespace Studio.MeowToon {
             }
         }
 
+        #endregion
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // public Events [verb, verb phrase]
+        #region public Events [verb, verb phrase]
 
         public event Action? OnFlight;
 
@@ -237,8 +245,10 @@ namespace Studio.MeowToon {
         /// </summary>
         public event Changed? Updated;
 
+        #endregion
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // update Methods
+        #region update Methods
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
@@ -283,7 +293,7 @@ namespace Studio.MeowToon {
                 prev_position = transform.position;
             });
 
-            #region for grounded player
+            #region for Grounded Player
 
             /// <summary>
             /// idol.
@@ -403,7 +413,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// flight.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => !_do_update.grounded).Subscribe(_ => {
+            this.UpdateAsObservable().Where(_ => _do_update.flighting).Subscribe(_ => {
                 _energy.speed = airSpeed;
                 _energy.altitude = transform.position.y - 0.5f; // 0.5 is half vehicle height.
                 _do_fixed_update.ApplyFlight();
@@ -414,53 +424,62 @@ namespace Studio.MeowToon {
                 rb.useGravity = false;
                 rb.velocity = transform.forward * _energy.GetCalculatedPower();
                 if (useLiftSpoiler) {
-                    var velocity = rb.velocity;
+                    Vector3 velocity = rb.velocity;
                     rb.velocity = new Vector3(velocity.x, velocity.y - FALL_VALUE, velocity.z);
                 }
                 _do_fixed_update.CancelFlight();
                 _flight_stopwatch.Start();
             });
 
+            #region Pitch
+
             /// <summary>
             /// pitch.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_up_button.isPressed || _down_button.isPressed)).Subscribe(_ => {
-                var axis = _up_button.isPressed ? 1 : _down_button.isPressed ? -1 : 0;
-                transform.Rotate(axis * (_pitch_speed * Time.deltaTime) * ADD_FORCE_VALUE, 0, 0);
-
-                Debug.Log($"_down_button.isPressed: {_down_button.isPressed}");
+            this.UpdateAsObservable().Where(_ => _do_update.flighting && (_up_button.isPressed || _down_button.isPressed)).Subscribe(_ => {
+                int pitch_axis = _up_button.isPressed ? 1 : _down_button.isPressed ? -1 : 0;
+                transform.Rotate(pitch_axis * (_pitch_speed * Time.deltaTime) * ADD_FORCE_VALUE, 0, 0);
             });
+
+            #endregion
+
+            #region Roll and Yaw
 
             /// <summary>
             /// roll and yaw.
             /// </summary>
             if (_game_system.mode == Envelope.MODE_EASY || _game_system.mode == Envelope.MODE_NORMAL) {
-                this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_left_button.isPressed || _right_button.isPressed)).Subscribe(_ => {
-                    var axis = _left_button.isPressed ? 1 : _right_button.isPressed ? -1 : 0;
-                    transform.Rotate(0, 0, axis * (_roll_speed * Time.deltaTime) * ADD_FORCE_VALUE);
-                    axis = _right_button.isPressed ? 1 : _left_button.isPressed ? -1 : 0;
-                    transform.Rotate(0, axis * (_roll_speed * Time.deltaTime) * ADD_FORCE_VALUE, 0);
+                this.UpdateAsObservable().Where(_ => _do_update.flighting && (_left_button.isPressed || _right_button.isPressed)).Subscribe(_ => {
+                    int roll_axis = _left_button.isPressed ? 1 : _right_button.isPressed ? -1 : 0;
+                    transform.Rotate(0, 0, roll_axis * (_roll_speed * Time.deltaTime) * ADD_FORCE_VALUE);
+                    int yaw_axis = _right_button.isPressed ? 1 : _left_button.isPressed ? -1 : 0;
+                    transform.Rotate(0, yaw_axis * (_roll_speed * Time.deltaTime) * ADD_FORCE_VALUE, 0);
                 });
             } 
             else if (_game_system.mode == Envelope.MODE_HARD) {
-                this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_left_button.isPressed || _right_button.isPressed)).Subscribe(_ => {
-                    var axis = _left_button.isPressed ? 1 : _right_button.isPressed ? -1 : 0;
-                    transform.Rotate(0, 0, axis * (_roll_speed * 2.0f * Time.deltaTime) * ADD_FORCE_VALUE);
+                this.UpdateAsObservable().Where(_ => _do_update.flighting && (_left_button.isPressed || _right_button.isPressed)).Subscribe(_ => {
+                    int roll_axis = _left_button.isPressed ? 1 : _right_button.isPressed ? -1 : 0;
+                    transform.Rotate(0, 0, roll_axis * (_roll_speed * 2.0f * Time.deltaTime) * ADD_FORCE_VALUE);
                 });
-                this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_left_1_button.isPressed || _right_1_button.isPressed)).Subscribe(_ => {
-                    var axis = _right_1_button.isPressed ? 1 : _left_1_button.isPressed ? -1 : 0;
-                    transform.Rotate(0, axis * (_roll_speed * 0.5f * Time.deltaTime) * ADD_FORCE_VALUE, 0);
+                this.UpdateAsObservable().Where(_ => _do_update.flighting && (_left_1_button.isPressed || _right_1_button.isPressed)).Subscribe(_ => {
+                    int yaw_axis = _right_1_button.isPressed ? 1 : _left_1_button.isPressed ? -1 : 0;
+                    transform.Rotate(0, yaw_axis * (_roll_speed * 0.5f * Time.deltaTime) * ADD_FORCE_VALUE, 0);
                 });
             }
-            this.UpdateAsObservable().Where(_ => !_do_update.grounded && _do_update.banking).Subscribe(_ => {
+            /// <summary>
+            /// persistent yaw against the world.
+            /// </summary>
+            this.UpdateAsObservable().Where(_ => _do_update.flighting && _do_update.banking).Subscribe(_ => {
+                const float ADJUSTED_VALUE = 0.001f;
                 float angle = bank > 90 ? 90 - (bank - 90) : bank;
-                float power = (float) (angle * (airSpeed / 2) * 0.001f);
-                // yaw against the world.
-                var axis = roll >= 180 ? 1 : roll < 180 ? -1 : 0;
-                transform.Rotate(new Vector3(0, axis * (_roll_speed * Time.deltaTime) * power, 0), Space.World);
+                float power = (float) (angle * (airSpeed / 2) * ADJUSTED_VALUE);
+                int yaw_axis = roll >= 180 ? 1 : roll < 180 ? -1 : 0;
+                transform.Rotate(new Vector3(0, yaw_axis * (_roll_speed * Time.deltaTime) * power, 0), Space.World);
             });
 
-            # region Quick Roll
+            #endregion
+
+            #region Quick Roll
 
             /// <summary>
             /// left quick roll.
@@ -469,7 +488,7 @@ namespace Studio.MeowToon {
             float left_quick_roll_time_count = 0f;
             Vector3 left_quick_roll_angle = new(0f, 0f, 0f);
             float left_quick_roll_to_z = 0f;
-            var left_double_click = this.UpdateAsObservable().Where(_ => _left_button.wasPressedThisFrame);
+            var left_double_click = this.UpdateAsObservable().Where(_ => _do_update.flighting && _left_button.wasPressedThisFrame);
             left_double_click.Buffer(left_double_click.Throttle(TimeSpan.FromMilliseconds(WAIT_FOR_DOUBLE_CLICK))).Where(x => x.Count == 2).Subscribe(_ => {
                 _do_update.needLeftQuickRoll = true;
                 left_quick_roll_time_count = 0f;
@@ -490,7 +509,7 @@ namespace Studio.MeowToon {
             float right_quick_roll_time_count = 0f;
             Vector3 right_quick_roll_angle = new(0f, 0f, 0f);
             float right_quick_roll_to_z = 0f;
-            var right_double_click = this.UpdateAsObservable().Where(_ => _right_button.wasPressedThisFrame);
+            var right_double_click = this.UpdateAsObservable().Where(_ => _do_update.flighting && _right_button.wasPressedThisFrame);
             right_double_click.Buffer(right_double_click.Throttle(TimeSpan.FromMilliseconds(WAIT_FOR_DOUBLE_CLICK))).Where(x => x.Count == 2).Subscribe(_ => {
                 _do_update.needRightQuickRoll = true;
                 right_quick_roll_time_count = 0f;
@@ -511,19 +530,19 @@ namespace Studio.MeowToon {
             /// stall.
             /// </summary>
             float stall_time_count = 0f;
-            this.UpdateAsObservable().Where(_ => !_do_update.grounded && _energy.power < 1.0f && flightTime > 0.5f).Subscribe(_ => {
+            this.UpdateAsObservable().Where(_ => _do_update.flighting && _energy.power < 1.0f && flightTime > 0.5f).Subscribe(_ => {
                 Debug.Log($"stall");
-                _do_update.stall = true;
+                _do_update.stalling = true;
                 stall_time_count = 0f;
                 OnStall?.Invoke();
             });
-            this.UpdateAsObservable().Where(_ => _do_update.stall).Subscribe(_ => {
+            this.UpdateAsObservable().Where(_ => _do_update.stalling).Subscribe(_ => {
                 var ground_object = Find(Envelope.GROUND_TYPE);
                 Quaternion ground_rotation = Quaternion.LookRotation(ground_object.transform.position);
                 stall_time_count += Time.deltaTime;
                 transform.rotation = Quaternion.Slerp(transform.rotation, ground_rotation, stall_time_count);
-                if (_energy.power < 10.0f || _energy.total < 10.0f || _energy.speed < 10.0f) { _energy.Gain(); }
-                if (stall_time_count >= 1) { _do_update.stall = false; }
+                if (_energy.power < 10.0f || _energy.total < 10.0f || _energy.speed < 10.0f) { _energy.Gain(); } // FIXME: into _energy
+                if (stall_time_count >= 1) { _do_update.stalling = false; }
             });
 
             #region Gain or Lose Energy
@@ -531,7 +550,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// gain energy.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => _b_button.wasPressedThisFrame && !_do_update.grounded && _game_system.usePoint).Subscribe(_ => {
+            this.UpdateAsObservable().Where(_ => _do_update.flighting && _b_button.wasPressedThisFrame && _game_system.usePoint).Subscribe(_ => {
                 _energy.Gain();
                 OnGainEnergy?.Invoke();
             });
@@ -539,7 +558,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// lose energy.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => _y_button.wasPressedThisFrame && !_do_update.grounded && _game_system.usePoint).Subscribe(_ => {
+            this.UpdateAsObservable().Where(_ => _do_update.flighting && _y_button.wasPressedThisFrame && _game_system.usePoint).Subscribe(_ => {
                 _energy.Lose();
                 OnLoseEnergy?.Invoke();
             });
@@ -549,7 +568,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// use or not use lift spoiler.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => _x_button.wasPressedThisFrame && !_do_update.grounded).Subscribe(_ => {
+            this.UpdateAsObservable().Where(_ => _do_update.flighting && _x_button.wasPressedThisFrame).Subscribe(_ => {
                 useLiftSpoiler = !useLiftSpoiler;
             });
 
@@ -587,10 +606,10 @@ namespace Studio.MeowToon {
 
         #endregion
 
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        // private Methods [verb]
+        #endregion
 
-        #region private Methods
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        #region private Methods [verb]
 
         /// <summary>
         /// the value until the top of the block.
@@ -715,7 +734,7 @@ namespace Studio.MeowToon {
         #endregion
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // inner Classes
+        #region inner Classes
 
         #region DoUpdate
 
@@ -737,7 +756,11 @@ namespace Studio.MeowToon {
                 set => _grounded = value;
             }
 
-            public bool stall {
+            public bool flighting {
+                get => !_grounded;
+            }
+
+            public bool stalling {
                 get => _stall;
                 set => _stall = value;
             }
@@ -1076,6 +1099,8 @@ namespace Studio.MeowToon {
                 _flight_power_base -= SUBTRACT_VALUE * _total_power_factor_value; ;
             }
         }
+
+        #endregion
 
         #endregion
     }
