@@ -554,6 +554,7 @@ namespace Studio.MeowToon {
                 } else {
                     _do_update.banking = false;
                 }
+                _energy.pitch = pitch;
             });
 
             /// <summary>
@@ -911,11 +912,7 @@ namespace Studio.MeowToon {
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Fields [noun, adjectives] 
 
-            float _flight_power_base;
-
-            float _default_flight_power_base;
-
-            float _calculated_power;
+            float _flight_power_base, _default_flight_power_base, _calculated_power;
 
             float _altitude;
 
@@ -924,6 +921,8 @@ namespace Studio.MeowToon {
             float _speed;
 
             float _threshold = 1f; // FIXME:
+
+            float _pitch;
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjectives] 
@@ -981,6 +980,13 @@ namespace Studio.MeowToon {
                 }
             }
 
+            /// <summary>
+            /// pitch
+            /// </summary>
+            public float pitch {
+                set => _pitch = value;
+            }
+
             ///////////////////////////////////////////////////////////////////////////////////////////
             //internal  Events [verb, verb phrase] 
 
@@ -1020,10 +1026,14 @@ namespace Studio.MeowToon {
                 const float AUTO_FLARE_ALTITUDE = 8.0f;
                 if (total > _threshold) {
                     if (_previous_altitudes.Peek() < _altitude) { // up
-                        _flight_power_base -= ADD_OR_SUBTRACT_VALUE * POWAR_FACTOR_VALUE * _total_power_factor_value;
+                        float pitch_factor = 1.0f;
+                        pitch_factor += Math.Abs(_pitch / 100f);
+                        _flight_power_base -= ADD_OR_SUBTRACT_VALUE * POWAR_FACTOR_VALUE * _total_power_factor_value * pitch_factor;
                     }
                     if (_previous_altitudes.Peek() > _altitude) { // down
-                        _flight_power_base += ADD_OR_SUBTRACT_VALUE * POWAR_FACTOR_VALUE * _total_power_factor_value;
+                        float pitch_factor = 1.0f;
+                        pitch_factor += Math.Abs(_pitch / 100f);
+                        _flight_power_base += ADD_OR_SUBTRACT_VALUE * POWAR_FACTOR_VALUE * _total_power_factor_value * pitch_factor;
                     }
                 }
                 if (total <= _threshold && _altitude < AUTO_FLARE_ALTITUDE) {
