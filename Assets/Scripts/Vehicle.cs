@@ -356,6 +356,14 @@ namespace Studio.MeowToon {
             });
 
             /// <summary>
+            /// rotate(yaw).
+            /// </summary>
+            this.UpdateAsObservable().Where(_ => _do_update.grounded).Subscribe(_ => {
+                var axis = _right_button.isPressed ? 1 : _left_button.isPressed ? -1 : 0;
+                transform.Rotate(0, axis * (_rotational_speed * Time.deltaTime) * ADD_FORCE_VALUE, 0);
+            });
+
+            /// <summary>
             /// freeze.
             /// </summary>
             this.OnCollisionStayAsObservable().Where(x => x.LikeBlock() && (_up_button.isPressed || _down_button.isPressed) && _acceleration.freeze).Subscribe(_ => {
@@ -390,6 +398,8 @@ namespace Studio.MeowToon {
 
             #endregion
 
+            # region for Flight Vehicle
+
             /// <summary>
             /// flight.
             /// </summary>
@@ -399,7 +409,6 @@ namespace Studio.MeowToon {
                 _do_fixed_update.ApplyFlight();
                 OnFlight?.Invoke(); // call event handler.
             });
-
             this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.flight).Subscribe(_ => {
                 const float FALL_VALUE = 5.0f; // 5.0 -> -5m/s
                 rb.useGravity = false;
@@ -410,37 +419,6 @@ namespace Studio.MeowToon {
                 }
                 _do_fixed_update.CancelFlight();
                 _flight_stopwatch.Start();
-            });
-
-            /// <summary>
-            /// gain energy.
-            /// </summary>
-            this.UpdateAsObservable().Where(_ => _b_button.wasPressedThisFrame && !_do_update.grounded && _game_system.usePoint).Subscribe(_ => {
-                OnGainEnergy?.Invoke();
-                _energy.Gain();
-            });
-
-            /// <summary>
-            /// lose energy.
-            /// </summary>
-            this.UpdateAsObservable().Where(_ => _y_button.wasPressedThisFrame && !_do_update.grounded && _game_system.usePoint).Subscribe(_ => {
-                OnLoseEnergy?.Invoke();
-                _energy.Lose();
-            });
-
-            /// <summary>
-            /// use or not use lift spoiler.
-            /// </summary>
-            this.UpdateAsObservable().Where(_ => _x_button.wasPressedThisFrame && !_do_update.grounded).Subscribe(_ => {
-                useLiftSpoiler = !useLiftSpoiler;
-            });
-
-            /// <summary>
-            /// rotate(yaw).
-            /// </summary>
-            this.UpdateAsObservable().Where(_ => _do_update.grounded).Subscribe(_ => {
-                var axis = _right_button.isPressed ? 1 : _left_button.isPressed ? -1 : 0;
-                transform.Rotate(0, axis * (_rotational_speed * Time.deltaTime) * ADD_FORCE_VALUE, 0);
             });
 
             /// <summary>
@@ -481,6 +459,8 @@ namespace Studio.MeowToon {
                 var axis = roll >= 180 ? 1 : roll < 180 ? -1 : 0;
                 transform.Rotate(new Vector3(0, axis * (_roll_speed * Time.deltaTime) * power, 0), Space.World);
             });
+
+            # region Quick Roll
 
             /// <summary>
             /// left quick roll.
@@ -525,6 +505,8 @@ namespace Studio.MeowToon {
                 if (right_quick_roll_time_count >= 1) { _do_update.needRightQuickRoll = false; }
             });
 
+            # endregion
+
             /// <summary>
             /// stall.
             /// </summary>
@@ -542,6 +524,33 @@ namespace Studio.MeowToon {
                 transform.rotation = Quaternion.Slerp(transform.rotation, ground_rotation, stall_time_count);
                 if (_energy.power < 10.0f || _energy.total < 10.0f || _energy.speed < 10.0f) { _energy.Gain(); }
                 if (stall_time_count >= 1) { _do_update.stall = false; }
+            });
+
+            #region Gain or Lose Energy
+
+            /// <summary>
+            /// gain energy.
+            /// </summary>
+            this.UpdateAsObservable().Where(_ => _b_button.wasPressedThisFrame && !_do_update.grounded && _game_system.usePoint).Subscribe(_ => {
+                _energy.Gain();
+                OnGainEnergy?.Invoke();
+            });
+
+            /// <summary>
+            /// lose energy.
+            /// </summary>
+            this.UpdateAsObservable().Where(_ => _y_button.wasPressedThisFrame && !_do_update.grounded && _game_system.usePoint).Subscribe(_ => {
+                _energy.Lose();
+                OnLoseEnergy?.Invoke();
+            });
+
+            # endregion
+
+            /// <summary>
+            /// use or not use lift spoiler.
+            /// </summary>
+            this.UpdateAsObservable().Where(_ => _x_button.wasPressedThisFrame && !_do_update.grounded).Subscribe(_ => {
+                useLiftSpoiler = !useLiftSpoiler;
             });
 
             // LateUpdate is called after all Update functions have been called.
@@ -576,8 +585,12 @@ namespace Studio.MeowToon {
             });
         }
 
+        #endregion
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // private Methods [verb]
+
+        #region private Methods
 
         /// <summary>
         /// the value until the top of the block.
@@ -698,6 +711,8 @@ namespace Studio.MeowToon {
                 }
             }
         }
+
+        #endregion
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // inner Classes
@@ -1022,24 +1037,24 @@ namespace Studio.MeowToon {
             public float GetCalculatedPower() {
                 const float ADD_OR_SUBTRACT_VALUE = 0.0009375f;
                 const float POWAR_FACTOR_VALUE = 5.0f;
-                const float ADJUSTED_VALUE = 2.65f;
+                const float ADJUSTED_VALUE_1 = 25.0f;
+                const float ADJUSTED_VALUE_2 = 2.65f;
                 const float AUTO_FLARE_ALTITUDE = 8.0f;
                 if (total > _threshold) {
+                    float pitch_factor_value = 1.0f;
+                    pitch_factor_value *= Math.Abs(_pitch / ADJUSTED_VALUE_1);
+                    float flight_value = ADD_OR_SUBTRACT_VALUE * POWAR_FACTOR_VALUE * _total_power_factor_value * pitch_factor_value;
                     if (_previous_altitudes.Peek() < _altitude) { // up
-                        float pitch_factor = 1.0f;
-                        pitch_factor += Math.Abs(_pitch / 100f);
-                        _flight_power_base -= ADD_OR_SUBTRACT_VALUE * POWAR_FACTOR_VALUE * _total_power_factor_value * pitch_factor;
+                        _flight_power_base -= flight_value;
                     }
                     if (_previous_altitudes.Peek() > _altitude) { // down
-                        float pitch_factor = 1.0f;
-                        pitch_factor += Math.Abs(_pitch / 100f);
-                        _flight_power_base += ADD_OR_SUBTRACT_VALUE * POWAR_FACTOR_VALUE * _total_power_factor_value * pitch_factor;
+                        _flight_power_base += flight_value;
                     }
                 }
                 if (total <= _threshold && _altitude < AUTO_FLARE_ALTITUDE) {
                     _flight_power_base = _default_flight_power_base;
                 }
-                float power_value = _flight_power_base * ADJUSTED_VALUE * _total_power_factor_value;
+                float power_value = _flight_power_base * ADJUSTED_VALUE_2 * _total_power_factor_value;
                 _calculated_power = power_value < 0 ? 0 : power_value;
                 Updated?.Invoke(this, new(nameof(power))); // call event handler.
                 return _calculated_power;
