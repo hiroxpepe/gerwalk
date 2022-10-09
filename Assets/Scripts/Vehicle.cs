@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.GameObject;
 using static UnityEngine.Vector3;
 using UniRx;
 using UniRx.Triggers;
@@ -229,6 +230,8 @@ namespace Studio.MeowToon {
 
         public event Action? OnLoseEnergy;
 
+        public event Action? OnStall;
+
         /// <summary>
         /// changed event handler.
         /// </summary>
@@ -279,6 +282,8 @@ namespace Studio.MeowToon {
                 verticalSpeed = ((transform.position.y - prev_position.y) / Time.deltaTime); // m/s
                 prev_position = transform.position;
             });
+
+            #region for grounded player
 
             /// <summary>
             /// idol.
@@ -351,6 +356,41 @@ namespace Studio.MeowToon {
             });
 
             /// <summary>
+            /// freeze.
+            /// </summary>
+            this.OnCollisionStayAsObservable().Where(x => x.LikeBlock() && (_up_button.isPressed || _down_button.isPressed) && _acceleration.freeze).Subscribe(_ => {
+                var reach = getReach();
+                if (_do_update.grounded && (reach < 0.5d || reach >= 0.99d)) {
+                    moveLetfOrRight(getDirection(transform.forward));
+                }
+                else if (reach >= 0.5d && reach < 0.99d) {
+                    rb.useGravity = false;
+                    moveTop();
+                }
+            });
+
+            /// <summary>
+            /// when touching blocks.
+            /// TODO: to Block ?
+            /// </summary>
+            this.OnCollisionEnterAsObservable().Where(x => x.LikeBlock()).Subscribe(x => {
+                if (!isHitSide(x.gameObject)) {
+                    _do_update.grounded = true;
+                    rb.useGravity = true;
+                }
+            });
+
+            /// <summary>
+            /// when leaving blocks.
+            /// TODO: to Block ?
+            /// </summary>
+            this.OnCollisionExitAsObservable().Where(x => x.LikeBlock()).Subscribe(x => {
+                rb.useGravity = true;
+            });
+
+            #endregion
+
+            /// <summary>
             /// flight.
             /// </summary>
             this.UpdateAsObservable().Where(_ => !_do_update.grounded).Subscribe(_ => {
@@ -409,6 +449,8 @@ namespace Studio.MeowToon {
             this.UpdateAsObservable().Where(_ => !_do_update.grounded && (_up_button.isPressed || _down_button.isPressed)).Subscribe(_ => {
                 var axis = _up_button.isPressed ? 1 : _down_button.isPressed ? -1 : 0;
                 transform.Rotate(axis * (_pitch_speed * Time.deltaTime) * ADD_FORCE_VALUE, 0, 0);
+
+                Debug.Log($"_down_button.isPressed: {_down_button.isPressed}");
             });
 
             /// <summary>
@@ -434,25 +476,72 @@ namespace Studio.MeowToon {
             }
             this.UpdateAsObservable().Where(_ => !_do_update.grounded && _do_update.banking).Subscribe(_ => {
                 float angle = bank > 90 ? 90 - (bank - 90) : bank;
-                float power = (float)(angle * (airSpeed / 2) * 0.001f);
+                float power = (float) (angle * (airSpeed / 2) * 0.001f);
                 // yaw against the world.
                 var axis = roll >= 180 ? 1 : roll < 180 ? -1 : 0;
                 transform.Rotate(new Vector3(0, axis * (_roll_speed * Time.deltaTime) * power, 0), Space.World);
             });
 
             /// <summary>
+            /// left quick roll.
+            /// </summary>
+            const float WAIT_FOR_DOUBLE_CLICK = 250f;
+            float left_quick_roll_time_count = 0f;
+            Vector3 left_quick_roll_angle = new(0f, 0f, 0f);
+            float left_quick_roll_to_z = 0f;
+            var left_double_click = this.UpdateAsObservable().Where(_ => _left_button.wasPressedThisFrame);
+            left_double_click.Buffer(left_double_click.Throttle(TimeSpan.FromMilliseconds(WAIT_FOR_DOUBLE_CLICK))).Where(x => x.Count == 2).Subscribe(_ => {
+                _do_update.needLeftQuickRoll = true;
+                left_quick_roll_time_count = 0f;
+                left_quick_roll_angle = transform.rotation.eulerAngles;
+                left_quick_roll_to_z = roll >= 180 ? left_quick_roll_angle.z - 180f : -(left_quick_roll_angle.z - 180f);
+            });
+            this.UpdateAsObservable().Where(_ => _do_update.needLeftQuickRoll).Subscribe(_ => {
+                left_quick_roll_angle = new Vector3(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, left_quick_roll_to_z);
+                Quaternion quick_roll_rotation = Quaternion.Euler(left_quick_roll_angle);
+                left_quick_roll_time_count += Time.deltaTime;
+                transform.rotation = Quaternion.Slerp(transform.rotation, quick_roll_rotation, left_quick_roll_time_count);
+                if (left_quick_roll_time_count >= 1) { _do_update.needLeftQuickRoll = false; }
+            });
+
+            /// <summary>
+            /// right quick roll.
+            /// </summary>
+            float right_quick_roll_time_count = 0f;
+            Vector3 right_quick_roll_angle = new(0f, 0f, 0f);
+            float right_quick_roll_to_z = 0f;
+            var right_double_click = this.UpdateAsObservable().Where(_ => _right_button.wasPressedThisFrame);
+            right_double_click.Buffer(right_double_click.Throttle(TimeSpan.FromMilliseconds(WAIT_FOR_DOUBLE_CLICK))).Where(x => x.Count == 2).Subscribe(_ => {
+                _do_update.needRightQuickRoll = true;
+                right_quick_roll_time_count = 0f;
+                right_quick_roll_angle = transform.rotation.eulerAngles;
+                right_quick_roll_to_z = roll < 180 ? right_quick_roll_angle.z - 180f : -(right_quick_roll_angle.z - 180f);
+            });
+            this.UpdateAsObservable().Where(_ => _do_update.needRightQuickRoll).Subscribe(_ => {
+                right_quick_roll_angle = new Vector3(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, right_quick_roll_to_z);
+                Quaternion quick_roll_rotation = Quaternion.Euler(right_quick_roll_angle);
+                right_quick_roll_time_count += Time.deltaTime;
+                transform.rotation = Quaternion.Slerp(transform.rotation, quick_roll_rotation, right_quick_roll_time_count);
+                if (right_quick_roll_time_count >= 1) { _do_update.needRightQuickRoll = false; }
+            });
+
+            /// <summary>
             /// stall.
             /// </summary>
+            float stall_time_count = 0f;
             this.UpdateAsObservable().Where(_ => !_do_update.grounded && _energy.power < 1.0f && flightTime > 0.5f).Subscribe(_ => {
                 Debug.Log($"stall");
-                var ground_object = GameObject.Find(Envelope.GROUND_TYPE);
+                _do_update.stall = true;
+                stall_time_count = 0f;
+                OnStall?.Invoke();
+            });
+            this.UpdateAsObservable().Where(_ => _do_update.stall).Subscribe(_ => {
+                var ground_object = Find(Envelope.GROUND_TYPE);
                 Quaternion ground_rotation = Quaternion.LookRotation(ground_object.transform.position);
-                float speed = 2.5f;
-                float step = speed * Time.deltaTime;
-                transform.rotation = Quaternion.Slerp(transform.rotation, ground_rotation, step);
-                if (_energy.power < 10.0f || _energy.total < 10.0f || _energy.speed < 10.0f) {
-                    _energy.Gain();
-                }
+                stall_time_count += Time.deltaTime;
+                transform.rotation = Quaternion.Slerp(transform.rotation, ground_rotation, stall_time_count);
+                if (_energy.power < 10.0f || _energy.total < 10.0f || _energy.speed < 10.0f) { _energy.Gain(); }
+                if (stall_time_count >= 1) { _do_update.stall = false; }
             });
 
             // LateUpdate is called after all Update functions have been called.
@@ -460,31 +549,16 @@ namespace Studio.MeowToon {
                 position = transform.position;
                 rotation = transform.rotation;
                 flightTime = (float) _flight_stopwatch.Elapsed.TotalSeconds;
-                if (bank > 1.5f) { // FIXME:
+                if (bank > 1.0f) { // FIXME:
                     _do_update.banking = true;
                 } else {
                     _do_update.banking = false;
                 }
-                Debug.Log($"banking: {_do_update.banking}");
-            });
-
-            /// <summary>
-            /// freeze.
-            /// </summary>
-            this.OnCollisionStayAsObservable().Where(x => x.LikeBlock() && (_up_button.isPressed || _down_button.isPressed) && _acceleration.freeze).Subscribe(_ => {
-                var reach = getReach();
-                if (_do_update.grounded && (reach < 0.5d || reach >= 0.99d)) {
-                    moveLetfOrRight(getDirection(transform.forward));
-                }
-                else if (reach >= 0.5d && reach < 0.99d) {
-                    rb.useGravity = false;
-                    moveTop();
-                }
+                _energy.pitch = pitch;
             });
 
             /// <summary>
             /// when touching grounds.
-            /// TODO: to Ground ?
             /// </summary>
             this.OnCollisionEnterAsObservable().Where(x => x.LikeGround()).Subscribe(x => {
                 _do_update.grounded = true;
@@ -499,25 +573,6 @@ namespace Studio.MeowToon {
                 _energy.hasLanded = true; // reset flight power.
                 _flight_stopwatch.Reset(); // reset flight time.
                 OnGrounded?.Invoke(); // call event handler.
-            });
-
-            /// <summary>
-            /// when touching blocks.
-            /// TODO: to Block ?
-            /// </summary>
-            this.OnCollisionEnterAsObservable().Where(x => x.LikeBlock()).Subscribe(x => {
-                if (!isHitSide(x.gameObject)) {
-                    _do_update.grounded = true;
-                    rb.useGravity = true;
-                }
-            });
-
-            /// <summary>
-            /// when leaving blocks.
-            /// TODO: to Block ?
-            /// </summary>
-            this.OnCollisionExitAsObservable().Where(x => x.LikeBlock()).Subscribe(x => {
-                rb.useGravity = true;
             });
         }
 
@@ -657,7 +712,7 @@ namespace Studio.MeowToon {
             ///////////////////////////////////////////////////////////////////////////////////////
             // Fields [noun, adjectives] 
 
-            bool _grounded, _banking;
+            bool _grounded, _stall, _banking, _need_left_quick_roll, _need_right_quick_roll;
 
             ///////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjectives] 
@@ -667,9 +722,24 @@ namespace Studio.MeowToon {
                 set => _grounded = value;
             }
 
+            public bool stall {
+                get => _stall;
+                set => _stall = value;
+            }
+
             public bool banking {
                 get => _banking;
                 set => _banking = value;
+            }
+
+            public bool needLeftQuickRoll {
+                get => _need_left_quick_roll;
+                set => _need_left_quick_roll = value;
+            }
+
+            public bool needRightQuickRoll {
+                get => _need_right_quick_roll;
+                set => _need_right_quick_roll = value;
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////
@@ -688,7 +758,7 @@ namespace Studio.MeowToon {
             // public Methods [verb]
 
             public void ResetState() {
-                _grounded = false;
+                _grounded = _stall = _banking = _need_left_quick_roll = _need_right_quick_roll = false;
             }
         }
 
@@ -842,11 +912,7 @@ namespace Studio.MeowToon {
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Fields [noun, adjectives] 
 
-            float _flight_power_base;
-
-            float _default_flight_power_base;
-
-            float _calculated_power;
+            float _flight_power_base, _default_flight_power_base, _calculated_power;
 
             float _altitude;
 
@@ -855,6 +921,8 @@ namespace Studio.MeowToon {
             float _speed;
 
             float _threshold = 1f; // FIXME:
+
+            float _pitch;
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjectives] 
@@ -912,6 +980,13 @@ namespace Studio.MeowToon {
                 }
             }
 
+            /// <summary>
+            /// pitch
+            /// </summary>
+            public float pitch {
+                set => _pitch = value;
+            }
+
             ///////////////////////////////////////////////////////////////////////////////////////////
             //internal  Events [verb, verb phrase] 
 
@@ -951,10 +1026,14 @@ namespace Studio.MeowToon {
                 const float AUTO_FLARE_ALTITUDE = 8.0f;
                 if (total > _threshold) {
                     if (_previous_altitudes.Peek() < _altitude) { // up
-                        _flight_power_base -= ADD_OR_SUBTRACT_VALUE * POWAR_FACTOR_VALUE * _total_power_factor_value;
+                        float pitch_factor = 1.0f;
+                        pitch_factor += Math.Abs(_pitch / 100f);
+                        _flight_power_base -= ADD_OR_SUBTRACT_VALUE * POWAR_FACTOR_VALUE * _total_power_factor_value * pitch_factor;
                     }
                     if (_previous_altitudes.Peek() > _altitude) { // down
-                        _flight_power_base += ADD_OR_SUBTRACT_VALUE * POWAR_FACTOR_VALUE * _total_power_factor_value;
+                        float pitch_factor = 1.0f;
+                        pitch_factor += Math.Abs(_pitch / 100f);
+                        _flight_power_base += ADD_OR_SUBTRACT_VALUE * POWAR_FACTOR_VALUE * _total_power_factor_value * pitch_factor;
                     }
                 }
                 if (total <= _threshold && _altitude < AUTO_FLARE_ALTITUDE) {
