@@ -533,7 +533,7 @@ namespace Studio.MeowToon {
             /// </summary>
             float stall_time_count = 0f;
             this.UpdateAsObservable().Where(_ => _do_update.flighting && _energy.power < 1.0f && flightTime > 0.5f).Subscribe(_ => {
-                Debug.Log($"stall");
+                //Debug.Log($"stall");
                 _do_update.stalling = true;
                 stall_time_count = 0f;
                 OnStall?.Invoke();
@@ -1035,11 +1035,12 @@ namespace Studio.MeowToon {
             /// </summary>
             public float ratio {
                 get {
-                    const float REFERENCE_SPEED = 100f;
-                    const float ADJUSTED_VALUE = 1.0f;
+                    const float REFERENCE_SPEED = 80f;
+                    const float ADJUSTED_VALUE_1 = 0.01f;
+                    const float ADJUSTED_VALUE_2 = 5.0f;
                     if (speed < 10.0f && !_has_landed) { return 1.0f; }
-                    float ratio = speed / (REFERENCE_SPEED * ADJUSTED_VALUE);
-                    //Debug.Log($"speed: {speed} ratio: {ratio}");
+                    float ratio = 1.0f + ((speed - REFERENCE_SPEED) * ADJUSTED_VALUE_1 / ADJUSTED_VALUE_2);
+                    Debug.Log($"speed: {speed} ratio: {ratio}");
                     return ratio;
                 }
             }

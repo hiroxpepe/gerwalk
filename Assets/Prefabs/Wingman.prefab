@@ -164,7 +164,7 @@ GameObject:
   - component: {fileID: 868065260740536468}
   - component: {fileID: 3488963593703965866}
   m_Layer: 0
-  m_Name: Orange
+  m_Name: Wingman
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
