@@ -46,7 +46,7 @@ namespace Studio.MeowToon {
         public const string WALL_TYPE = "Wall";
         public const string BALLOON_TYPE = "Balloon";
         public const string COIN_TYPE = "Coin";
-        public const string VEHICLE_TYPE = "Vehicle";
+        public const string VEHICLE_TYPE = "Gerwalk"; //"Vehicle";
         public const string HOME_TYPE = "Home";
         public const string LEVEL_TYPE = "Level";
 
