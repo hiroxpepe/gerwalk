@@ -162,6 +162,7 @@ namespace Studio.MeowToon {
 
         /// <summary>
         /// move to new position.
+        /// MEMO: time_count becomes over 1 but it works.
         /// </summary>
         float moveWingmanPosition(Vector3 movePosition, float timeCount) {
             timeCount += Time.deltaTime;
