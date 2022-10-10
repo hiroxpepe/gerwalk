@@ -68,7 +68,8 @@ namespace Studio.MeowToon {
                 /// <summary>
                 /// set altitude.
                 /// </summary>
-                float altitude = _vehicle_object.transform.position.y - 0.5f; // 0.5 is half vehicle height.
+                const float VEHICLE_HEIGHT_OFFSET = 0.0f;
+                float altitude = _vehicle_object.transform.position.y - VEHICLE_HEIGHT_OFFSET;
                 _long_needle_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (DIVIDE_CIRCLE_LONG / altitude)));
                 _short_needle_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (DIVIDE_CIRCLE_SHORT / altitude)));
             });

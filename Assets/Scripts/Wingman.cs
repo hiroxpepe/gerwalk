@@ -37,18 +37,31 @@ namespace Studio.MeowToon {
 
         Direction _vehicle_previous_direction;
 
+        Quaternion _vehicle_rotation;
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // update Methods
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            _vehicle_object = Find(Envelope.VEHICLE_TYPE);
-            var vehicle = _vehicle_object.GetVehicle();
-
             /// <remarks>
             /// Rigidbody should be only used in FixedUpdate.
             /// </remarks>
             Rigidbody rb = transform.GetRigidbody();
+
+            // get vehicle.
+            _vehicle_object = Find(Envelope.VEHICLE_TYPE);
+            var vehicle = _vehicle_object.GetVehicle();
+
+            /// <summary>
+            /// vehicle updated.
+            /// </summary>
+            vehicle.Updated += (object sender, EvtArgs e) => {
+                var vehicle = sender as Vehicle;
+                if (vehicle is not null) {
+                    if (e.Name.Equals(nameof(Vehicle.rotation))) { _vehicle_rotation = vehicle.rotation; return; }
+                }
+            };
 
             /// <summary>
             /// vehicle on flight.
@@ -77,15 +90,18 @@ namespace Studio.MeowToon {
             _vehicle_previous_direction = getDirection(_vehicle_object.transform.forward);
 
             // Update is called once per frame.
+            float move_time_count = 0f;
             this.UpdateAsObservable().Subscribe(_ => {
                 var vehicle_position = _vehicle_object.transform.position;
                 Direction vehicle_direction = getDirection(_vehicle_object.transform.forward);
                 Vector3 move_position = getWingmanPosition(vehicle_direction);
                 if (vehicle_direction != _vehicle_previous_direction) {
                     _vehicle_previous_direction = vehicle_direction;
+                    move_time_count = 0f; // reset time count.
                 }
-                moveWingmanPosition(move_position);
+                move_time_count = moveWingmanPosition(move_position, move_time_count);
                 transform.forward = _vehicle_object.transform.forward;
+                transform.rotation = _vehicle_rotation;
             });
 
             this.FixedUpdateAsObservable().Subscribe(_ => {
@@ -99,7 +115,7 @@ namespace Studio.MeowToon {
         /// get new position.
         /// </summary>
         Vector3 getWingmanPosition(Direction direction) {
-            const float OFFSET_VALUE = 2.5f;
+            const float OFFSET_VALUE = 1.25f;
             Vector3 move_position = new(0f, 0f, 0f);
             // z-axis positive.
             if (direction == Direction.PositiveZ ) {
@@ -147,9 +163,10 @@ namespace Studio.MeowToon {
         /// <summary>
         /// move to new position.
         /// </summary>
-        void moveWingmanPosition(Vector3 movePosition) {
-            const float DURATION = 4.5f;
-            transform.position = Vector3.Slerp(transform.position, movePosition, Time.deltaTime * DURATION);
+        float moveWingmanPosition(Vector3 movePosition, float timeCount) {
+            timeCount += Time.deltaTime;
+            transform.position = Vector3.Slerp(transform.position, movePosition, timeCount);
+            return timeCount;
         }
 
         /// <summary>

@@ -46,7 +46,7 @@ namespace Studio.MeowToon {
         public const string WALL_TYPE = "Wall";
         public const string BALLOON_TYPE = "Balloon";
         public const string COIN_TYPE = "Coin";
-        public const string VEHICLE_TYPE = "Vehicle";
+        public const string VEHICLE_TYPE = "Gerwalk"; //"Vehicle";
         public const string HOME_TYPE = "Home";
         public const string LEVEL_TYPE = "Level";
 
@@ -56,6 +56,7 @@ namespace Studio.MeowToon {
         public const string MESSAGE_LEVEL_CLEAR = "Level Clear!";
         public const string MESSAGE_GAME_OVER = "Game Over!";
         public const string MESSAGE_GAME_PAUSE = "Pause";
+        public const string MESSAGE_STALL = "Stall";
 
         /// https://www.color-sample.com/colorschemes/rule/dominant/
         public const string COLOR_RED = "#FF0000";

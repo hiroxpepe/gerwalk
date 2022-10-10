@@ -141,6 +141,7 @@ namespace Studio.MeowToon {
             /// vehicle updated.
             /// </summary>
             vehicle.Updated += (object sender, EvtArgs e) => {
+                const float VEHICLE_HEIGHT_OFFSET = 0.0f;
                 var vehicle = sender as Vehicle;
                 if (vehicle is not null) {
                     if (e.Name.Equals(nameof(Vehicle.airSpeed))) { _air_speed = vehicle.airSpeed; return; }
@@ -149,11 +150,21 @@ namespace Studio.MeowToon {
                     if (e.Name.Equals(nameof(Vehicle.total))) { _energy = vehicle.total; return; }
                     if (e.Name.Equals(nameof(Vehicle.power))) { _power = vehicle.power; return; }
                     if (e.Name.Equals(nameof(Vehicle.useLiftSpoiler))) { _use_lift_spoiler = vehicle.useLiftSpoiler; return; }
-                    if (e.Name.Equals(nameof(Vehicle.position))) { _altitude = vehicle.position.y - 0.5f; return; } // 0.5 is half vehicle height.
+                    if (e.Name.Equals(nameof(Vehicle.position))) { _altitude = vehicle.position.y - VEHICLE_HEIGHT_OFFSET; return; }
                     if (e.Name.Equals(nameof(Vehicle.rotation))) {
                         _heading = vehicle.heading; _pitch = vehicle.pitch; _roll = vehicle.roll; _bank = vehicle.bank; return;
                     }
                 }
+            };
+
+            /// <summary>
+            /// vehicle on stall.
+            /// </summary>
+            vehicle.OnStall += () => {
+                _message_text.text = Envelope.MESSAGE_STALL;
+                Observable.Timer(TimeSpan.FromSeconds(2)).Subscribe(_ => {
+                    _message_text.text = string.Empty;
+                }).AddTo(this);
             };
 
             // get home.
