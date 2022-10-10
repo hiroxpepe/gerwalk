@@ -416,6 +416,7 @@ namespace Studio.MeowToon {
             this.UpdateAsObservable().Where(_ => _do_update.flighting).Subscribe(_ => {
                 _energy.speed = airSpeed;
                 _energy.altitude = transform.position.y - 0.5f; // 0.5 is half vehicle height.
+                _energy.hasLanded = false;
                 _do_fixed_update.ApplyFlight();
                 OnFlight?.Invoke(); // call event handler.
             });
@@ -438,7 +439,7 @@ namespace Studio.MeowToon {
             /// </summary>
             this.UpdateAsObservable().Where(_ => _do_update.flighting && (_up_button.isPressed || _down_button.isPressed)).Subscribe(_ => {
                 int pitch_axis = _up_button.isPressed ? 1 : _down_button.isPressed ? -1 : 0;
-                transform.Rotate(pitch_axis * _pitch_speed * Time.deltaTime * ADD_FORCE_VALUE, 0, 0);
+                transform.Rotate(pitch_axis * _pitch_speed * _energy.ratio * Time.deltaTime * ADD_FORCE_VALUE, 0, 0);
             });
 
             #endregion
@@ -451,19 +452,19 @@ namespace Studio.MeowToon {
             if (_game_system.mode == Envelope.MODE_EASY || _game_system.mode == Envelope.MODE_NORMAL) {
                 this.UpdateAsObservable().Where(_ => _do_update.flighting && (_left_button.isPressed || _right_button.isPressed)).Subscribe(_ => {
                     int roll_axis = _left_button.isPressed ? 1 : _right_button.isPressed ? -1 : 0;
-                    transform.Rotate(0, 0, roll_axis * _roll_speed * _energy.rollRatio * Time.deltaTime * ADD_FORCE_VALUE);
+                    transform.Rotate(0, 0, roll_axis * _roll_speed * _energy.ratio * Time.deltaTime * ADD_FORCE_VALUE);
                     int yaw_axis = _right_button.isPressed ? 1 : _left_button.isPressed ? -1 : 0;
-                    transform.Rotate(0, yaw_axis * _roll_speed * Time.deltaTime * ADD_FORCE_VALUE, 0);
+                    transform.Rotate(0, yaw_axis * _roll_speed * _energy.ratio * Time.deltaTime * ADD_FORCE_VALUE, 0);
                 });
             } 
             else if (_game_system.mode == Envelope.MODE_HARD) {
                 this.UpdateAsObservable().Where(_ => _do_update.flighting && (_left_button.isPressed || _right_button.isPressed)).Subscribe(_ => {
                     int roll_axis = _left_button.isPressed ? 1 : _right_button.isPressed ? -1 : 0;
-                    transform.Rotate(0, 0, roll_axis * _roll_speed * _energy.rollRatio * 2.0f * Time.deltaTime * ADD_FORCE_VALUE);
+                    transform.Rotate(0, 0, roll_axis * _roll_speed * _energy.ratio * 2.0f * Time.deltaTime * ADD_FORCE_VALUE);
                 });
                 this.UpdateAsObservable().Where(_ => _do_update.flighting && (_left_1_button.isPressed || _right_1_button.isPressed)).Subscribe(_ => {
                     int yaw_axis = _right_1_button.isPressed ? 1 : _left_1_button.isPressed ? -1 : 0;
-                    transform.Rotate(0, yaw_axis * _roll_speed * 0.5f * Time.deltaTime * ADD_FORCE_VALUE, 0);
+                    transform.Rotate(0, yaw_axis * _roll_speed * _energy.ratio * 0.5f * Time.deltaTime * ADD_FORCE_VALUE, 0);
                 });
             }
             /// <summary>
@@ -474,7 +475,7 @@ namespace Studio.MeowToon {
                 float angle = bank > 90 ? 90 - (bank - 90) : bank;
                 float power = (float) (angle * (airSpeed / 2) * ADJUSTED_VALUE);
                 int yaw_axis = roll >= 180 ? 1 : roll < 180 ? -1 : 0;
-                transform.Rotate(new Vector3(0, yaw_axis * _roll_speed * Time.deltaTime * power, 0), Space.World);
+                transform.Rotate(new Vector3(0, yaw_axis * _roll_speed * _energy.ratio * Time.deltaTime * power, 0), Space.World);
             });
 
             #endregion
@@ -498,7 +499,7 @@ namespace Studio.MeowToon {
             this.UpdateAsObservable().Where(_ => _do_update.needLeftQuickRoll).Subscribe(_ => {
                 left_quick_roll_angle = new Vector3(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, left_quick_roll_to_z);
                 Quaternion quick_roll_rotation = Quaternion.Euler(left_quick_roll_angle);
-                left_quick_roll_time_count += Time.deltaTime * _energy.rollRatio;
+                left_quick_roll_time_count += Time.deltaTime * _energy.ratio;
                 transform.rotation = Quaternion.Slerp(transform.rotation, quick_roll_rotation, left_quick_roll_time_count);
                 if (left_quick_roll_time_count >= 1) { _do_update.needLeftQuickRoll = false; }
             });
@@ -519,7 +520,7 @@ namespace Studio.MeowToon {
             this.UpdateAsObservable().Where(_ => _do_update.needRightQuickRoll).Subscribe(_ => {
                 right_quick_roll_angle = new Vector3(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, right_quick_roll_to_z);
                 Quaternion quick_roll_rotation = Quaternion.Euler(right_quick_roll_angle);
-                right_quick_roll_time_count += Time.deltaTime * _energy.rollRatio;
+                right_quick_roll_time_count += Time.deltaTime * _energy.ratio;
                 transform.rotation = Quaternion.Slerp(transform.rotation, quick_roll_rotation, right_quick_roll_time_count);
                 if (right_quick_roll_time_count >= 1) { _do_update.needRightQuickRoll = false; }
             });
@@ -962,6 +963,8 @@ namespace Studio.MeowToon {
 
             float _pitch;
 
+            bool _has_landed = false;
+
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjectives] 
 
@@ -1011,6 +1014,7 @@ namespace Studio.MeowToon {
             /// </summary>
             public bool hasLanded {
                 set {
+                    _has_landed = value;
                     if (value) {
                         _speed = 0;
                         _flight_power_base = _default_flight_power_base;
@@ -1026,13 +1030,15 @@ namespace Studio.MeowToon {
             }
 
             /// <summary>
-            /// roll ratio value to adjust roll speed.
+            /// ratio value to adjust pitch, roll, yaw speed.
             /// </summary>
-            public float rollRatio {
+            public float ratio {
                 get {
                     const float REFERENCE_SPEED = 80f;
-                    const float ADJUSTED_VALUE = 1.75f;
-                    float ratio = speed / REFERENCE_SPEED * ADJUSTED_VALUE;
+                    const float ADJUSTED_VALUE = 1.5f;
+                    if (speed < 10.0f && !_has_landed) { return 1.0f; }
+                    float ratio = speed / (REFERENCE_SPEED * ADJUSTED_VALUE);
+                    Debug.Log($"speed: {speed} ratio: {ratio}");
                     return ratio;
                 }
             }
