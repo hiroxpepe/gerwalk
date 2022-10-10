@@ -414,8 +414,9 @@ namespace Studio.MeowToon {
             /// flight.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _do_update.flighting).Subscribe(_ => {
+                const float VEHICLE_HEIGHT_OFFSET = 0.0f;
                 _energy.speed = airSpeed;
-                _energy.altitude = transform.position.y - 0.5f; // 0.5 is half vehicle height.
+                _energy.altitude = transform.position.y - VEHICLE_HEIGHT_OFFSET;
                 _energy.hasLanded = false;
                 _do_fixed_update.ApplyFlight();
                 OnFlight?.Invoke(); // call event handler.
@@ -1034,11 +1035,11 @@ namespace Studio.MeowToon {
             /// </summary>
             public float ratio {
                 get {
-                    const float REFERENCE_SPEED = 80f;
-                    const float ADJUSTED_VALUE = 1.5f;
+                    const float REFERENCE_SPEED = 100f;
+                    const float ADJUSTED_VALUE = 1.0f;
                     if (speed < 10.0f && !_has_landed) { return 1.0f; }
                     float ratio = speed / (REFERENCE_SPEED * ADJUSTED_VALUE);
-                    Debug.Log($"speed: {speed} ratio: {ratio}");
+                    //Debug.Log($"speed: {speed} ratio: {ratio}");
                     return ratio;
                 }
             }
