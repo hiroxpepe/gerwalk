@@ -490,7 +490,7 @@ namespace Studio.MeowToon {
             float left_quick_roll_time_count = 0f;
             Vector3 left_quick_roll_angle = new(0f, 0f, 0f);
             float left_quick_roll_to_z = 0f;
-            var left_double_click = this.UpdateAsObservable().Where(_ => _do_update.flighting && _left_button.wasPressedThisFrame);
+            var left_double_click = this.UpdateAsObservable().Where(_ => _do_update.flighting && _left_button.wasPressedThisFrame && _a_button.isPressed);
             left_double_click.Buffer(left_double_click.Throttle(TimeSpan.FromMilliseconds(WAIT_FOR_DOUBLE_CLICK))).Where(x => x.Count == 2).Subscribe(_ => {
                 _do_update.needLeftQuickRoll = true;
                 left_quick_roll_time_count = 0f;
@@ -511,7 +511,7 @@ namespace Studio.MeowToon {
             float right_quick_roll_time_count = 0f;
             Vector3 right_quick_roll_angle = new(0f, 0f, 0f);
             float right_quick_roll_to_z = 0f;
-            var right_double_click = this.UpdateAsObservable().Where(_ => _do_update.flighting && _right_button.wasPressedThisFrame);
+            var right_double_click = this.UpdateAsObservable().Where(_ => _do_update.flighting && _right_button.wasPressedThisFrame && _a_button.isPressed);
             right_double_click.Buffer(right_double_click.Throttle(TimeSpan.FromMilliseconds(WAIT_FOR_DOUBLE_CLICK))).Where(x => x.Count == 2).Subscribe(_ => {
                 _do_update.needRightQuickRoll = true;
                 right_quick_roll_time_count = 0f;
@@ -1037,7 +1037,7 @@ namespace Studio.MeowToon {
                 get {
                     const float REFERENCE_SPEED = 80f;
                     const float ADJUSTED_VALUE_1 = 0.01f;
-                    const float ADJUSTED_VALUE_2 = 5.0f;
+                    const float ADJUSTED_VALUE_2 = 7.5f;
                     if (speed < 10.0f && !_has_landed) { return 1.0f; }
                     float ratio = 1.0f + ((speed - REFERENCE_SPEED) * ADJUSTED_VALUE_1 / ADJUSTED_VALUE_2);
                     Debug.Log($"speed: {speed} ratio: {ratio}");
