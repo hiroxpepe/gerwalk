@@ -450,7 +450,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// roll and yaw.
             /// </summary>
-            if (_game_system.mode == Envelope.MODE_EASY || _game_system.mode == Envelope.MODE_NORMAL) {
+            if (_game_system.mode == Envelope.MODE_EASY) {
                 this.UpdateAsObservable().Where(_ => _do_update.flighting && (_left_button.isPressed || _right_button.isPressed)).Subscribe(_ => {
                     int roll_axis = _left_button.isPressed ? 1 : _right_button.isPressed ? -1 : 0;
                     transform.Rotate(0, 0, roll_axis * _roll_speed * _energy.ratio * Time.deltaTime * ADD_FORCE_VALUE);
@@ -458,7 +458,7 @@ namespace Studio.MeowToon {
                     transform.Rotate(0, yaw_axis * _roll_speed * _energy.ratio * Time.deltaTime * ADD_FORCE_VALUE, 0);
                 });
             } 
-            else if (_game_system.mode == Envelope.MODE_HARD) {
+            else if (_game_system.mode == Envelope.MODE_NORMAL || _game_system.mode == Envelope.MODE_HARD) {
                 this.UpdateAsObservable().Where(_ => _do_update.flighting && (_left_button.isPressed || _right_button.isPressed)).Subscribe(_ => {
                     int roll_axis = _left_button.isPressed ? 1 : _right_button.isPressed ? -1 : 0;
                     transform.Rotate(0, 0, roll_axis * _roll_speed * _energy.ratio * 2.0f * Time.deltaTime * ADD_FORCE_VALUE);
