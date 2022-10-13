@@ -21,9 +21,11 @@ using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
-    /// Wingman class
-    /// @author h.adachi
+    /// wingman class
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public class Wingman : MonoBehaviour {
 #nullable enable
 
@@ -47,11 +49,11 @@ namespace Studio.MeowToon {
             /// <remarks>
             /// Rigidbody should be only used in FixedUpdate.
             /// </remarks>
-            Rigidbody rb = transform.GetRigidbody();
+            Rigidbody rb = transform.Get<Rigidbody>();
 
             // get vehicle.
-            _vehicle_object = Find(Envelope.VEHICLE_TYPE);
-            var vehicle = _vehicle_object.GetVehicle();
+            _vehicle_object = Find(name: Env.VEHICLE_TYPE);
+            var vehicle = _vehicle_object.Get<Vehicle>();
 
             /// <summary>
             /// vehicle updated.
@@ -84,7 +86,7 @@ namespace Studio.MeowToon {
             /// <remarks>
             /// Rigidbody should be only used in FixedUpdate.
             /// </remarks>
-            Rigidbody rb = transform.GetRigidbody();
+            Rigidbody rb = transform.Get<Rigidbody>();
 
             // FIXME: no use.
             _vehicle_previous_direction = getDirection(_vehicle_object.transform.forward);
@@ -164,26 +166,26 @@ namespace Studio.MeowToon {
         /// move to new position.
         /// MEMO: time_count becomes over 1 but it works.
         /// </summary>
-        float moveWingmanPosition(Vector3 movePosition, float timeCount) {
-            timeCount += Time.deltaTime;
-            transform.position = Vector3.Slerp(transform.position, movePosition, timeCount);
-            return timeCount;
+        float moveWingmanPosition(Vector3 move_position, float time_count) {
+            time_count += Time.deltaTime;
+            transform.position = Vector3.Slerp(transform.position, move_position, time_count);
+            return time_count;
         }
 
         /// <summary>
         /// returns an enum of the vehicle's direction.
         /// </summary>
-        Direction getDirection(Vector3 forwardVector) {
-            var forward_x = (float)Math.Round(forwardVector.x);
-            var forward_y = (float)Math.Round(forwardVector.y);
-            var forward_z = (float)Math.Round(forwardVector.z);
+        Direction getDirection(Vector3 forward_vector) {
+            var forward_x = (float)Math.Round(forward_vector.x);
+            var forward_y = (float)Math.Round(forward_vector.y);
+            var forward_z = (float)Math.Round(forward_vector.z);
             if (forward_x == 0 && forward_z == 1) { return Direction.PositiveZ; } // z-axis positive.
             if (forward_x == 0 && forward_z == -1) { return Direction.NegativeZ; } // z-axis negative.
             if (forward_x == 1 && forward_z == 0) { return Direction.PositiveX; } // x-axis positive.
             if (forward_x == -1 && forward_z == 0) { return Direction.NegativeX; } // x-axis negative.
             // determine the difference between the two axes.
-            float absolute_x = Math.Abs(forwardVector.x);
-            float absolute_z = Math.Abs(forwardVector.z);
+            float absolute_x = Math.Abs(forward_vector.x);
+            float absolute_z = Math.Abs(forward_vector.z);
             if (absolute_x > absolute_z) {
                 if (forward_x == 1) { return Direction.PositiveX; } // x-axis positive.
                 if (forward_x == -1) { return Direction.NegativeX; } // x-axis negative.

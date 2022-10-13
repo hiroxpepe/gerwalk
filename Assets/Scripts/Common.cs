@@ -20,8 +20,10 @@ using UniRx.Triggers;
 namespace Studio.MeowToon {
     /// <summary>
     /// common processing of objects
-    /// @author h.adachi
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public class Common : MonoBehaviour {
 #nullable enable
 
@@ -94,7 +96,7 @@ namespace Studio.MeowToon {
             if (_auto_destroy_param.enable) { // if auto delete is enabled.
                 _auto_destroy_param.second += Time.deltaTime;
                 if (_auto_destroy_param.second > 0.1f) { // after 0.1 seconds, collider enabled on.
-                    gameObject.GetCollider().enabled = true;
+                    gameObject.Get<Collider>().enabled = true;
                 }
                 fadeoutToDestroy(); // gradually become transparent.
                 if (_auto_destroy_param.second > _auto_destroy_param.limit) { // when the limit time comes,
@@ -108,7 +110,7 @@ namespace Studio.MeowToon {
         /// </summary>
         void fadeoutToDestroy() {
             if (_auto_destroy_param.second > _auto_destroy_param.limit - 0.8f) { // from 0.8 seconds before the limit time.
-                var render = gameObject.GetMeshRenderer();
+                var render = gameObject.Get<MeshRenderer>();
                 var materialList = render.materials;
                 foreach (var material in materialList) {
                     Utils.SetRenderingMode(material, RenderingMode.Fade);

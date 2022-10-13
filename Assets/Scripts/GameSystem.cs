@@ -21,8 +21,10 @@ using static Studio.MeowToon.Utils;
 namespace Studio.MeowToon {
     /// <summary>
     /// game system
-    /// @author h.adachi
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public class GameSystem : MonoBehaviour {
 #nullable enable
 
@@ -99,11 +101,11 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            Application.targetFrameRate = Envelope.FPS;
+            Application.targetFrameRate = Env.FPS;
 
             if (HasLevel()) {
                 // get level.
-                Level level = Find(Envelope.LEVEL_TYPE).GetLevel();
+                Level level = Find(name: Env.LEVEL_TYPE).Get<Level>();
 
                 /// <summary>
                 /// level pause on.
@@ -122,7 +124,7 @@ namespace Studio.MeowToon {
 
             if (HasVehicle()) {
                 // get vehicle.
-                Vehicle vehicle = Find(Envelope.VEHICLE_TYPE).GetVehicle();
+                Vehicle vehicle = Find(name: Env.VEHICLE_TYPE).Get<Vehicle>();
 
                 /// <summary>
                 /// vehicle on gain energy.
@@ -161,7 +163,7 @@ namespace Studio.MeowToon {
             // static Constructor
 
             static Status() {
-                _mode = Envelope.MODE_NORMAL;
+                _mode = Env.MODE_NORMAL;
                 _point_total = 100;
                 _target_total = 0;
                 _target_remain = 0;

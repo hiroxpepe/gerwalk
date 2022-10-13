@@ -16,113 +16,47 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.GameObject;
 
 namespace Studio.MeowToon {
     /// <summary>
-    /// generic extension method.
-    /// @author h.adachi
+    /// generic extension method
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public static class Extensions {
 #nullable enable
 
         #region type of object.
 
         /// <summary>
-        /// whether the GameObject's name contains "Block".
+        /// whether the GameObject's name contains the argument string.
         /// </summary>
-        public static bool LikeBlock(this GameObject self) {
-            return self.name.Contains(Envelope.BLOCK_TYPE);
+        public static bool Like(this GameObject self, string type) {
+            return self.name.Contains(type);
         }
 
         /// <summary>
-        /// whether the Transform's name contains "Block".
+        /// whether the Transform's name contains the argument string.
         /// </summary>
-        public static bool LikeBlock(this Transform self) {
-            return self.name.Contains(Envelope.BLOCK_TYPE);
+        public static bool Like(this Transform self, string type) {
+            return self.name.Contains(type);
         }
 
         /// <summary>
-        /// whether the Collider's name contains "Block".
+        /// whether the Collider's name contains the argument string.
         /// </summary>
-        public static bool LikeBlock(this Collider self) {
-            return self.name.Contains(Envelope.BLOCK_TYPE);
+        public static bool Like(this Collider self, string type) {
+            return self.name.Contains(type);
         }
 
         /// <summary>
-        /// whether the Collision's name contains "Block".
+        /// whether the Collision's name contains the argument string.
         /// </summary>
-        public static bool LikeBlock(this Collision self) {
-            return self.gameObject.name.Contains(Envelope.BLOCK_TYPE);
-        }
-
-        /// <summary>
-        /// whether the GameObject's name contains "Ground".
-        /// </summary>
-        public static bool LikeGround(this GameObject self) {
-            return self.name.Contains(Envelope.GROUND_TYPE);
-        }
-
-        /// <summary>
-        /// whether the Transform's name contains "Ground".
-        /// </summary>
-        public static bool LikeGround(this Transform self) {
-            return self.name.Contains(Envelope.GROUND_TYPE);
-        }
-
-        /// <summary>
-        /// whether the Collision's name contains "Ground".
-        /// </summary>
-        public static bool LikeGround(this Collision self) {
-            return self.gameObject.name.Contains(Envelope.GROUND_TYPE);
-        }
-
-        /// <summary>
-        /// whether the GameObject's name contains "Wall".
-        /// </summary>
-        public static bool LikeWall(this GameObject self) {
-            return self.name.Contains(Envelope.WALL_TYPE);
-        }
-
-        /// <summary>
-        /// whether the Transform's name contains "Wall".
-        /// </summary>
-        public static bool LikeWall(this Transform self) {
-            return self.name.Contains(Envelope.WALL_TYPE);
-        }
-
-        /// <summary>
-        /// whether the Collider's name contains "Wall".
-        /// </summary>
-        public static bool LikeWall(this Collider self) {
-            return self.name.Contains(Envelope.WALL_TYPE);
-        }
-
-        /// <summary>
-        /// whether the Collision's name contains "Wall".
-        /// </summary>
-        public static bool LikeWall(this Collision self) {
-            return self.gameObject.name.Contains(Envelope.WALL_TYPE);
-        }
-
-        /// <summary>
-        /// whether the Collision's name contains "Balloon".
-        /// </summary>
-        public static bool LikeBalloon(this Collision self) {
-            return self.gameObject.name.Contains(Envelope.BALLOON_TYPE);
-        }
-
-        /// <summary>
-        /// whether the Collision's name contains "Coin".
-        /// </summary>
-        public static bool LikeCoin(this Collision self) {
-            return self.gameObject.name.Contains(Envelope.COIN_TYPE);
-        }
-
-        /// <summary>
-        /// whether the Collision's name contains "Vehicle".
-        /// </summary>
-        public static bool LikeVehicle(this Collision self) {
-            return self.gameObject.name.Contains(Envelope.VEHICLE_TYPE);
+        public static bool Like(this Collision self, string type) {
+            var h = self.gameObject.name.Contains(type);
+            return self.gameObject.name.Contains(type);
         }
 
         #endregion
@@ -130,150 +64,38 @@ namespace Studio.MeowToon {
         #region get the component.
 
         /// <summary>
-        /// get the Collider component.
+        /// gets T component from children.
         /// </summary>
-        public static Collider GetCollider(this GameObject self) {
-            return self.GetComponent<Collider>();
+        public static IEnumerable<T> GetInChildren<T>(this GameObject self) {
+            return self.GetComponentsInChildren<T>();
         }
 
         /// <summary>
-        /// get the BoxCollider component.
+        /// gets T component.
         /// </summary>
-        public static BoxCollider GetBoxCollider(this GameObject self) {
-            return self.GetComponent<BoxCollider>();
+        public static T Get<T>(this GameObject self) {
+            return self.GetComponent<T>();
         }
 
         /// <summary>
-        /// get the CapsuleCollider component.
+        /// gets T component.
         /// </summary>
-        public static CapsuleCollider GetCapsuleCollider(this GameObject self) {
-            return self.GetComponent<CapsuleCollider>();
+        public static T Get<T>(this Transform self) {
+            return self.GetComponent<T>();
         }
 
         /// <summary>
-        /// get the SphereCollider component.
+        /// adds T component.
         /// </summary>
-        public static SphereCollider GetSphereCollider(this GameObject self) {
-            return self.GetComponent<SphereCollider>();
+        public static T Add<T>(this GameObject self) where T : Component {
+            return self.AddComponent<T>();
         }
 
         /// <summary>
-        /// get the Rigidbody component.
+        /// adds T component.
         /// </summary>
-        public static Rigidbody GetRigidbody(this GameObject self) {
-            return self.GetComponent<Rigidbody>();
-        }
-
-        /// <summary>
-        /// get the Rigidbody component.
-        /// </summary>
-        public static Rigidbody GetRigidbody(this Transform self) {
-            return self.GetComponent<Rigidbody>();
-        }
-
-        /// <summary>
-        /// add a Rigidbody component.
-        /// </summary>
-        public static Rigidbody AddRigidbody(this GameObject self) {
-            return self.AddComponent<Rigidbody>();
-        }
-
-        /// <summary>
-        /// add a Rigidbody component.
-        /// </summary>
-        public static Rigidbody AddRigidbody(this Transform self) {
-            return self.gameObject.AddComponent<Rigidbody>();
-        }
-
-        /// <summary>
-        /// get the Renderer component.
-        /// </summary>
-        public static Renderer GetRenderer(this GameObject self) {
-            return self.GetComponent<Renderer>();
-        }
-
-        /// <summary>
-        /// get the MeshRenderer component.
-        /// </summary>
-        public static MeshRenderer GetMeshRenderer(this GameObject self) {
-            return self.GetComponent<MeshRenderer>();
-        }
-
-        /// <summary>
-        /// get the Image component.
-        /// </summary>
-        public static Image GetImage(this GameObject self) {
-            return self.GetComponent<Image>();
-        }
-
-        /// <summary>
-        /// get the RectTransform component.
-        /// </summary>
-        public static RectTransform GetRectTransform(this GameObject self) {
-            return self.GetComponent<RectTransform>();
-        }
-
-        /// <summary>
-        /// get the Transform component.
-        /// </summary>
-        public static IEnumerable<Transform> GetTransformsInChildren(this GameObject self) {
-            return self.GetComponentsInChildren<Transform>();
-        }
-
-        /// <summary>
-        /// get the CameraSystem component.
-        /// </summary>
-        public static CameraSystem GetCameraSystem(this GameObject self) {
-            return GameObject.Find(Envelope.CAMERA_SYSTEM).GetComponent<CameraSystem>();
-        }
-
-        /// <summary>
-        /// get the GameSystem component.
-        /// </summary>
-        public static GameSystem GetGameSystem(this GameObject self) {
-            return GameObject.Find(Envelope.GAME_SYSTEM).GetComponent<GameSystem>();
-        }
-
-        /// <summary>
-        /// get the NoticeSystem component.
-        /// </summary>
-        public static NoticeSystem GetNoticeSystem(this GameObject self) {
-            return GameObject.Find(Envelope.NOTICE_SYSTEM).GetComponent<NoticeSystem>();
-        }
-
-        /// <summary>
-        /// get the Level component.
-        /// </summary>
-        public static Level GetLevel(this GameObject self) {
-            return self.GetComponent<Level>();
-        }
-
-        /// <summary>
-        /// get the Vehicle component.
-        /// </summary>
-        public static Vehicle GetVehicle(this GameObject self) {
-            return self.GetComponent<Vehicle>();
-        }
-
-        /// <summary>
-        /// get the Home component.
-        /// </summary>
-        public static Home GetHome(this GameObject self) {
-            return self.GetComponent<Home>();
-        }
-
-        /// <summary>
-        /// get the Balloon component.
-        /// </summary>
-        public static Balloon GetBalloon(this GameObject self) {
-            return self.GetComponent<Balloon>();
-        }
-
-        /// <summary>
-        /// get the Coin component.
-        /// </summary>
-        public static Coin GetCoin(this GameObject self) {
-            return self.GetComponent<Coin>();
+        public static T Add<T>(this Transform self) where T : Component {
+            return self.gameObject.AddComponent<T>();
         }
 
         #endregion
@@ -281,7 +103,7 @@ namespace Studio.MeowToon {
         #region for Material.
 
         /// <summary>
-        /// set Material color to opaque.
+        /// sets Material color to opaque.
         /// </summary>
         public static Material ToOpaque(this Material self, float time = 0) {
             var color = self.color;
@@ -291,7 +113,7 @@ namespace Studio.MeowToon {
         }
 
         /// <summary>
-        /// set Material color to transparent.
+        /// sets Material color to transparent.
         /// </summary>
         public static Material ToTransparent(this Material self, float time = 0) {
             var color = self.color;

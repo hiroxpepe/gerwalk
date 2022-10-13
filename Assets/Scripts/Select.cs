@@ -15,6 +15,7 @@
 
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static UnityEngine.GameObject;
 using UnityEngine.UI;
 using UniRx;
 using UniRx.Triggers;
@@ -22,9 +23,12 @@ using UniRx.Triggers;
 namespace Studio.MeowToon {
     /// <summary>
     /// select scene
-    /// @author h.adachi
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public class Select : InputMaper {
+#nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constants
@@ -50,7 +54,7 @@ namespace Studio.MeowToon {
 
         Map<int, string> _focus = new();
 
-        string _selected = Envelope.MODE_NORMAL;
+        string _selected = Env.MODE_NORMAL;
 
         int _idx = 0;
 
@@ -59,11 +63,11 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            _game_system = gameObject.GetGameSystem();
+            _game_system = Find(name: Env.GAME_SYSTEM).Get<GameSystem>();
             // set default focus.
-            _focus.Add(0, Envelope.MODE_EASY);
-            _focus.Add(1, Envelope.MODE_NORMAL);
-            _focus.Add(2, Envelope.MODE_HARD);
+            _focus.Add(0, Env.MODE_EASY);
+            _focus.Add(1, Env.MODE_NORMAL);
+            _focus.Add(2, Env.MODE_HARD);
             _idx = 1; // FIXME:
             _selected = _focus[_idx];
             changeSelectedColor();
@@ -103,7 +107,7 @@ namespace Studio.MeowToon {
             /// return title.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _start_button.wasPressedThisFrame || _a_button.wasPressedThisFrame).Subscribe(_ => {
-                SceneManager.LoadScene(Envelope.SCENE_TITLE);
+                SceneManager.LoadScene(Env.SCENE_TITLE);
             });
         }
 
@@ -116,17 +120,17 @@ namespace Studio.MeowToon {
             ColorUtility.TryParseHtmlString("#FFFF00", out yellow);
             ColorUtility.TryParseHtmlString("#FFFFFF", out white);
             switch (_selected) {
-                case Envelope.MODE_EASY:
+                case Env.MODE_EASY:
                     _easy.color = yellow;
                     _normal.color = white;
                     _hard.color = white;
                     break;
-                case Envelope.MODE_NORMAL:
+                case Env.MODE_NORMAL:
                     _easy.color = white;
                     _normal.color = yellow;
                     _hard.color = white;
                     break;
-                case Envelope.MODE_HARD:
+                case Env.MODE_HARD:
                     _easy.color = white;
                     _normal.color = white;
                     _hard.color = yellow;

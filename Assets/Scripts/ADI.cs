@@ -21,9 +21,12 @@ using UniRx.Triggers;
 namespace Studio.MeowToon {
     /// <summary>
     /// ADI class
-    /// @author h.adachi
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public class ADI : MonoBehaviour {
+#nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constants
@@ -52,7 +55,7 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            _vehicle_object = Find(Envelope.VEHICLE_TYPE);
+            _vehicle_object = Find(name: Env.VEHICLE_TYPE);
         }
 
         // Start is called before the first frame update.
@@ -66,11 +69,11 @@ namespace Studio.MeowToon {
                 /// <summary>
                 /// set ADI.
                 /// </summary>
-                _direction_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (DIVIDE_CIRCLE / _vehicle_object.GetVehicle().roll)));
-                _angle_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (DIVIDE_CIRCLE / _vehicle_object.GetVehicle().roll)));
+                _direction_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (DIVIDE_CIRCLE / _vehicle_object.Get<Vehicle>().roll)));
+                _angle_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (DIVIDE_CIRCLE / _vehicle_object.Get<Vehicle>().roll)));
                 _angle_object.transform.localPosition = new Vector3(
                     _angle_object.transform.localPosition.x,
-                    -_vehicle_object.GetVehicle().pitch / ((float) (300f / 500f)),
+                    -_vehicle_object.Get<Vehicle>().pitch / ((float) (300f / 500f)),
                     _angle_object.transform.localPosition.z
                 );
             });

@@ -21,8 +21,10 @@ using UniRx.Triggers;
 namespace Studio.MeowToon {
     /// <summary>
     /// TAS class
-    /// @author h.adachi
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public class TAS : MonoBehaviour {
 #nullable enable
 
@@ -50,7 +52,7 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            _vehicle_object = Find(Envelope.VEHICLE_TYPE);
+            _vehicle_object = Find(name: Env.VEHICLE_TYPE);
         }
 
         // Start is called before the first frame update.
@@ -64,7 +66,7 @@ namespace Studio.MeowToon {
                 /// <summary>
                 /// set speed.
                 /// </summary>
-                _needle_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (DIVIDE_CIRCLE / _vehicle_object.GetVehicle().airSpeed)));
+                _needle_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (DIVIDE_CIRCLE / _vehicle_object.Get<Vehicle>().airSpeed)));
                 
             });
         }

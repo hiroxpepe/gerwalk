@@ -14,6 +14,7 @@
  */
 
 using UnityEngine;
+using UnityEngine.UI;
 using static UnityEngine.GameObject;
 using UniRx;
 using UniRx.Triggers;
@@ -21,8 +22,10 @@ using UniRx.Triggers;
 namespace Studio.MeowToon {
     /// <summary>
     /// radar class
-    /// @author h.adachi
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public class Radar : MonoBehaviour {
 #nullable enable
 
@@ -69,15 +72,15 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            _vehicle_object = Find(Envelope.VEHICLE_TYPE);
-            _home_object = Find(Envelope.HOME_TYPE);
-            _targets_object = Find(Envelope.TARGETS_OBJECT);
+            _vehicle_object = Find(name: Env.VEHICLE_TYPE);
+            _home_object = Find(name: Env.HOME_TYPE);
+            _targets_object = Find(name: Env.TARGETS_OBJECT);
         }
 
         // Start is called before the first frame update.
         void Start() {
             // hide default mark.
-            _target_mark_object.GetImage().enabled = false;
+            _target_mark_object.Get<Image>().enabled = false;
 
             // get home and target positions.
             mapHomePositionsToRadar();
@@ -127,8 +130,8 @@ namespace Studio.MeowToon {
             // reset target mark.
             if (!create) {
                 for (int reset_idx = 1; reset_idx < TARGETS_COUNT + 1; reset_idx++) {
-                    var target_mark = Find($"RadarTarget(Clone)_{reset_idx}");
-                    target_mark.GetImage().enabled = false;
+                    var target_mark = Find(name: $"RadarTarget(Clone)_{reset_idx}");
+                    target_mark.Get<Image>().enabled = false;
                 }
             }
             // set target mark.
@@ -143,20 +146,20 @@ namespace Studio.MeowToon {
                     target_mark.transform.SetParent(_direction_object.transform, false);
                 } else if (!create) {
                     // get target mark.
-                    target_mark = Find($"RadarTarget(Clone)_{idx}"); // FIXME:
+                    target_mark = Find(name: $"RadarTarget(Clone)_{idx}"); // FIXME:
                 }
                 // get target position from vehicle point of view.
                 Vector3 target_position = target_transform.transform.position - _vehicle_object.transform.position;
                 // map positions to radar.
                 target_mark.transform.localPosition = new Vector3(target_position.x * RANGE, target_position.z * RANGE, 0);
-                target_mark.GetImage().enabled = true;
+                target_mark.Get<Image>().enabled = true;
 
                 // higher altitude targets blink slowly, and lower altitude targets blink faster.
                 Vector3 vehicle_position = _vehicle_object.transform.position;
                 if (position.y < vehicle_position.y - ADJUSTED_VALUE) {
-                    target_mark.GetImage().enabled = fast_repeat_value >= _fast_cycle * TO_MIDDLE_VALUE;
+                    target_mark.Get<Image>().enabled = fast_repeat_value >= _fast_cycle * TO_MIDDLE_VALUE;
                 } else if (position.y > vehicle_position.y + ADJUSTED_VALUE) {
-                    target_mark.GetImage().enabled = slow_repeat_value >= _slow_cycle * TO_MIDDLE_VALUE;
+                    target_mark.Get<Image>().enabled = slow_repeat_value >= _slow_cycle * TO_MIDDLE_VALUE;
                 }
                 idx++;
             }
