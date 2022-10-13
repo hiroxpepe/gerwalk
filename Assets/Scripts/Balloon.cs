@@ -15,14 +15,17 @@
 
 using System.Linq;
 using UnityEngine;
+using static UnityEngine.GameObject;
 using UniRx;
 using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
     /// balloon class
-    /// @author h.adachi
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public class Balloon : MonoBehaviour {
 #nullable enable
 
@@ -53,7 +56,7 @@ namespace Studio.MeowToon {
         void Awake() {
             _do_fixed_update = DoFixedUpdate.getInstance();
             _explode_param = ExplodeParam.getDefaultInstance();
-            _game_system = gameObject.GetGameSystem();
+            _game_system = Find(name: Env.GAME_SYSTEM).Get<GameSystem>();
             initializePiece();
         }
 
@@ -65,9 +68,9 @@ namespace Studio.MeowToon {
 
             // FixedUpdate is called just before each physics update.
             this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.explode).Subscribe(_ => {
-                gameObject.GetSphereCollider().enabled = false; // collider detection off. *passed on to children.
+                gameObject.Get<SphereCollider>().enabled = false; // collider detection off. *passed on to children.
                 explodePiece();
-                gameObject.GetSphereCollider().enabled = true; // collider detection on.
+                gameObject.Get<SphereCollider>().enabled = true; // collider detection on.
                 _do_fixed_update.explode = false;
                 if (_destroyable) {
                     Destroy(gameObject); // delete myself
@@ -77,7 +80,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// wwhen being touched vehicle.
             /// </summary>
-            this.OnCollisionEnterAsObservable().Where(x => x.LikeVehicle()).Subscribe(x => {
+            this.OnCollisionEnterAsObservable().Where(x => x.Like(Env.VEHICLE_TYPE)).Subscribe(x => {
                 destroyWithItems(x.transform);
             });
         }
@@ -88,7 +91,7 @@ namespace Studio.MeowToon {
         /// <summary>
         /// scatter items before destroy.
         /// </summary>
-        void destroyWithItems(Transform bullet, int numberOfPiece = 8) {
+        void destroyWithItems(Transform bullet, int number_of_piece = 8) {
             if (_destroyable) {
                 _do_fixed_update.explode = true;
             }
@@ -102,7 +105,7 @@ namespace Studio.MeowToon {
             var scale = _explode_param.scale;
             for (var i = 0; i < number; i++) {
                 var piece = Instantiate(_item_object);
-                var coin = piece.GetCoin();
+                var coin = piece.Get<Coin>();
                 coin.OnDestroy += () => {
                     _game_system.IncrementPoints();
                 };
@@ -115,11 +118,11 @@ namespace Studio.MeowToon {
                 );
                 piece.name += "_Piece"; // add "_Piece" to the name of the piece.
                 piece.transform.localScale = new Vector3(scale, scale, scale);
-                if (piece.GetRigidbody() == null) {
-                    piece.AddRigidbody();
+                if (piece.Get<Rigidbody>() == null) {
+                    piece.Add<Rigidbody>();
                 }
-                piece.GetRigidbody().useGravity = false;
-                piece.GetRigidbody().isKinematic = true;
+                piece.Get<Rigidbody>().useGravity = false;
+                piece.Get<Rigidbody>().isKinematic = true;
                 piece.transform.parent = transform;
             }
         }
@@ -137,11 +140,11 @@ namespace Studio.MeowToon {
                 var min = -getRandomForce(force);
                 var max = getRandomForce(force);
                 var force_value = new Vector3(random.Next(min, max), random.Next(min, max), random.Next(min, max));
-                piece.GetRigidbody().useGravity = true;
-                piece.GetRigidbody().isKinematic = false;
-                piece.GetRigidbody().AddTorque(force_value, ForceMode.Impulse);
-                piece.GetRigidbody().AddForce(force_value, ForceMode.Impulse);
-                piece.gameObject.GetCoin().autoDestroy = true; // clear pieces after 2 seconds.
+                piece.Get<Rigidbody>().useGravity = true;
+                piece.Get<Rigidbody>().isKinematic = false;
+                piece.Get<Rigidbody>().AddTorque(force_value, ForceMode.Impulse);
+                piece.Get<Rigidbody>().AddForce(force_value, ForceMode.Impulse);
+                piece.gameObject.Get<Coin>().autoDestroy = true; // clear pieces after 2 seconds.
             }
         }
 

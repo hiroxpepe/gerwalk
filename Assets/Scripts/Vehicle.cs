@@ -24,8 +24,10 @@ using UniRx.Triggers;
 namespace Studio.MeowToon {
     /// <summary>
     /// vehicle controller
-    /// @author h.adachi
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public class Vehicle : InputMaper {
 #nullable enable
 
@@ -252,7 +254,7 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            _game_system = gameObject.GetGameSystem();
+            _game_system = Find(name: Env.GAME_SYSTEM).Get<GameSystem>();
             _do_update = DoUpdate.GetInstance();
             _do_fixed_update = DoFixedUpdate.GetInstance();
             _acceleration = Acceleration.GetInstance(_forward_speed_limit, _run_speed_limit, _backward_speed_limit);
@@ -268,15 +270,15 @@ namespace Studio.MeowToon {
 
             // set game mode
             switch (_game_system.mode) {
-                case Envelope.MODE_EASY: _total_power_factor_value = 1.0f; break;
-                case Envelope.MODE_NORMAL: _total_power_factor_value = 1.5f; break;
-                case Envelope.MODE_HARD: _total_power_factor_value = 2.0f; break;
+                case Env.MODE_EASY: _total_power_factor_value = 1.0f; break;
+                case Env.MODE_NORMAL: _total_power_factor_value = 1.5f; break;
+                case Env.MODE_HARD: _total_power_factor_value = 2.0f; break;
             }
 
             /// <remarks>
             /// Rigidbody should be only used in FixedUpdate.
             /// </remarks>
-            Rigidbody rb = transform.GetRigidbody();
+            Rigidbody rb = transform.Get<Rigidbody>();
 
             // FIXME: to integrate with Energy function.
             this.FixedUpdateAsObservable().Subscribe(_ => {
@@ -376,7 +378,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// freeze.
             /// </summary>
-            this.OnCollisionStayAsObservable().Where(x => x.LikeBlock() && (_up_button.isPressed || _down_button.isPressed) && _acceleration.freeze).Subscribe(_ => {
+            this.OnCollisionStayAsObservable().Where(x => x.Like(Env.BLOCK_TYPE) && (_up_button.isPressed || _down_button.isPressed) && _acceleration.freeze).Subscribe(_ => {
                 var reach = getReach();
                 if (_do_update.grounded && (reach < 0.5d || reach >= 0.99d)) {
                     moveLetfOrRight(getDirection(transform.forward));
@@ -391,7 +393,7 @@ namespace Studio.MeowToon {
             /// when touching blocks.
             /// TODO: to Block ?
             /// </summary>
-            this.OnCollisionEnterAsObservable().Where(x => x.LikeBlock()).Subscribe(x => {
+            this.OnCollisionEnterAsObservable().Where(x => x.Like(Env.BLOCK_TYPE)).Subscribe(x => {
                 if (!isHitSide(x.gameObject)) {
                     _do_update.grounded = true;
                     rb.useGravity = true;
@@ -402,7 +404,7 @@ namespace Studio.MeowToon {
             /// when leaving blocks.
             /// TODO: to Block ?
             /// </summary>
-            this.OnCollisionExitAsObservable().Where(x => x.LikeBlock()).Subscribe(x => {
+            this.OnCollisionExitAsObservable().Where(x => x.Like(Env.BLOCK_TYPE)).Subscribe(x => {
                 rb.useGravity = true;
             });
 
@@ -450,7 +452,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// roll and yaw.
             /// </summary>
-            if (_game_system.mode == Envelope.MODE_EASY) {
+            if (_game_system.mode == Env.MODE_EASY) {
                 this.UpdateAsObservable().Where(_ => _do_update.flighting && (_left_button.isPressed || _right_button.isPressed)).Subscribe(_ => {
                     int roll_axis = _left_button.isPressed ? 1 : _right_button.isPressed ? -1 : 0;
                     transform.Rotate(0, 0, roll_axis * _roll_speed * _energy.ratio * Time.deltaTime * ADD_FORCE_VALUE);
@@ -458,7 +460,7 @@ namespace Studio.MeowToon {
                     transform.Rotate(0, yaw_axis * _roll_speed * _energy.ratio * Time.deltaTime * ADD_FORCE_VALUE, 0);
                 });
             } 
-            else if (_game_system.mode == Envelope.MODE_NORMAL || _game_system.mode == Envelope.MODE_HARD) {
+            else if (_game_system.mode == Env.MODE_NORMAL || _game_system.mode == Env.MODE_HARD) {
                 this.UpdateAsObservable().Where(_ => _do_update.flighting && (_left_button.isPressed || _right_button.isPressed)).Subscribe(_ => {
                     int roll_axis = _left_button.isPressed ? 1 : _right_button.isPressed ? -1 : 0;
                     transform.Rotate(0, 0, roll_axis * _roll_speed * _energy.ratio * 2.0f * Time.deltaTime * ADD_FORCE_VALUE);
@@ -539,7 +541,7 @@ namespace Studio.MeowToon {
                 OnStall?.Invoke();
             });
             this.UpdateAsObservable().Where(_ => _do_update.stalling).Subscribe(_ => {
-                var ground_object = Find(Envelope.GROUND_TYPE);
+                var ground_object = Find(name: Env.GROUND_TYPE);
                 Quaternion ground_rotation = Quaternion.LookRotation(ground_object.transform.position);
                 stall_time_count += Time.deltaTime;
                 transform.rotation = Quaternion.Slerp(transform.rotation, ground_rotation, stall_time_count);
@@ -590,7 +592,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// when touching grounds.
             /// </summary>
-            this.OnCollisionEnterAsObservable().Where(x => x.LikeGround()).Subscribe(x => {
+            this.OnCollisionEnterAsObservable().Where(x => x.Like(Env.GROUND_TYPE)).Subscribe(x => {
                 _do_update.grounded = true;
                 rb.useGravity = true;
 
@@ -680,17 +682,17 @@ namespace Studio.MeowToon {
         /// <summary>
         /// returns an enum of the vehicle's direction.
         /// </summary>
-        Direction getDirection(Vector3 forwardVector) {
-            var forward_x = (float) Math.Round(forwardVector.x);
-            var forward_y = (float) Math.Round(forwardVector.y);
-            var forward_z = (float) Math.Round(forwardVector.z);
+        Direction getDirection(Vector3 forward_vector) {
+            var forward_x = (float) Math.Round(forward_vector.x);
+            var forward_y = (float) Math.Round(forward_vector.y);
+            var forward_z = (float) Math.Round(forward_vector.z);
             if (forward_x == 0 && forward_z == 1) { return Direction.PositiveZ; } // z-axis positive.
             if (forward_x == 0 && forward_z == -1) { return Direction.NegativeZ; } // z-axis negative.
             if (forward_x == 1 && forward_z == 0) { return Direction.PositiveX; } // x-axis positive.
             if (forward_x == -1 && forward_z == 0) { return Direction.NegativeX; } // x-axis negative.
             // determine the difference between the two axes.
-            float absolute_x = Math.Abs(forwardVector.x);
-            float absolute_z = Math.Abs(forwardVector.z);
+            float absolute_x = Math.Abs(forward_vector.x);
+            float absolute_z = Math.Abs(forward_vector.z);
             if (absolute_x > absolute_z) {
                 if (forward_x == 1) { return Direction.PositiveX; } // x-axis positive.
                 if (forward_x == -1) { return Direction.NegativeX; } // x-axis negative.
@@ -707,7 +709,7 @@ namespace Studio.MeowToon {
         /// </summary>
         bool isHitSide(GameObject target) {
             const float ADJUST = 0.1f;
-            float target_height = target.GetRenderer().bounds.size.y;
+            float target_height = target.Get<Renderer>().bounds.size.y;
             float target_y = target.transform.position.y;
             float target_top = target_height + target_y;
             var position_y = transform.position.y;
@@ -929,17 +931,17 @@ namespace Studio.MeowToon {
             /// <summary>
             /// hide the constructor.
             /// </summary>
-            Acceleration(float forwardSpeedLimit, float runSpeedLimit, float backwardSpeedLimit) {
-                _forward_speed_limit = forwardSpeedLimit;
-                _run_speed_limit = runSpeedLimit;
-                _backward_speed_limit = backwardSpeedLimit;
+            Acceleration(float forward_speed_limit, float run_speed_limit, float backward_speed_limit) {
+                _forward_speed_limit = forward_speed_limit;
+                _run_speed_limit = run_speed_limit;
+                _backward_speed_limit = backward_speed_limit;
             }
 
             /// <summary>
             /// returns an initialized instance.
             /// </summary>
-            public static Acceleration GetInstance(float forwardSpeedLimit, float runSpeedLimit, float backwardSpeedLimit) {
-                return new Acceleration(forwardSpeedLimit, runSpeedLimit, backwardSpeedLimit);
+            public static Acceleration GetInstance(float forward_speed_limit, float run_speed_limit, float backward_speed_limit) {
+                return new Acceleration(forward_speed_limit, run_speed_limit, backward_speed_limit);
             }
         }
 
@@ -974,7 +976,7 @@ namespace Studio.MeowToon {
             /// </summary>
             public float altitude {
                 set {
-                    const int QUEUE_COUNT = Envelope.FPS / 2; // 0.5 sec.
+                    const int QUEUE_COUNT = Env.FPS / 2; // 0.5 sec.
                     if (_previous_altitudes.Count < QUEUE_COUNT) {
                         _previous_altitudes.Enqueue(_altitude);
                     }
@@ -1059,16 +1061,16 @@ namespace Studio.MeowToon {
             /// <summary>
             /// hide the constructor.
             /// </summary>
-            Energy(float flightPower) {
-                _flight_power_base = flightPower;
+            Energy(float flight_power) {
+                _flight_power_base = flight_power;
                 _default_flight_power_base = _flight_power_base;
             }
 
             /// <summary>
             /// returns an initialized instance.
             /// </summary>
-            public static Energy GetInstance(float flightPower) {
-                return new Energy(flightPower);
+            public static Energy GetInstance(float flight_power) {
+                return new Energy(flight_power);
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////////

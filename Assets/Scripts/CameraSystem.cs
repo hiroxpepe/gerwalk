@@ -21,9 +21,11 @@ using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
-    /// camera controller.
-    /// @author h.adachi
+    /// camera controller
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public class CameraSystem : InputMaper {
 #nullable enable
 
@@ -79,8 +81,8 @@ namespace Studio.MeowToon {
             /// <summary>
             /// when touching the back wall.
             /// </summary>
-            this.OnTriggerEnterAsObservable().Where(x => x.LikeWall()).Subscribe(x => {
-                var material_list = x.gameObject.GetMeshRenderer().materials.ToList();
+            this.OnTriggerEnterAsObservable().Where(x => x.Like(Env.WALL_TYPE)).Subscribe(x => {
+                var material_list = x.gameObject.Get<MeshRenderer>().materials.ToList();
                 material_list.ForEach(material => {
                     material.ToOpaque();
                 });
@@ -89,8 +91,8 @@ namespace Studio.MeowToon {
             /// <summary>
             /// when leaving the back wall.
             /// </summary>
-            this.OnTriggerExitAsObservable().Where(x => x.LikeWall()).Subscribe(x => {
-                var material_list = x.gameObject.GetMeshRenderer().materials.ToList();
+            this.OnTriggerExitAsObservable().Where(x => x.Like(Env.WALL_TYPE)).Subscribe(x => {
+                var material_list = x.gameObject.Get<MeshRenderer>().materials.ToList();
                 material_list.ForEach(material => {
                     material.ToTransparent();
                 });
@@ -99,8 +101,8 @@ namespace Studio.MeowToon {
             /// <summary>
             /// when touching the block.
             /// </summary>
-            this.OnTriggerEnterAsObservable().Where(x => x.LikeBlock()).Subscribe(x => {
-                var material_list = x.gameObject.GetMeshRenderer().materials.ToList();
+            this.OnTriggerEnterAsObservable().Where(x => x.Like(Env.BLOCK_TYPE)).Subscribe(x => {
+                var material_list = x.gameObject.Get<MeshRenderer>().materials.ToList();
                 material_list.ForEach(material => {
                     material.ToOpaque();
                 });
@@ -109,8 +111,8 @@ namespace Studio.MeowToon {
             /// <summary>
             /// when leaving the block.
             /// </summary>
-            this.OnTriggerExitAsObservable().Where(x => x.LikeBlock()).Subscribe(x => {
-                var material_list = x.gameObject.GetMeshRenderer().materials.ToList();
+            this.OnTriggerExitAsObservable().Where(x => x.Like(Env.BLOCK_TYPE)).Subscribe(x => {
+                var material_list = x.gameObject.Get<MeshRenderer>().materials.ToList();
                 material_list.ForEach(material => {
                     material.ToTransparent();
                 });

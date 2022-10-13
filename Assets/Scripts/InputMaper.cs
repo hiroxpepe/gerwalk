@@ -21,9 +21,11 @@ using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
-    /// to map physical Gamepad.
-    /// @author h.adachi
+    /// to map physical gamepad
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public class InputMaper : MonoBehaviour {
 #nullable enable
 
@@ -88,7 +90,7 @@ namespace Studio.MeowToon {
         // Start is called before the first frame update
         protected void Start() {
             // get virtual controller object.
-            _v_controller_object = GameObject.Find("VController");
+            _v_controller_object = GameObject.Find(name: "VController");
 
             // Update is called once per frame.
             this.UpdateAsObservable().Subscribe(_ => {

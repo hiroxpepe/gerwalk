@@ -14,15 +14,19 @@
  */
 
 using UnityEngine.SceneManagement;
+using static UnityEngine.GameObject;
 using UniRx;
 using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
     /// title scene
-    /// @author h.adachi
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public class Title : InputMaper {
+#nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives]
@@ -34,7 +38,7 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            _game_system = gameObject.GetGameSystem();
+            _game_system = Find(name: Env.GAME_SYSTEM).Get<GameSystem>();
         }
 
         // Start is called before the first frame update
@@ -45,14 +49,14 @@ namespace Studio.MeowToon {
             /// open select.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _select_button.wasPressedThisFrame).Subscribe(_ => {
-                SceneManager.LoadScene(Envelope.SCENE_SELECT);
+                SceneManager.LoadScene(Env.SCENE_SELECT);
             });
 
             /// <summary>
             /// start level.
             /// </summary>
             this.UpdateAsObservable().Where(_ => (_start_button.wasPressedThisFrame || _a_button.wasPressedThisFrame)).Subscribe(_ => {
-                SceneManager.LoadScene(Envelope.SCENE_LEVEL_1);
+                SceneManager.LoadScene(Env.SCENE_LEVEL_1);
             });
         }
     }

@@ -21,8 +21,10 @@ using UniRx.Triggers;
 namespace Studio.MeowToon {
     /// <summary>
     /// item coin class
-    /// @author h.adachi
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public class Coin : Common {
 #nullable enable
 
@@ -41,7 +43,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// wwhen being touched vehicle.
             /// </summary>
-            this.OnCollisionEnterAsObservable().Where(x => x.LikeVehicle()).Subscribe(x => {
+            this.OnCollisionEnterAsObservable().Where(x => x.Like(Env.VEHICLE_TYPE)).Subscribe(x => {
                 OnDestroy?.Invoke();
                 Destroy(gameObject);
             });

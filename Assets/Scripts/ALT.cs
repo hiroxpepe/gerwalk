@@ -21,8 +21,10 @@ using UniRx.Triggers;
 namespace Studio.MeowToon {
     /// <summary>
     /// ALT class
-    /// @author h.adachi
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public class ALT : MonoBehaviour {
 #nullable enable
 
@@ -54,7 +56,7 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            _vehicle_object = Find(Envelope.VEHICLE_TYPE);
+            _vehicle_object = Find(name: Env.VEHICLE_TYPE);
         }
 
         // Start is called before the first frame update.

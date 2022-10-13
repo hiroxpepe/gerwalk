@@ -23,9 +23,12 @@ using UniRx.Triggers;
 namespace Studio.MeowToon {
     /// <summary>
     /// lavel scene
-    /// @author h.adachi
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public class Level : InputMaper {
+#nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives]
@@ -48,10 +51,10 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            _game_system = gameObject.GetGameSystem();
-            
+            _game_system = Find(name: Env.GAME_SYSTEM).Get<GameSystem>();
+
             // get home.
-            Home home = Find(Envelope.HOME_TYPE).GetHome();
+            Home home = Find(name: Env.HOME_TYPE).Get<Home>();
 
             /// <summary>
             /// came back home.
@@ -94,17 +97,17 @@ namespace Studio.MeowToon {
             /// </summary>
             this.UpdateAsObservable().Where(_ => (_a_button.wasPressedThisFrame) && _game_system.beatLevel && _is_home).Subscribe(_ => {
                 switch (SceneManager.GetActiveScene().name) {
-                    case Envelope.SCENE_LEVEL_1:
+                    case Env.SCENE_LEVEL_1:
                         Time.timeScale = 1f;
-                        SceneManager.LoadScene(Envelope.SCENE_LEVEL_2);
+                        SceneManager.LoadScene(Env.SCENE_LEVEL_2);
                         break;
-                    case Envelope.SCENE_LEVEL_2:
+                    case Env.SCENE_LEVEL_2:
                         Time.timeScale = 1f;
-                        SceneManager.LoadScene(Envelope.SCENE_LEVEL_3);
+                        SceneManager.LoadScene(Env.SCENE_LEVEL_3);
                         break;
-                    case Envelope.SCENE_LEVEL_3:
+                    case Env.SCENE_LEVEL_3:
                         Time.timeScale = 1f;
-                        SceneManager.LoadScene(Envelope.SCENE_ENDING);
+                        SceneManager.LoadScene(Env.SCENE_ENDING);
                         break;
                 }
             });
@@ -113,7 +116,7 @@ namespace Studio.MeowToon {
             /// restart game.
             /// </summary>
             this.UpdateAsObservable().Where(_ => _select_button.wasPressedThisFrame).Subscribe(_ => {
-                SceneManager.LoadScene(Envelope.SCENE_TITLE);
+                SceneManager.LoadScene(Env.SCENE_TITLE);
             });
 
             ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -130,7 +133,7 @@ namespace Studio.MeowToon {
             /// get targets count.
             /// </summary>
             int getTargetsCount() {
-                var targets = GameObject.Find(Envelope.TARGETS_OBJECT);
+                var targets = GameObject.Find(name: Env.TARGETS_OBJECT);
                 Transform targets_transform = targets.GetComponentInChildren<Transform>();
                 return targets_transform.childCount;
             }

@@ -14,15 +14,19 @@
  */
 
 using UnityEngine.SceneManagement;
+using static UnityEngine.GameObject;
 using UniRx;
 using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
     /// ending scene
-    /// @author h.adachi
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public class Ending : InputMaper {
+#nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives]
@@ -34,7 +38,7 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            _game_system = gameObject.GetGameSystem();
+            _game_system = Find(name: Env.GAME_SYSTEM).Get<GameSystem>();
         }
 
         // Start is called before the first frame update
@@ -45,7 +49,7 @@ namespace Studio.MeowToon {
             /// go to title. 
             /// </summary>
             this.UpdateAsObservable().Where(_ => (_start_button.wasPressedThisFrame || _a_button.wasPressedThisFrame)).Subscribe(_ => {
-                SceneManager.LoadScene(Envelope.SCENE_TITLE);
+                SceneManager.LoadScene(Env.SCENE_TITLE);
             });
         }
     }

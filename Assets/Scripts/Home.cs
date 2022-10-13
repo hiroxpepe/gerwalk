@@ -15,14 +15,17 @@
 
 using System;
 using UnityEngine;
+using static UnityEngine.GameObject;
 using UniRx;
 using UniRx.Triggers;
 
 namespace Studio.MeowToon {
     /// <summary>
     /// home class
-    /// @author h.adachi
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public class Home : MonoBehaviour {
 #nullable enable
 
@@ -41,7 +44,7 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            _game_system = gameObject.GetGameSystem();
+            _game_system = Find(name: Env.GAME_SYSTEM).Get<GameSystem>();
         }
 
         // Start is called before the first frame update
@@ -49,7 +52,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// when being touched vehicle.
             /// </summary>
-            this.OnCollisionEnterAsObservable().Where(x => x.LikeVehicle() && _game_system.beatLevel).Subscribe(x => {
+            this.OnCollisionEnterAsObservable().Where(x => x.Like(Env.VEHICLE_TYPE) && _game_system.beatLevel).Subscribe(x => {
                 OnCameBack?.Invoke();
             });
         }

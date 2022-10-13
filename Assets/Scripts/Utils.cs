@@ -40,9 +40,11 @@ namespace Studio.MeowToon {
     public delegate void Changed(object sender, EvtArgs e);
 
     /// <summary>
-    /// generic utility class.
-    /// @author h.adachi
+    /// generic utility class
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public static class Utils {
 #nullable enable
 
@@ -58,17 +60,17 @@ namespace Studio.MeowToon {
         // static Constructor
 
         static Utils() {
-            ColorUtility.TryParseHtmlString(Envelope.COLOR_RED, out _red);
-            ColorUtility.TryParseHtmlString(Envelope.COLOR_ORANGE, out _orange);
-            ColorUtility.TryParseHtmlString(Envelope.COLOR_YELLOW, out _yellow);
-            ColorUtility.TryParseHtmlString(Envelope.COLOR_LIME, out _lime);
-            ColorUtility.TryParseHtmlString(Envelope.COLOR_GREEN, out _green);
-            ColorUtility.TryParseHtmlString(Envelope.COLOR_CYAN, out _cyan);
-            ColorUtility.TryParseHtmlString(Envelope.COLOR_AZURE, out _azure);
-            ColorUtility.TryParseHtmlString(Envelope.COLOR_BLUE, out _blue);
-            ColorUtility.TryParseHtmlString(Envelope.COLOR_PURPLE, out _purple);
-            ColorUtility.TryParseHtmlString(Envelope.COLOR_MAGENTA, out _magenta);
-            ColorUtility.TryParseHtmlString(Envelope.COLOR_WHITE, out _white);
+            ColorUtility.TryParseHtmlString(Env.COLOR_RED, out _red);
+            ColorUtility.TryParseHtmlString(Env.COLOR_ORANGE, out _orange);
+            ColorUtility.TryParseHtmlString(Env.COLOR_YELLOW, out _yellow);
+            ColorUtility.TryParseHtmlString(Env.COLOR_LIME, out _lime);
+            ColorUtility.TryParseHtmlString(Env.COLOR_GREEN, out _green);
+            ColorUtility.TryParseHtmlString(Env.COLOR_CYAN, out _cyan);
+            ColorUtility.TryParseHtmlString(Env.COLOR_AZURE, out _azure);
+            ColorUtility.TryParseHtmlString(Env.COLOR_BLUE, out _blue);
+            ColorUtility.TryParseHtmlString(Env.COLOR_PURPLE, out _purple);
+            ColorUtility.TryParseHtmlString(Env.COLOR_MAGENTA, out _magenta);
+            ColorUtility.TryParseHtmlString(Env.COLOR_WHITE, out _white);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -95,7 +97,7 @@ namespace Studio.MeowToon {
         /// has level.
         /// </summary>
         public static bool HasLevel() {
-            GameObject game_object = GameObject.Find(Envelope.LEVEL_TYPE);
+            GameObject game_object = GameObject.Find(name: Env.LEVEL_TYPE);
             if (game_object is not null) {
                 return true;
             }
@@ -106,7 +108,7 @@ namespace Studio.MeowToon {
         /// has vehicle.
         /// </summary>
         public static bool HasVehicle() {
-            GameObject game_object = GameObject.Find(Envelope.VEHICLE_TYPE);
+            GameObject game_object = GameObject.Find(name: Env.VEHICLE_TYPE);
             if (game_object is not null) {
                 return true;
             }
@@ -118,8 +120,8 @@ namespace Studio.MeowToon {
         /// <summary>
         /// set the rendering mode of the material.
         /// </summary>
-        public static void SetRenderingMode(Material material, RenderingMode renderingMode) {
-            switch (renderingMode) {
+        public static void SetRenderingMode(Material material, RenderingMode rendering_mode) {
+            switch (rendering_mode) {
                 case RenderingMode.Opaque:
                     material.SetOverrideTag("RenderType", "");
                     material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
