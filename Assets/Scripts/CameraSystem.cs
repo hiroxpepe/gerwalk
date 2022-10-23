@@ -13,6 +13,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using static UnityEngine.Vector3;
@@ -82,40 +83,32 @@ namespace Studio.MeowToon {
             /// when touching the back wall.
             /// </summary>
             this.OnTriggerEnterAsObservable().Where(x => x.Like(Env.WALL_TYPE)).Subscribe(x => {
-                var material_list = x.gameObject.Get<MeshRenderer>().materials.ToList();
-                material_list.ForEach(material => {
-                    material.ToOpaque();
-                });
+                List<Material> material_list = x.gameObject.Get<MeshRenderer>().materials.ToList();
+                material_list.ForEach(material => { material.ToOpaque(); });
             });
 
             /// <summary>
             /// when leaving the back wall.
             /// </summary>
             this.OnTriggerExitAsObservable().Where(x => x.Like(Env.WALL_TYPE)).Subscribe(x => {
-                var material_list = x.gameObject.Get<MeshRenderer>().materials.ToList();
-                material_list.ForEach(material => {
-                    material.ToTransparent();
-                });
+                List<Material> material_list = x.gameObject.Get<MeshRenderer>().materials.ToList();
+                material_list.ForEach(material => { material.ToTransparent(); });
             });
 
             /// <summary>
             /// when touching the block.
             /// </summary>
             this.OnTriggerEnterAsObservable().Where(x => x.Like(Env.BLOCK_TYPE)).Subscribe(x => {
-                var material_list = x.gameObject.Get<MeshRenderer>().materials.ToList();
-                material_list.ForEach(material => {
-                    material.ToOpaque();
-                });
+                List<Material> material_list = x.gameObject.Get<MeshRenderer>().materials.ToList();
+                material_list.ForEach(material => { material.ToOpaque(); });
             });
 
             /// <summary>
             /// when leaving the block.
             /// </summary>
             this.OnTriggerExitAsObservable().Where(x => x.Like(Env.BLOCK_TYPE)).Subscribe(x => {
-                var material_list = x.gameObject.Get<MeshRenderer>().materials.ToList();
-                material_list.ForEach(material => {
-                    material.ToTransparent();
-                });
+                List<Material> material_list = x.gameObject.Get<MeshRenderer>().materials.ToList();
+                material_list.ForEach(material => { material.ToTransparent(); });
             });
         }
 
@@ -127,7 +120,7 @@ namespace Studio.MeowToon {
         /// </summary>
         void rotateView() {
             const float ADJUST = 120.0f;
-            var player_position = transform.parent.gameObject.transform.position;
+            Vector3 player_position = transform.parent.gameObject.transform.position;
             // up.
             if (_right_stick_up_button.isPressed) {
                 transform.RotateAround(player_position, right, 1.0f * ADJUST * Time.deltaTime);

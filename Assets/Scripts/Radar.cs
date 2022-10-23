@@ -120,13 +120,13 @@ namespace Studio.MeowToon {
             _time += Time.deltaTime;
 
             // get the value that repeats in cycle.
-            var fast_repeat_value = Mathf.Repeat(_time, _fast_cycle);
-            var slow_repeat_value = Mathf.Repeat(_time, _slow_cycle);
+            float fast_repeat_value = Mathf.Repeat(_time, _fast_cycle);
+            float slow_repeat_value = Mathf.Repeat(_time, _slow_cycle);
 
             // reset target mark.
             if (!create) {
                 for (int reset_idx = 1; reset_idx < TARGETS_COUNT + 1; reset_idx++) {
-                    var target_mark = Find(name: $"RadarTarget(Clone)_{reset_idx}");
+                    GameObject target_mark = Find(name: $"RadarTarget(Clone)_{reset_idx}");
                     target_mark.Get<Image>().enabled = false;
                 }
             }

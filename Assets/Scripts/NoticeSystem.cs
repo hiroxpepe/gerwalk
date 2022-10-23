@@ -136,7 +136,7 @@ namespace Studio.MeowToon {
             /// </summary>
             vehicle.Updated += (object sender, EvtArgs e) => {
                 const float VEHICLE_HEIGHT_OFFSET = 0.0f;
-                var vehicle = sender as Vehicle;
+                Vehicle vehicle = sender as Vehicle;
                 if (vehicle is not null) {
                     if (e.Name.Equals(nameof(Vehicle.airSpeed))) { _air_speed = vehicle.airSpeed; return; }
                     if (e.Name.Equals(nameof(Vehicle.verticalSpeed))) { _vertical_speed = vehicle.verticalSpeed; return; }

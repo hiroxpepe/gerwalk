@@ -347,7 +347,7 @@ namespace Studio.MeowToon {
             /// rotate(yaw).
             /// </summary>
             this.UpdateAsObservable().Where(_ => _do_update.grounded).Subscribe(_ => {
-                var axis = _right_button.isPressed ? 1 : _left_button.isPressed ? -1 : 0;
+                int axis = _right_button.isPressed ? 1 : _left_button.isPressed ? -1 : 0;
                 transform.Rotate(0, axis * (_rotational_speed * Time.deltaTime) * ADD_FORCE_VALUE, 0);
             });
 
@@ -355,7 +355,7 @@ namespace Studio.MeowToon {
             /// freeze.
             /// </summary>
             this.OnCollisionStayAsObservable().Where(x => x.Like(Env.BLOCK_TYPE) && (_up_button.isPressed || _down_button.isPressed) && _acceleration.freeze).Subscribe(_ => {
-                var reach = getReach();
+                double reach = getReach();
                 if (_do_update.grounded && (reach < 0.5d || reach >= 0.99d)) {
                     moveLetfOrRight(getDirection(transform.forward));
                 }
@@ -468,7 +468,7 @@ namespace Studio.MeowToon {
             float left_quick_roll_time_count = 0f;
             Vector3 left_quick_roll_angle = new(0f, 0f, 0f);
             float left_quick_roll_to_z = 0f;
-            var left_double_click = this.UpdateAsObservable().Where(_ => _do_update.flighting && _left_button.wasPressedThisFrame && _a_button.isPressed);
+            IObservable<Unit> left_double_click = this.UpdateAsObservable().Where(_ => _do_update.flighting && _left_button.wasPressedThisFrame && _a_button.isPressed);
             left_double_click.Buffer(left_double_click.Throttle(TimeSpan.FromMilliseconds(WAIT_FOR_DOUBLE_CLICK))).Where(x => x.Count == 2).Subscribe(_ => {
                 _do_update.needLeftQuickRoll = true;
                 left_quick_roll_time_count = 0f;
@@ -489,7 +489,7 @@ namespace Studio.MeowToon {
             float right_quick_roll_time_count = 0f;
             Vector3 right_quick_roll_angle = new(0f, 0f, 0f);
             float right_quick_roll_to_z = 0f;
-            var right_double_click = this.UpdateAsObservable().Where(_ => _do_update.flighting && _right_button.wasPressedThisFrame && _a_button.isPressed);
+            IObservable<Unit> right_double_click = this.UpdateAsObservable().Where(_ => _do_update.flighting && _right_button.wasPressedThisFrame && _a_button.isPressed);
             right_double_click.Buffer(right_double_click.Throttle(TimeSpan.FromMilliseconds(WAIT_FOR_DOUBLE_CLICK))).Where(x => x.Count == 2).Subscribe(_ => {
                 _do_update.needRightQuickRoll = true;
                 right_quick_roll_time_count = 0f;
@@ -517,7 +517,7 @@ namespace Studio.MeowToon {
                 OnStall?.Invoke();
             });
             this.UpdateAsObservable().Where(_ => _do_update.stalling).Subscribe(_ => {
-                var ground_object = Find(name: Env.GROUND_TYPE);
+                GameObject ground_object = Find(name: Env.GROUND_TYPE);
                 Quaternion ground_rotation = Quaternion.LookRotation(ground_object.transform.position);
                 stall_time_count += Time.deltaTime;
                 transform.rotation = Quaternion.Slerp(transform.rotation, ground_rotation, stall_time_count);
@@ -659,9 +659,9 @@ namespace Studio.MeowToon {
         /// returns an enum of the vehicle's direction.
         /// </summary>
         Direction getDirection(Vector3 forward_vector) {
-            var forward_x = (float) Math.Round(forward_vector.x);
-            var forward_y = (float) Math.Round(forward_vector.y);
-            var forward_z = (float) Math.Round(forward_vector.z);
+            float forward_x = (float) Math.Round(forward_vector.x);
+            float forward_y = (float) Math.Round(forward_vector.y);
+            float forward_z = (float) Math.Round(forward_vector.z);
             if (forward_x == 0 && forward_z == 1) { return Direction.PositiveZ; } // z-axis positive.
             if (forward_x == 0 && forward_z == -1) { return Direction.NegativeZ; } // z-axis negative.
             if (forward_x == 1 && forward_z == 0) { return Direction.PositiveX; } // x-axis positive.
@@ -688,7 +688,7 @@ namespace Studio.MeowToon {
             float target_height = target.Get<Renderer>().bounds.size.y;
             float target_y = target.transform.position.y;
             float target_top = target_height + target_y;
-            var position_y = transform.position.y;
+            float position_y = transform.position.y;
             if (position_y < (target_top - ADJUST)) {
                 return true;
             }
@@ -746,7 +746,7 @@ namespace Studio.MeowToon {
             /// returns an initialized instance.
             /// </summary>
             public static DoUpdate GetInstance() {
-                var instance = new DoUpdate();
+                DoUpdate instance = new();
                 instance.ResetState();
                 return instance;
             }
