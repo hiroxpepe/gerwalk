@@ -39,20 +39,14 @@ namespace Studio.MeowToon {
         /// clear automatically after `n` seconds.
         /// </summary>
         public float autoDestroyAfter { 
-            set { 
-                _auto_destroy_param.enable = true; 
-                _auto_destroy_param.limit = getRandomLimit(value); 
-            } 
+            set { _auto_destroy_param.enable = true;  _auto_destroy_param.limit = getRandomLimit(value); } 
         }
 
         /// <summary>
         /// clear automatically after 2 seconds.
         /// </summary>
         public bool autoDestroy { 
-            set { 
-                _auto_destroy_param.enable = value;
-                _auto_destroy_param.limit = getRandomLimit(2.0f); 
-            } 
+            set {  _auto_destroy_param.enable = value; _auto_destroy_param.limit = getRandomLimit(2.0f); } 
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,10 +66,6 @@ namespace Studio.MeowToon {
                     Destroy(gameObject); // so it is deleted.
                 }
             });
-
-            // FixedUpdate is called just before each physics update.
-            this.FixedUpdateAsObservable().Subscribe(_ => {
-            });
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,7 +75,7 @@ namespace Studio.MeowToon {
         /// random number of seconds to remove automatically.
         /// </summary>
         float getRandomLimit(float limit) {
-            var random = new System.Random();
+            System.Random random = new System.Random();
             return random.Next(2, (int)limit * 25); // from 2 seconds to (limit * 25) seconds.
         }
 
@@ -110,11 +100,11 @@ namespace Studio.MeowToon {
         /// </summary>
         void fadeoutToDestroy() {
             if (_auto_destroy_param.second > _auto_destroy_param.limit - 0.8f) { // from 0.8 seconds before the limit time.
-                var render = gameObject.Get<MeshRenderer>();
-                var materialList = render.materials;
-                foreach (var material in materialList) {
+                MeshRenderer render = gameObject.Get<MeshRenderer>();
+                Material[] material_array = render.materials;
+                foreach (Material material in material_array) {
                     Utils.SetRenderingMode(material, RenderingMode.Fade);
-                    var color = material.color;
+                    Color color = material.color;
                     color.a = _auto_destroy_param.limit - _auto_destroy_param.second; // gradually becoming transparent.
                     material.color = color;
                 }

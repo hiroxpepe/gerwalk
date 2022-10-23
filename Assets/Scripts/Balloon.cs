@@ -62,10 +62,6 @@ namespace Studio.MeowToon {
 
         // Start is called before the first frame update.
         void Start() {
-            // Update is called once per frame.
-            this.UpdateAsObservable().Subscribe(_ => {
-            });
-
             // FixedUpdate is called just before each physics update.
             this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.explode).Subscribe(_ => {
                 gameObject.Get<SphereCollider>().enabled = false; // collider detection off. *passed on to children.
@@ -101,16 +97,16 @@ namespace Studio.MeowToon {
         /// initialize pieces.
         /// </summary>
         void initializePiece() {
-            var number = _explode_param.number;
-            var scale = _explode_param.scale;
-            for (var i = 0; i < number; i++) {
-                var piece = Instantiate(_item_object);
-                var coin = piece.Get<Coin>();
+            int number = _explode_param.number;
+            float scale = _explode_param.scale;
+            for (int i = 0; i < number; i++) {
+                GameObject piece = Instantiate(_item_object);
+                Coin coin = piece.Get<Coin>();
                 coin.OnDestroy += () => {
                     _game_system.IncrementPoints();
                 };
-                var position = transform.position;
-                var shift = i % 4;
+                Vector3 position = transform.position;
+                int shift = i % 4;
                 piece.transform.position = new Vector3( // set shifted position.
                     position.x + ((float) shift / 2.25f) - 0.65f,
                     position.y + ((float) shift / 1.0f) - 2.00f,
@@ -131,15 +127,15 @@ namespace Studio.MeowToon {
         /// explode pieces.
         /// </summary>
         void explodePiece() {
-            var force = _explode_param.force;
-            var scale = _explode_param.scale;
+            int force = _explode_param.force;
+            float scale = _explode_param.scale;
             foreach (Transform piece in transform) {
                 piece.parent = null;
                 piece.transform.localScale = new Vector3(scale * 2, scale * 2, scale * 2);
-                var random = new System.Random();
-                var min = -getRandomForce(force);
-                var max = getRandomForce(force);
-                var force_value = new Vector3(random.Next(min, max), random.Next(min, max), random.Next(min, max));
+                System.Random random = new System.Random();
+                int min = -getRandomForce(force);
+                int max = getRandomForce(force);
+                Vector3 force_value = new Vector3(random.Next(min, max), random.Next(min, max), random.Next(min, max));
                 piece.Get<Rigidbody>().useGravity = true;
                 piece.Get<Rigidbody>().isKinematic = false;
                 piece.Get<Rigidbody>().AddTorque(force_value, ForceMode.Impulse);
@@ -152,7 +148,7 @@ namespace Studio.MeowToon {
         /// get a random value for the force applied to the flying pieces.
         /// </summary>
         int getRandomForce(int force) {
-            var random = new System.Random();
+            System.Random random = new System.Random();
             return random.Next((int) force / 2, (int) force * 2); // range of 1/2 to 2 times the force.
         }
 
@@ -183,7 +179,7 @@ namespace Studio.MeowToon {
             /// returns an initialized instance.
             /// </summary>
             public static DoFixedUpdate getInstance() {
-                var instance = new DoFixedUpdate();
+                DoFixedUpdate instance = new();
                 instance.ResetMotion();
                 return instance;
             }

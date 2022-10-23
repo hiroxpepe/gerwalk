@@ -19,6 +19,7 @@ using static UnityEngine.GameObject;
 using UnityEngine.UI;
 using UniRx;
 using UniRx.Triggers;
+using static Studio.MeowToon.Utils;
 
 namespace Studio.MeowToon {
     /// <summary>
@@ -115,10 +116,6 @@ namespace Studio.MeowToon {
         // private Methods [verb]
 
         void changeSelectedColor() {
-            // create color.
-            Color yellow, white;
-            ColorUtility.TryParseHtmlString("#FFFF00", out yellow);
-            ColorUtility.TryParseHtmlString("#FFFFFF", out white);
             switch (_selected) {
                 case Env.MODE_EASY:
                     _easy.color = yellow;

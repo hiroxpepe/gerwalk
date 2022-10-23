@@ -53,13 +53,13 @@ namespace Studio.MeowToon {
 
             // get vehicle.
             _vehicle_object = Find(name: Env.VEHICLE_TYPE);
-            var vehicle = _vehicle_object.Get<Vehicle>();
+            Vehicle vehicle = _vehicle_object.Get<Vehicle>();
 
             /// <summary>
             /// vehicle updated.
             /// </summary>
             vehicle.Updated += (object sender, EvtArgs e) => {
-                var vehicle = sender as Vehicle;
+                Vehicle vehicle = sender as Vehicle;
                 if (vehicle is not null) {
                     if (e.Name.Equals(nameof(Vehicle.rotation))) { _vehicle_rotation = vehicle.rotation; return; }
                 }
@@ -68,21 +68,16 @@ namespace Studio.MeowToon {
             /// <summary>
             /// vehicle on flight.
             /// </summary>
-            vehicle.OnFlight += () => {
-                rb.useGravity = false;
-            };
+            vehicle.OnFlight += () => { rb.useGravity = false; };
 
             /// <summary>
             /// vehicle on grounded.
             /// </summary>
-            vehicle.OnGrounded += () => {
-                rb.useGravity = true;
-            };
+            vehicle.OnGrounded += () => { rb.useGravity = true; };
         }
 
         // Start is called before the first frame update.
         void Start() {
-
             /// <remarks>
             /// Rigidbody should be only used in FixedUpdate.
             /// </remarks>
@@ -94,7 +89,7 @@ namespace Studio.MeowToon {
             // Update is called once per frame.
             float move_time_count = 0f;
             this.UpdateAsObservable().Subscribe(_ => {
-                var vehicle_position = _vehicle_object.transform.position;
+                Vector3 vehicle_position = _vehicle_object.transform.position;
                 Direction vehicle_direction = getDirection(_vehicle_object.transform.forward);
                 Vector3 move_position = getWingmanPosition(vehicle_direction);
                 if (vehicle_direction != _vehicle_previous_direction) {
@@ -104,9 +99,6 @@ namespace Studio.MeowToon {
                 move_time_count = moveWingmanPosition(move_position, move_time_count);
                 transform.forward = _vehicle_object.transform.forward;
                 transform.rotation = _vehicle_rotation;
-            });
-
-            this.FixedUpdateAsObservable().Subscribe(_ => {
             });
         }
 
@@ -176,9 +168,9 @@ namespace Studio.MeowToon {
         /// returns an enum of the vehicle's direction.
         /// </summary>
         Direction getDirection(Vector3 forward_vector) {
-            var forward_x = (float)Math.Round(forward_vector.x);
-            var forward_y = (float)Math.Round(forward_vector.y);
-            var forward_z = (float)Math.Round(forward_vector.z);
+            float forward_x = (float) Math.Round(forward_vector.x);
+            float forward_y = (float) Math.Round(forward_vector.y);
+            float forward_z = (float) Math.Round(forward_vector.z);
             if (forward_x == 0 && forward_z == 1) { return Direction.PositiveZ; } // z-axis positive.
             if (forward_x == 0 && forward_z == -1) { return Direction.NegativeZ; } // z-axis negative.
             if (forward_x == 1 && forward_z == 0) { return Direction.PositiveX; } // x-axis positive.
