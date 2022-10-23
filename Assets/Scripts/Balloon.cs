@@ -62,10 +62,6 @@ namespace Studio.MeowToon {
 
         // Start is called before the first frame update.
         void Start() {
-            // Update is called once per frame.
-            this.UpdateAsObservable().Subscribe(_ => {
-            });
-
             // FixedUpdate is called just before each physics update.
             this.FixedUpdateAsObservable().Where(_ => _do_fixed_update.explode).Subscribe(_ => {
                 gameObject.Get<SphereCollider>().enabled = false; // collider detection off. *passed on to children.

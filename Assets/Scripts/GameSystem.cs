@@ -44,9 +44,7 @@ namespace Studio.MeowToon {
         /// <summary>
         /// can use points.
         /// </summary>
-        public bool usePoint {
-            get => Status.pointTotal > 0;
-        }
+        public bool usePoint { get => Status.pointTotal > 0; }
 
         /// <summary>
         /// target total.
@@ -61,9 +59,7 @@ namespace Studio.MeowToon {
         /// <summary>
         /// beat the level.
         /// </summary>
-        public bool beatLevel {
-            get => Status.targetRemain == 0;
-        }
+        public bool beatLevel { get => Status.targetRemain == 0; }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Events [verb, verb phrase]
@@ -110,16 +106,12 @@ namespace Studio.MeowToon {
                 /// <summary>
                 /// level pause on.
                 /// </summary>
-                level.OnPauseOn += () => {
-                    OnPauseOn?.Invoke();
-                };
+                level.OnPauseOn += () => { OnPauseOn?.Invoke(); };
 
                 /// <summary>
                 /// level pause off.
                 /// </summary>
-                level.OnPauseOff += () => {
-                    OnPauseOff?.Invoke();
-                };
+                level.OnPauseOff += () => { OnPauseOff?.Invoke(); };
             }
 
             if (HasVehicle()) {
@@ -130,17 +122,13 @@ namespace Studio.MeowToon {
                 /// vehicle on gain energy.
                 /// spend points.
                 /// </summary>
-                vehicle.OnGainEnergy += () => {
-                    DecrementPoints();
-                };
+                vehicle.OnGainEnergy += () => { DecrementPoints(); };
 
                 /// <summary>
                 /// vehicle on lose energy.
                 /// spend points.
                 /// </summary>
-                vehicle.OnLoseEnergy += () => {
-                    DecrementPoints();
-                };
+                vehicle.OnLoseEnergy += () => { DecrementPoints(); };
             }
         }
 
@@ -165,8 +153,7 @@ namespace Studio.MeowToon {
             static Status() {
                 _mode = Env.MODE_NORMAL;
                 _point_total = 100;
-                _target_total = 0;
-                _target_remain = 0;
+                _target_total = _target_remain = 0;
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////////

@@ -57,10 +57,6 @@ namespace Studio.MeowToon {
 
         // Start is called before the first frame update.
         void Start() {
-            // Update is called once per frame.
-            this.UpdateAsObservable().Subscribe(_ => {
-            });
-
             // LateUpdate is called after all Update functions have been called.
             this.LateUpdateAsObservable().Subscribe(_ => {
                 /// <summary>

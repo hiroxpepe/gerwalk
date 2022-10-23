@@ -119,9 +119,8 @@ namespace Studio.MeowToon {
         // private Methods [verb]
 
         void mapGamepad() {
-
             // check a physical gamepad connected.
-            var controller_names = Input.GetJoystickNames();
+            string[] controller_names = Input.GetJoystickNames();
             if (controller_names.Length == 0 || controller_names[0] == "") {
                 _v_controller_object.SetActive(true);
                 _use_v_controller = true;

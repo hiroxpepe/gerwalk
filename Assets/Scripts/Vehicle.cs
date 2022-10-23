@@ -97,25 +97,16 @@ namespace Studio.MeowToon {
         /// <summary>
         /// current speed of the vehicle object to flight.
         /// </summary>
-        public float airSpeed {
-            get => _air_speed;
-            set { _air_speed = value; Updated?.Invoke(this, new(nameof(airSpeed))); }
-        }
+        public float airSpeed { get => _air_speed; set { _air_speed = value; Updated?.Invoke(this, new(nameof(airSpeed))); }}
 
         /// current vertical speed of the vehicle object to flight.
         /// </summary>
-        public float verticalSpeed { 
-            get => _vertical_speed;
-            set { _vertical_speed = value; Updated?.Invoke(this, new(nameof(verticalSpeed))); }
-        }
+        public float verticalSpeed { get => _vertical_speed; set { _vertical_speed = value; Updated?.Invoke(this, new(nameof(verticalSpeed))); }}
 
         /// <summary>
         /// elapsed time after takeoff.
         /// </summary>
-        public float flightTime { 
-            get => _flight_time;
-            set { _flight_time = value; Updated?.Invoke(this, new(nameof(flightTime))); }
-        }
+        public float flightTime { get => _flight_time; set { _flight_time = value; Updated?.Invoke(this, new(nameof(flightTime))); }}
 
         /// <summary>
         /// total energy.
@@ -123,10 +114,7 @@ namespace Studio.MeowToon {
         /// <remarks>
         /// for development.
         /// </remarks>
-        public float total {
-            get => _total;
-            set { _total = value; Updated?.Invoke(this, new(nameof(total))); }
-        }
+        public float total { get => _total; set { _total = value; Updated?.Invoke(this, new(nameof(total))); }}
 
         /// <summary>
         /// current power of the vehicle to flight.
@@ -134,34 +122,22 @@ namespace Studio.MeowToon {
         /// <remarks>
         /// for development.
         /// </remarks>
-        public float power { 
-            get => _power;
-            set { _power = value; Updated?.Invoke(this, new(nameof(power))); }
-        }
+        public float power { get => _power; set { _power = value; Updated?.Invoke(this, new(nameof(power))); }}
 
         /// <summary>
         /// use or not use lift spoiler.
         /// </summary>
-        public bool useLiftSpoiler { 
-            get => _use_lift_spoiler;
-            set { _use_lift_spoiler = value; Updated?.Invoke(this, new(nameof(useLiftSpoiler))); }
-        }
+        public bool useLiftSpoiler { get => _use_lift_spoiler; set { _use_lift_spoiler = value; Updated?.Invoke(this, new(nameof(useLiftSpoiler))); }}
 
         /// <summary>
         /// transform position.
         /// </summary>
-        public Vector3 position {
-            get => transform.position;
-            set { transform.position = value; Updated?.Invoke(this, new(nameof(position))); }
-        }
+        public Vector3 position { get => transform.position; set { transform.position = value; Updated?.Invoke(this, new(nameof(position))); }}
 
         /// <summary>
         /// transform rotation.
         /// </summary>
-        public Quaternion rotation {
-            get => transform.rotation;
-            set { transform.rotation = value; Updated?.Invoke(this, new(nameof(rotation))); }
-        }
+        public Quaternion rotation { get => transform.rotation; set { transform.rotation = value; Updated?.Invoke(this, new(nameof(rotation))); }}
 
         /// <summary>
         /// value of heading angle.
@@ -726,12 +702,8 @@ namespace Studio.MeowToon {
         /// </summary>
         void onChanged(object sender, EvtArgs  e) {
             if (sender as Energy is not null) {
-                if (e.Name.Equals(nameof(Energy.total))) {
-                    total = _energy.total;
-                }
-                if (e.Name.Equals(nameof(Energy.power))) {
-                    power = _energy.power;
-                }
+                if (e.Name.Equals(nameof(Energy.total))) { total = _energy.total; }
+                if (e.Name.Equals(nameof(Energy.power))) { power = _energy.power; }
             }
         }
 
@@ -755,34 +727,17 @@ namespace Studio.MeowToon {
             ///////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjectives] 
 
-            public bool grounded {
-                get => _grounded;
-                set => _grounded = value;
-            }
+            public bool grounded { get => _grounded; set => _grounded = value; }
 
-            public bool flighting {
-                get => !_grounded;
-            }
+            public bool flighting { get => !_grounded; }
 
-            public bool stalling {
-                get => _stall;
-                set => _stall = value;
-            }
+            public bool stalling { get => _stall; set => _stall = value; }
 
-            public bool banking {
-                get => _banking;
-                set => _banking = value;
-            }
+            public bool banking { get => _banking; set => _banking = value; }
 
-            public bool needLeftQuickRoll {
-                get => _need_left_quick_roll;
-                set => _need_left_quick_roll = value;
-            }
+            public bool needLeftQuickRoll { get => _need_left_quick_roll; set => _need_left_quick_roll = value; }
 
-            public bool needRightQuickRoll {
-                get => _need_right_quick_roll;
-                set => _need_right_quick_roll = value;
-            }
+            public bool needRightQuickRoll { get => _need_right_quick_roll; set => _need_right_quick_roll = value; }
 
             ///////////////////////////////////////////////////////////////////////////////////////
             // Constructor
@@ -822,10 +777,15 @@ namespace Studio.MeowToon {
             // Properties [noun, adjectives] 
 
             public bool idol { get => _idol; }
+
             public bool run { get => _run; }
+
             public bool walk { get => _walk; }
+
             public bool jump { get => _jump; }
+
             public bool backward { get => _backward; }
+
             public bool flight { get => _flight; }
 
             ///////////////////////////////////////////////////////////////////////////////////////
@@ -841,54 +801,27 @@ namespace Studio.MeowToon {
             ///////////////////////////////////////////////////////////////////////////////////////////
             // public Methods [verb]
 
-            public void ApplyIdol() {
-                _idol = true;
-                _run = _walk = _backward = _jump = _flight = false;
-            }
+            public void ApplyIdol() { _idol = true; _run = _walk = _backward = _jump = _flight = false; }
 
-            public void ApplyRun() {
-                _idol = _walk = _backward = _flight = false;
-                _run = true;
-            }
+            public void ApplyRun() { _idol = _walk = _backward = _flight = false; _run = true; }
 
-            public void CancelRun() {
-                _run = false;
-            }
+            public void CancelRun() { _run = false; }
 
-            public void ApplyWalk() {
-                _idol = _run = _backward = _flight = false;
-                _walk = true;
-            }
+            public void ApplyWalk() { _idol = _run = _backward = _flight = false; _walk = true; }
 
-            public void CancelWalk() {
-                _walk = false;
-            }
+            public void CancelWalk() { _walk = false; }
 
-            public void ApplyBackward() {
-                _idol = _run = _walk = _flight = false;
-                _backward = true;
-            }
+            public void ApplyBackward() { _idol = _run = _walk = _flight = false; _backward = true; }
 
-            public void CancelBackward() {
-                _backward = false;
-            }
+            public void CancelBackward() { _backward = false; }
 
-            public void ApplyJump() {
-                _jump = true;
-            }
+            public void ApplyJump() { _jump = true; }
 
-            public void CancelJump() {
-                _jump = false;
-            }
+            public void CancelJump() { _jump = false; }
 
-            public void ApplyFlight() {
-                _idol = _walk = _run = _backward = false;
-                _flight = true;
-            }
+            public void ApplyFlight() { _idol = _walk = _run = _backward = false; _flight = true; }
 
-            public void CancelFlight() {
-                _flight = false;
-            }
+            public void CancelFlight() { _flight = false;}
         }
 
         #endregion
@@ -900,20 +833,21 @@ namespace Studio.MeowToon {
             ///////////////////////////////////////////////////////////////////////////////////////
             // Fields [noun, adjectives] 
 
-            float _current_speed;
-            float _previous_speed;
-            float _forward_speed_limit;
-            float _run_speed_limit;
-            float _backward_speed_limit;
+            float _current_speed, _previous_speed, _forward_speed_limit, _run_speed_limit, _backward_speed_limit;
 
             ///////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjectives] 
 
             public float currentSpeed { get => _current_speed; set => _current_speed = value; }
+
             public float previousSpeed { get => _previous_speed; set => _previous_speed = value; }
+
             public bool canWalk { get => _current_speed < _forward_speed_limit; }
+
             public bool canRun { get => _current_speed < _run_speed_limit; }
+
             public bool canBackward { get => _current_speed < _backward_speed_limit; }
+
             public bool freeze {
                 get {
                     if (Math.Round(_previous_speed, 2) < 0.02 &&
@@ -954,17 +888,11 @@ namespace Studio.MeowToon {
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Fields [noun, adjectives] 
 
-            float _flight_power_base, _default_flight_power_base, _calculated_power;
-
-            float _altitude;
-
-            Queue<float> _previous_altitudes = new();
-
-            float _speed;
+            float _flight_power_base, _default_flight_power_base, _calculated_power, _altitude, _speed, _pitch;
 
             float _threshold = 1f; // FIXME:
 
-            float _pitch;
+            Queue<float> _previous_altitudes = new();
 
             bool _has_landed = false;
 
@@ -991,26 +919,17 @@ namespace Studio.MeowToon {
             /// <summary>
             /// speed in flighting.
             /// </summary>
-            public float speed {
-                get => _speed;
-                set { _speed = value; Updated?.Invoke(this, new(nameof(total))); }
-            }
+            public float speed { get => _speed; set { _speed = value; Updated?.Invoke(this, new(nameof(total))); }}
 
             /// <summary>
             /// total energy.
             /// </summary>
-            public float total {
-                get => _altitude + _speed;
-            }
+            public float total { get => _altitude + _speed; }
 
             /// <summary>
             /// power for velocity.
             /// </summary>
-            public float power {
-                get {
-                    return _calculated_power;
-                }
-            }
+            public float power { get => _calculated_power; }
 
             /// <summary>
             /// whether it has landed.
@@ -1028,9 +947,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// pitch
             /// </summary>
-            public float pitch {
-                set => _pitch = value;
-            }
+            public float pitch { set => _pitch = value; }
 
             /// <summary>
             /// ratio value to adjust pitch, roll, yaw speed.

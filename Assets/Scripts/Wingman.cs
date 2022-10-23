@@ -68,21 +68,16 @@ namespace Studio.MeowToon {
             /// <summary>
             /// vehicle on flight.
             /// </summary>
-            vehicle.OnFlight += () => {
-                rb.useGravity = false;
-            };
+            vehicle.OnFlight += () => { rb.useGravity = false; };
 
             /// <summary>
             /// vehicle on grounded.
             /// </summary>
-            vehicle.OnGrounded += () => {
-                rb.useGravity = true;
-            };
+            vehicle.OnGrounded += () => { rb.useGravity = true; };
         }
 
         // Start is called before the first frame update.
         void Start() {
-
             /// <remarks>
             /// Rigidbody should be only used in FixedUpdate.
             /// </remarks>
@@ -104,9 +99,6 @@ namespace Studio.MeowToon {
                 move_time_count = moveWingmanPosition(move_position, move_time_count);
                 transform.forward = _vehicle_object.transform.forward;
                 transform.rotation = _vehicle_rotation;
-            });
-
-            this.FixedUpdateAsObservable().Subscribe(_ => {
             });
         }
 

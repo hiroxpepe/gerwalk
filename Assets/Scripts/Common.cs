@@ -72,10 +72,6 @@ namespace Studio.MeowToon {
                     Destroy(gameObject); // so it is deleted.
                 }
             });
-
-            // FixedUpdate is called just before each physics update.
-            this.FixedUpdateAsObservable().Subscribe(_ => {
-            });
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////

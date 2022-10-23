@@ -111,30 +111,22 @@ namespace Studio.MeowToon {
             /// <summary>
             /// game system pause on.
             /// </summary>
-            _game_system.OnPauseOn += () => {
-                _message_text.text = Env.MESSAGE_GAME_PAUSE;
-            };
+            _game_system.OnPauseOn += () => { _message_text.text = Env.MESSAGE_GAME_PAUSE; };
 
             /// <summary>
             /// game system pause off.
             /// </summary>
-            _game_system.OnPauseOff += () => {
-                _message_text.text = string.Empty;
-            };
+            _game_system.OnPauseOff += () => { _message_text.text = string.Empty; };
 
             /// <summary>
             /// game system increment points.
             /// </summary>
-            _game_system.OnIncrementPoints += () => {
-                updateGameStatus();
-            };
+            _game_system.OnIncrementPoints += () => { updateGameStatus(); };
 
             /// <summary>
             /// game system decrement points.
             /// </summary>
-            _game_system.OnDecrementPoints += () => {
-                updateGameStatus();
-            };
+            _game_system.OnDecrementPoints += () => { updateGameStatus(); };
 
             // get vehicle.
             Vehicle vehicle = Find(name: Env.VEHICLE_TYPE).Get<Vehicle>();
@@ -175,9 +167,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// came back home.
             /// </summary>
-            home.OnCameBack += () => {
-                _message_text.text = Env.MESSAGE_LEVEL_CLEAR;
-            };
+            home.OnCameBack += () => { _message_text.text = Env.MESSAGE_LEVEL_CLEAR; };
         }
 
         // Start is called before the first frame update

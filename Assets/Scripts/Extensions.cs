@@ -15,8 +15,6 @@
 
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using static UnityEngine.GameObject;
 
 namespace Studio.MeowToon {
     /// <summary>
@@ -55,7 +53,6 @@ namespace Studio.MeowToon {
         /// whether the Collision's name contains the argument string.
         /// </summary>
         public static bool Like(this Collision self, string type) {
-            var h = self.gameObject.name.Contains(type);
             return self.gameObject.name.Contains(type);
         }
 
@@ -106,7 +103,7 @@ namespace Studio.MeowToon {
         /// sets Material color to opaque.
         /// </summary>
         public static Material ToOpaque(this Material self, float time = 0) {
-            var color = self.color;
+            Color color = self.color;
             color.a = 0; // to opaque.
             self.color = color;
             return self;
@@ -116,7 +113,7 @@ namespace Studio.MeowToon {
         /// sets Material color to transparent.
         /// </summary>
         public static Material ToTransparent(this Material self, float time = 0) {
-            var color = self.color;
+            Color color = self.color;
             color.a = 1; // to transparent.
             self.color = color;
             return self;

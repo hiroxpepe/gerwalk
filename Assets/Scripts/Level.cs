@@ -133,7 +133,7 @@ namespace Studio.MeowToon {
             /// get targets count.
             /// </summary>
             int getTargetsCount() {
-                var targets = GameObject.Find(name: Env.TARGETS_OBJECT);
+                GameObject targets = Find(name: Env.TARGETS_OBJECT);
                 Transform targets_transform = targets.GetComponentInChildren<Transform>();
                 return targets_transform.childCount;
             }

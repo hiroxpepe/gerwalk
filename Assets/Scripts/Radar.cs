@@ -55,11 +55,7 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields
 
-        GameObject _vehicle_object;
-
-        GameObject _home_object;
-
-        GameObject _targets_object;
+        GameObject _vehicle_object, _home_object, _targets_object;
 
         float _fast_cycle = 0.25f;
 
