@@ -15,8 +15,11 @@
 
 using UnityEngine;
 using static UnityEngine.GameObject;
+using static UnityEngine.Quaternion;
 using UniRx;
 using UniRx.Triggers;
+
+using static Studio.MeowToon.Env;
 
 namespace Studio.MeowToon {
     /// <summary>
@@ -56,20 +59,20 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            _vehicle_object = Find(name: Env.VEHICLE_TYPE);
+            _vehicle_object = Find(name: VEHICLE_TYPE);
         }
 
         // Start is called before the first frame update.
         void Start() {
             // LateUpdate is called after all Update functions have been called.
-            this.LateUpdateAsObservable().Subscribe(_ => {
+            this.LateUpdateAsObservable().Subscribe(onNext: _ => {
                 /// <summary>
                 /// set altitude.
                 /// </summary>
                 const float VEHICLE_HEIGHT_OFFSET = 0.0f;
                 float altitude = _vehicle_object.transform.position.y - VEHICLE_HEIGHT_OFFSET;
-                _long_needle_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (DIVIDE_CIRCLE_LONG / altitude)));
-                _short_needle_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (DIVIDE_CIRCLE_SHORT / altitude)));
+                _long_needle_object.transform.rotation = Euler(x: 0f, y: 0f, z: -(360 / (DIVIDE_CIRCLE_LONG / altitude)));
+                _short_needle_object.transform.rotation = Euler(x: 0f, y: 0f, z: -(360 / (DIVIDE_CIRCLE_SHORT / altitude)));
             });
         }
     }

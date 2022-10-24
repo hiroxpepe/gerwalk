@@ -41,14 +41,14 @@ namespace Studio.MeowToon {
         /// clear automatically after `n` seconds.
         /// </summary>
         public float autoDestroyAfter { 
-            set { _auto_destroy_param.enable = true;  _auto_destroy_param.limit = getRandomLimit(value); } 
+            set { _auto_destroy_param.enable = true;  _auto_destroy_param.limit = getRandomLimit(limit: value); } 
         }
 
         /// <summary>
         /// clear automatically after 2 seconds.
         /// </summary>
         public bool autoDestroy { 
-            set {  _auto_destroy_param.enable = value; _auto_destroy_param.limit = getRandomLimit(2.0f); } 
+            set {  _auto_destroy_param.enable = value; _auto_destroy_param.limit = getRandomLimit(limit: 2.0f); } 
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,7 +63,7 @@ namespace Studio.MeowToon {
         // Start is called before the first frame update.
         protected void Start() {
             // Update is called once per frame.
-            this.UpdateAsObservable().Subscribe(_ => {
+            this.UpdateAsObservable().Subscribe(onNext: _ => {
                 doAutoDestroy(); // automatic deletion.
                 if (transform.position.y < -100f) { // less than -100m, it has fallen from the level,
                     Destroy(gameObject); // so it is deleted.
@@ -78,7 +78,7 @@ namespace Studio.MeowToon {
         /// random number of seconds to remove automatically.
         /// </summary>
         float getRandomLimit(float limit) {
-            return _random.Next(2, (int)limit * 25); // from 2 seconds to (limit * 25) seconds.
+            return _random.Next(minValue: 2, maxValue: (int)limit * 25); // from 2 seconds to (limit * 25) seconds.
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace Studio.MeowToon {
                 MeshRenderer render = gameObject.Get<MeshRenderer>();
                 Material[] material_array = render.materials;
                 foreach (Material material in material_array) {
-                    Utils.SetRenderingMode(material, RenderingMode.Fade);
+                    Utils.SetRenderingMode(material: material, rendering_mode: RenderingMode.Fade);
                     Color color = material.color;
                     color.a = _auto_destroy_param.limit - _auto_destroy_param.second; // gradually becoming transparent.
                     material.color = color;

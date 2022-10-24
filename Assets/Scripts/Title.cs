@@ -18,6 +18,8 @@ using static UnityEngine.GameObject;
 using UniRx;
 using UniRx.Triggers;
 
+using static Studio.MeowToon.Env;
+
 namespace Studio.MeowToon {
     /// <summary>
     /// title scene
@@ -38,7 +40,7 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            _game_system = Find(name: Env.GAME_SYSTEM).Get<GameSystem>();
+            _game_system = Find(name: GAME_SYSTEM).Get<GameSystem>();
         }
 
         // Start is called before the first frame update
@@ -48,15 +50,15 @@ namespace Studio.MeowToon {
             /// <summary>
             /// open select.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => _select_button.wasPressedThisFrame).Subscribe(_ => {
-                SceneManager.LoadScene(Env.SCENE_SELECT);
+            this.UpdateAsObservable().Where(predicate: _ => _select_button.wasPressedThisFrame).Subscribe(onNext: _ => {
+                SceneManager.LoadScene(sceneName: SCENE_SELECT);
             });
 
             /// <summary>
             /// start level.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => (_start_button.wasPressedThisFrame || _a_button.wasPressedThisFrame)).Subscribe(_ => {
-                SceneManager.LoadScene(Env.SCENE_LEVEL_1);
+            this.UpdateAsObservable().Where(predicate: _ => (_start_button.wasPressedThisFrame || _a_button.wasPressedThisFrame)).Subscribe(onNext: _ => {
+                SceneManager.LoadScene(sceneName: SCENE_LEVEL_1);
             });
         }
     }

@@ -16,8 +16,11 @@
 using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.GameObject;
+using static UnityEngine.Quaternion;
 using UniRx;
 using UniRx.Triggers;
+
+using static Studio.MeowToon.Env;
 
 namespace Studio.MeowToon {
     /// <summary>
@@ -68,9 +71,9 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            _vehicle_object = Find(name: Env.VEHICLE_TYPE);
-            _home_object = Find(name: Env.HOME_TYPE);
-            _targets_object = Find(name: Env.TARGETS_OBJECT);
+            _vehicle_object = Find(name: VEHICLE_TYPE);
+            _home_object = Find(name: HOME_TYPE);
+            _targets_object = Find(name: TARGETS_OBJECT);
         }
 
         // Start is called before the first frame update.
@@ -83,18 +86,18 @@ namespace Studio.MeowToon {
             mapTargetPositionsToRadar(create: true);
 
             // Update is called once per frame.
-            this.UpdateAsObservable().Subscribe(_ => {
+            this.UpdateAsObservable().Subscribe(onNext: _ => {
                 mapHomePositionsToRadar();
                 mapTargetPositionsToRadar(create: false);
             });
 
             // LateUpdate is called after all Update functions have been called.
-            this.LateUpdateAsObservable().Subscribe(_ => {
+            this.LateUpdateAsObservable().Subscribe(onNext: _ => {
                 /// <summary>
                 /// set the vehicle's y-axis to the radar direction's z-axis.
                 /// </summary>
                 Quaternion vehicle_rotation = _vehicle_object.transform.rotation;
-                _direction_object.transform.rotation = Quaternion.Euler(0f, 0f, vehicle_rotation.eulerAngles.y);
+                _direction_object.transform.rotation = Euler(x: 0f, y: 0f, z: vehicle_rotation.eulerAngles.y);
             });
         }
 
@@ -108,7 +111,7 @@ namespace Studio.MeowToon {
             // get home position from vehicle point of view.
             Vector3 home_position = _home_object.transform.position - _vehicle_object.transform.position;
             // map position to radar.
-            _home_mark_object.transform.localPosition = new Vector3(home_position.x * RANGE, home_position.z * RANGE, 0);
+            _home_mark_object.transform.localPosition = new Vector3(x: home_position.x * RANGE, y: home_position.z * RANGE, z: 0);
         }
 
         /// <summary>
@@ -120,8 +123,8 @@ namespace Studio.MeowToon {
             _time += Time.deltaTime;
 
             // get the value that repeats in cycle.
-            float fast_repeat_value = Mathf.Repeat(_time, _fast_cycle);
-            float slow_repeat_value = Mathf.Repeat(_time, _slow_cycle);
+            float fast_repeat_value = Mathf.Repeat(t: _time, length: _fast_cycle);
+            float slow_repeat_value = Mathf.Repeat(t: _time, length: _slow_cycle);
 
             // reset target mark.
             if (!create) {
@@ -137,9 +140,9 @@ namespace Studio.MeowToon {
                 GameObject target_mark = new();
                 if (create) {
                     // create target mark.
-                    target_mark = Instantiate(_target_mark_object);
+                    target_mark = Instantiate(original: _target_mark_object);
                     target_mark.name += $"_{idx}";
-                    target_mark.transform.SetParent(_direction_object.transform, false);
+                    target_mark.transform.SetParent(parent: _direction_object.transform, worldPositionStays: false);
                 } else if (!create) {
                     // get target mark.
                     target_mark = Find(name: $"RadarTarget(Clone)_{idx}"); // FIXME:
@@ -147,7 +150,7 @@ namespace Studio.MeowToon {
                 // get target position from vehicle point of view.
                 Vector3 target_position = target_transform.transform.position - _vehicle_object.transform.position;
                 // map positions to radar.
-                target_mark.transform.localPosition = new Vector3(target_position.x * RANGE, target_position.z * RANGE, 0);
+                target_mark.transform.localPosition = new Vector3(x: target_position.x * RANGE, y: target_position.z * RANGE, z: 0);
                 target_mark.Get<Image>().enabled = true;
 
                 // higher altitude targets blink slowly, and lower altitude targets blink faster.

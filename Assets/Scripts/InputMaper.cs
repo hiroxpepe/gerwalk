@@ -16,6 +16,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+using static UnityEngine.GameObject;
 using UniRx;
 using UniRx.Triggers;
 
@@ -90,25 +91,27 @@ namespace Studio.MeowToon {
         // Start is called before the first frame update
         protected void Start() {
             // get virtual controller object.
-            _v_controller_object = GameObject.Find(name: "VController");
+            _v_controller_object = Find(name: "VController");
 
             // Update is called once per frame.
-            this.UpdateAsObservable().Subscribe(_ => {
+            this.UpdateAsObservable().Subscribe(onNext: _ => {
                 mapGamepad();
             });
 
             #region mobile phone vibration.
 
             // vibrate the smartphone when the button is pressed.
-            this.UpdateAsObservable().Where(_ => _v_controller_object && _use_vibration &&
+            this.UpdateAsObservable().Where(predicate: _ => _v_controller_object && _use_vibration &&
                 (_a_button.wasPressedThisFrame || _b_button.wasPressedThisFrame || _x_button.wasPressedThisFrame || _y_button.wasPressedThisFrame ||
                 _up_button.wasPressedThisFrame || _down_button.wasPressedThisFrame || _left_button.wasPressedThisFrame || _right_button.wasPressedThisFrame ||
-                _left_1_button.wasPressedThisFrame || _right_1_button.wasPressedThisFrame || _select_button.wasPressedThisFrame || _start_button.wasPressedThisFrame)).Subscribe(_ => {
-                    AndroidVibrator.Vibrate(50L);
+                _left_1_button.wasPressedThisFrame || _right_1_button.wasPressedThisFrame || 
+                _select_button.wasPressedThisFrame || _start_button.wasPressedThisFrame)).Subscribe(onNext: _ => {
+                    AndroidVibrator.Vibrate(milliseconds: 50L);
             });
 
             // no vibration of the smartphone by pressing the start and X buttons at the same time.
-            this.UpdateAsObservable().Where(_ => (_x_button.isPressed && _start_button.wasPressedThisFrame) || (_x_button.wasPressedThisFrame && _start_button.isPressed)).Subscribe(_ => {
+            this.UpdateAsObservable().Where(predicate: _ => (_x_button.isPressed && _start_button.wasPressedThisFrame) || 
+                (_x_button.wasPressedThisFrame && _start_button.isPressed)).Subscribe(onNext: _ => {
                 _use_vibration = !_use_vibration;
             });
 
@@ -122,11 +125,11 @@ namespace Studio.MeowToon {
             // check a physical gamepad connected.
             string[] controller_names = Input.GetJoystickNames();
             if (controller_names.Length == 0 || controller_names[0] == "") {
-                _v_controller_object.SetActive(true);
+                _v_controller_object.SetActive(value: true);
                 _use_v_controller = true;
             }
             else {
-                _v_controller_object.SetActive(false);
+                _v_controller_object.SetActive(value: false);
                 _use_v_controller = false;
             }
 
