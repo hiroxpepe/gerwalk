@@ -15,8 +15,11 @@
 
 using UnityEngine;
 using static UnityEngine.GameObject;
+using static UnityEngine.Quaternion;
 using UniRx;
 using UniRx.Triggers;
+
+using static Studio.MeowToon.Env;
 
 namespace Studio.MeowToon {
     /// <summary>
@@ -55,22 +58,22 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            _vehicle_object = Find(name: Env.VEHICLE_TYPE);
+            _vehicle_object = Find(name: VEHICLE_TYPE);
         }
 
         // Start is called before the first frame update.
         void Start() {
             // LateUpdate is called after all Update functions have been called.
-            this.LateUpdateAsObservable().Subscribe(_ => {
+            this.LateUpdateAsObservable().Subscribe(onNext: _ => {
                 /// <summary>
                 /// set ADI.
                 /// </summary>
-                _direction_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (DIVIDE_CIRCLE / _vehicle_object.Get<Vehicle>().roll)));
-                _angle_object.transform.rotation = Quaternion.Euler(0f, 0f, -(360 / (DIVIDE_CIRCLE / _vehicle_object.Get<Vehicle>().roll)));
+                _direction_object.transform.rotation = Euler(x: 0f, y: 0f, z: -(360 / (DIVIDE_CIRCLE / _vehicle_object.Get<Vehicle>().roll)));
+                _angle_object.transform.rotation = Euler(x: 0f, y: 0f, z: -(360 / (DIVIDE_CIRCLE / _vehicle_object.Get<Vehicle>().roll)));
                 _angle_object.transform.localPosition = new Vector3(
-                    _angle_object.transform.localPosition.x,
-                    -_vehicle_object.Get<Vehicle>().pitch / ((float) (300f / 500f)),
-                    _angle_object.transform.localPosition.z
+                    x: _angle_object.transform.localPosition.x,
+                    y: -_vehicle_object.Get<Vehicle>().pitch / ((float) (300f / 500f)),
+                    z: _angle_object.transform.localPosition.z
                 );
             });
         }

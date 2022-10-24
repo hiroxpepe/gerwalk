@@ -16,6 +16,9 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.GameObject;
+
+using static Studio.MeowToon.Env;
 
 namespace Studio.MeowToon {
     /// <summary>
@@ -60,17 +63,17 @@ namespace Studio.MeowToon {
         // static Constructor
 
         static Utils() {
-            ColorUtility.TryParseHtmlString(Env.COLOR_RED, out _red);
-            ColorUtility.TryParseHtmlString(Env.COLOR_ORANGE, out _orange);
-            ColorUtility.TryParseHtmlString(Env.COLOR_YELLOW, out _yellow);
-            ColorUtility.TryParseHtmlString(Env.COLOR_LIME, out _lime);
-            ColorUtility.TryParseHtmlString(Env.COLOR_GREEN, out _green);
-            ColorUtility.TryParseHtmlString(Env.COLOR_CYAN, out _cyan);
-            ColorUtility.TryParseHtmlString(Env.COLOR_AZURE, out _azure);
-            ColorUtility.TryParseHtmlString(Env.COLOR_BLUE, out _blue);
-            ColorUtility.TryParseHtmlString(Env.COLOR_PURPLE, out _purple);
-            ColorUtility.TryParseHtmlString(Env.COLOR_MAGENTA, out _magenta);
-            ColorUtility.TryParseHtmlString(Env.COLOR_WHITE, out _white);
+            ColorUtility.TryParseHtmlString(htmlString: COLOR_RED, color: out _red);
+            ColorUtility.TryParseHtmlString(htmlString: COLOR_ORANGE, color: out _orange);
+            ColorUtility.TryParseHtmlString(htmlString: COLOR_YELLOW, color: out _yellow);
+            ColorUtility.TryParseHtmlString(htmlString: COLOR_LIME, color: out _lime);
+            ColorUtility.TryParseHtmlString(htmlString: COLOR_GREEN, color: out _green);
+            ColorUtility.TryParseHtmlString(htmlString: COLOR_CYAN, color: out _cyan);
+            ColorUtility.TryParseHtmlString(htmlString: COLOR_AZURE, color: out _azure);
+            ColorUtility.TryParseHtmlString(htmlString: COLOR_BLUE, color: out _blue);
+            ColorUtility.TryParseHtmlString(htmlString: COLOR_PURPLE, color: out _purple);
+            ColorUtility.TryParseHtmlString(htmlString: COLOR_MAGENTA, color: out _magenta);
+            ColorUtility.TryParseHtmlString(htmlString: COLOR_WHITE, color: out _white);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -97,7 +100,7 @@ namespace Studio.MeowToon {
         /// has level.
         /// </summary>
         public static bool HasLevel() {
-            GameObject game_object = GameObject.Find(name: Env.LEVEL_TYPE);
+            GameObject game_object = Find(name: LEVEL_TYPE);
             if (game_object is not null) {
                 return true;
             }
@@ -108,7 +111,7 @@ namespace Studio.MeowToon {
         /// has vehicle.
         /// </summary>
         public static bool HasVehicle() {
-            GameObject game_object = GameObject.Find(name: Env.VEHICLE_TYPE);
+            GameObject game_object = Find(name: VEHICLE_TYPE);
             if (game_object is not null) {
                 return true;
             }
@@ -182,7 +185,7 @@ namespace Studio.MeowToon {
 #endif
         public static void Vibrate(long milliseconds) {
             if (isAndroid()) {
-                vibrator.Call("vibrate", milliseconds);
+                vibrator.Call(methodName: "vibrate", args: milliseconds);
             }
             else {
                 Handheld.Vibrate();

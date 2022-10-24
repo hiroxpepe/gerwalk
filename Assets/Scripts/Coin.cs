@@ -18,6 +18,8 @@ using System.Linq;
 using UniRx;
 using UniRx.Triggers;
 
+using static Studio.MeowToon.Env;
+
 namespace Studio.MeowToon {
     /// <summary>
     /// item coin class
@@ -43,7 +45,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// wwhen being touched vehicle.
             /// </summary>
-            this.OnCollisionEnterAsObservable().Where(x => x.Like(Env.VEHICLE_TYPE)).Subscribe(x => {
+            this.OnCollisionEnterAsObservable().Where(predicate: x => x.Like(VEHICLE_TYPE)).Subscribe(onNext: x => {
                 OnDestroy?.Invoke();
                 Destroy(gameObject);
             });

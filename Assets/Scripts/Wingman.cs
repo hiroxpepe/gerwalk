@@ -19,6 +19,8 @@ using static UnityEngine.GameObject;
 using UniRx;
 using UniRx.Triggers;
 
+using static Studio.MeowToon.Env;
+
 namespace Studio.MeowToon {
     /// <summary>
     /// wingman class
@@ -52,7 +54,7 @@ namespace Studio.MeowToon {
             Rigidbody rb = transform.Get<Rigidbody>();
 
             // get vehicle.
-            _vehicle_object = Find(name: Env.VEHICLE_TYPE);
+            _vehicle_object = Find(name: VEHICLE_TYPE);
             Vehicle vehicle = _vehicle_object.Get<Vehicle>();
 
             /// <summary>
@@ -84,19 +86,19 @@ namespace Studio.MeowToon {
             Rigidbody rb = transform.Get<Rigidbody>();
 
             // FIXME: no use.
-            _vehicle_previous_direction = getDirection(_vehicle_object.transform.forward);
+            _vehicle_previous_direction = getDirection(forward_vector: _vehicle_object.transform.forward);
 
             // Update is called once per frame.
             float move_time_count = 0f;
-            this.UpdateAsObservable().Subscribe(_ => {
+            this.UpdateAsObservable().Subscribe(onNext: _ => {
                 Vector3 vehicle_position = _vehicle_object.transform.position;
-                Direction vehicle_direction = getDirection(_vehicle_object.transform.forward);
-                Vector3 move_position = getWingmanPosition(vehicle_direction);
+                Direction vehicle_direction = getDirection(forward_vector: _vehicle_object.transform.forward);
+                Vector3 move_position = getWingmanPosition(direction: vehicle_direction);
                 if (vehicle_direction != _vehicle_previous_direction) {
                     _vehicle_previous_direction = vehicle_direction;
                     move_time_count = 0f; // reset time count.
                 }
-                move_time_count = moveWingmanPosition(move_position, move_time_count);
+                move_time_count = moveWingmanPosition(move_position: move_position, time_count: move_time_count);
                 transform.forward = _vehicle_object.transform.forward;
                 transform.rotation = _vehicle_rotation;
             });
@@ -110,7 +112,7 @@ namespace Studio.MeowToon {
         /// </summary>
         Vector3 getWingmanPosition(Direction direction) {
             const float OFFSET_VALUE = 1.25f;
-            Vector3 move_position = new(0f, 0f, 0f);
+            Vector3 move_position = new(x: 0f, y: 0f, z: 0f);
             // z-axis positive.
             if (direction == Direction.PositiveZ ) {
                 move_position = new(
@@ -160,7 +162,7 @@ namespace Studio.MeowToon {
         /// </summary>
         float moveWingmanPosition(Vector3 move_position, float time_count) {
             time_count += Time.deltaTime;
-            transform.position = Vector3.Slerp(transform.position, move_position, time_count);
+            transform.position = Vector3.Slerp(a: transform.position, b: move_position, t: time_count);
             return time_count;
         }
 

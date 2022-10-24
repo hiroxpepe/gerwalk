@@ -16,6 +16,8 @@
 using System;
 using UnityEngine;
 using static UnityEngine.GameObject;
+
+using static Studio.MeowToon.Env;
 using static Studio.MeowToon.Utils;
 
 namespace Studio.MeowToon {
@@ -97,11 +99,11 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            Application.targetFrameRate = Env.FPS;
+            Application.targetFrameRate = FPS;
 
             if (HasLevel()) {
                 // get level.
-                Level level = Find(name: Env.LEVEL_TYPE).Get<Level>();
+                Level level = Find(name: LEVEL_TYPE).Get<Level>();
 
                 /// <summary>
                 /// level pause on.
@@ -116,7 +118,7 @@ namespace Studio.MeowToon {
 
             if (HasVehicle()) {
                 // get vehicle.
-                Vehicle vehicle = Find(name: Env.VEHICLE_TYPE).Get<Vehicle>();
+                Vehicle vehicle = Find(name: VEHICLE_TYPE).Get<Vehicle>();
 
                 /// <summary>
                 /// vehicle on gain energy.
@@ -151,7 +153,7 @@ namespace Studio.MeowToon {
             // static Constructor
 
             static Status() {
-                _mode = Env.MODE_NORMAL;
+                _mode = MODE_NORMAL;
                 _point_total = 100;
                 _target_total = _target_remain = 0;
             }

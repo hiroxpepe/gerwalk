@@ -20,6 +20,8 @@ using static UnityEngine.Vector3;
 using UniRx;
 using UniRx.Triggers;
 
+using static Studio.MeowToon.Env;
+
 namespace Studio.MeowToon {
     /// <summary>
     /// camera controller
@@ -68,21 +70,21 @@ namespace Studio.MeowToon {
             /// <summary>
             /// rotate the camera view.
             /// </summary>
-            this.UpdateAsObservable().Subscribe(_ => {
+            this.UpdateAsObservable().Subscribe(onNext: _ => {
                 rotateView();
             });
 
             /// <summary>
             /// reset the camera view.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => _right_stick_button.wasPressedThisFrame).Subscribe(_ => {
+            this.UpdateAsObservable().Where(predicate: _ => _right_stick_button.wasPressedThisFrame).Subscribe(onNext: _ => {
                 resetRotateView();
             });
 
             /// <summary>
             /// when touching the back wall.
             /// </summary>
-            this.OnTriggerEnterAsObservable().Where(x => x.Like(Env.WALL_TYPE)).Subscribe(x => {
+            this.OnTriggerEnterAsObservable().Where(predicate: x => x.Like(WALL_TYPE)).Subscribe(onNext: x => {
                 List<Material> material_list = x.gameObject.Get<MeshRenderer>().materials.ToList();
                 material_list.ForEach(material => { material.ToOpaque(); });
             });
@@ -90,7 +92,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// when leaving the back wall.
             /// </summary>
-            this.OnTriggerExitAsObservable().Where(x => x.Like(Env.WALL_TYPE)).Subscribe(x => {
+            this.OnTriggerExitAsObservable().Where(predicate: x => x.Like(WALL_TYPE)).Subscribe(onNext: x => {
                 List<Material> material_list = x.gameObject.Get<MeshRenderer>().materials.ToList();
                 material_list.ForEach(material => { material.ToTransparent(); });
             });
@@ -98,7 +100,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// when touching the block.
             /// </summary>
-            this.OnTriggerEnterAsObservable().Where(x => x.Like(Env.BLOCK_TYPE)).Subscribe(x => {
+            this.OnTriggerEnterAsObservable().Where(predicate: x => x.Like(BLOCK_TYPE)).Subscribe(onNext: x => {
                 List<Material> material_list = x.gameObject.Get<MeshRenderer>().materials.ToList();
                 material_list.ForEach(material => { material.ToOpaque(); });
             });
@@ -106,7 +108,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// when leaving the block.
             /// </summary>
-            this.OnTriggerExitAsObservable().Where(x => x.Like(Env.BLOCK_TYPE)).Subscribe(x => {
+            this.OnTriggerExitAsObservable().Where(predicate: x => x.Like(BLOCK_TYPE)).Subscribe(onNext: x => {
                 List<Material> material_list = x.gameObject.Get<MeshRenderer>().materials.ToList();
                 material_list.ForEach(material => { material.ToTransparent(); });
             });
@@ -123,21 +125,21 @@ namespace Studio.MeowToon {
             Vector3 player_position = transform.parent.gameObject.transform.position;
             // up.
             if (_right_stick_up_button.isPressed) {
-                transform.RotateAround(player_position, right, 1.0f * ADJUST * Time.deltaTime);
-                transform.LookAt(_look_target.transform);
+                transform.RotateAround(point: player_position, axis: right, angle: 1.0f * ADJUST * Time.deltaTime);
+                transform.LookAt(target: _look_target.transform);
             }
             // down.
             else if (_right_stick_down_button.isPressed) {
-                transform.RotateAround(player_position, right, -1.0f * ADJUST * Time.deltaTime);
-                transform.LookAt(_look_target.transform);
+                transform.RotateAround(point: player_position, axis: right, angle: -1.0f * ADJUST * Time.deltaTime);
+                transform.LookAt(target: _look_target.transform);
             }
             // left.
             else if (_right_stick_left_button.isPressed) {
-                transform.RotateAround(player_position, up, 1.0f * ADJUST * Time.deltaTime);
+                transform.RotateAround(point: player_position, axis: up, angle: 1.0f * ADJUST * Time.deltaTime);
             }
             // right
             else if (_right_stick_right_button.isPressed) {
-                transform.RotateAround(player_position, up, -1.0f * ADJUST * Time.deltaTime);
+                transform.RotateAround(point: player_position, axis: up, angle: -1.0f * ADJUST * Time.deltaTime);
             }
         }
 

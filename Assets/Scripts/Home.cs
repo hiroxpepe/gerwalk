@@ -19,6 +19,8 @@ using static UnityEngine.GameObject;
 using UniRx;
 using UniRx.Triggers;
 
+using static Studio.MeowToon.Env;
+
 namespace Studio.MeowToon {
     /// <summary>
     /// home class
@@ -44,7 +46,7 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            _game_system = Find(name: Env.GAME_SYSTEM).Get<GameSystem>();
+            _game_system = Find(name: GAME_SYSTEM).Get<GameSystem>();
         }
 
         // Start is called before the first frame update
@@ -52,7 +54,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// when being touched vehicle.
             /// </summary>
-            this.OnCollisionEnterAsObservable().Where(x => x.Like(Env.VEHICLE_TYPE) && _game_system.beatLevel).Subscribe(x => {
+            this.OnCollisionEnterAsObservable().Where(predicate: x => x.Like(VEHICLE_TYPE) && _game_system.beatLevel).Subscribe(onNext: x => {
                 OnCameBack?.Invoke();
             });
         }

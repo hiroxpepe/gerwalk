@@ -20,6 +20,8 @@ using static UnityEngine.GameObject;
 using UniRx;
 using UniRx.Triggers;
 
+using static Studio.MeowToon.Env;
+
 namespace Studio.MeowToon {
     /// <summary>
     /// lavel scene
@@ -51,10 +53,10 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            _game_system = Find(name: Env.GAME_SYSTEM).Get<GameSystem>();
+            _game_system = Find(name: GAME_SYSTEM).Get<GameSystem>();
 
             // get home.
-            Home home = Find(name: Env.HOME_TYPE).Get<Home>();
+            Home home = Find(name: HOME_TYPE).Get<Home>();
 
             /// <summary>
             /// came back home.
@@ -72,7 +74,7 @@ namespace Studio.MeowToon {
             /// <summary>
             /// pause the game execute or cancel.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => _start_button.wasPressedThisFrame).Subscribe(_ => {
+            this.UpdateAsObservable().Where(predicate: _ => _start_button.wasPressedThisFrame).Subscribe(onNext: _ => {
                 if (_is_pausing) {
                     Time.timeScale = 1f;
                     OnPauseOff?.Invoke();
@@ -88,26 +90,26 @@ namespace Studio.MeowToon {
             _game_system.targetTotal = getTargetsCount();
 
             // check game status.
-            this.UpdateAsObservable().Subscribe(_ => {
+            this.UpdateAsObservable().Subscribe(onNext: _ => {
                 checkGameStatus();
             });
 
             /// <summary>
             /// next level.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => (_a_button.wasPressedThisFrame) && _game_system.beatLevel && _is_home).Subscribe(_ => {
+            this.UpdateAsObservable().Where(predicate: _ => (_a_button.wasPressedThisFrame) && _game_system.beatLevel && _is_home).Subscribe(onNext: _ => {
                 switch (SceneManager.GetActiveScene().name) {
-                    case Env.SCENE_LEVEL_1:
+                    case SCENE_LEVEL_1:
                         Time.timeScale = 1f;
-                        SceneManager.LoadScene(Env.SCENE_LEVEL_2);
+                        SceneManager.LoadScene(sceneName: SCENE_LEVEL_2);
                         break;
-                    case Env.SCENE_LEVEL_2:
+                    case SCENE_LEVEL_2:
                         Time.timeScale = 1f;
-                        SceneManager.LoadScene(Env.SCENE_LEVEL_3);
+                        SceneManager.LoadScene(sceneName: SCENE_LEVEL_3);
                         break;
-                    case Env.SCENE_LEVEL_3:
+                    case SCENE_LEVEL_3:
                         Time.timeScale = 1f;
-                        SceneManager.LoadScene(Env.SCENE_ENDING);
+                        SceneManager.LoadScene(sceneName: SCENE_ENDING);
                         break;
                 }
             });
@@ -115,8 +117,8 @@ namespace Studio.MeowToon {
             /// <summary>
             /// restart game.
             /// </summary>
-            this.UpdateAsObservable().Where(_ => _select_button.wasPressedThisFrame).Subscribe(_ => {
-                SceneManager.LoadScene(Env.SCENE_TITLE);
+            this.UpdateAsObservable().Where(predicate: _ => _select_button.wasPressedThisFrame).Subscribe(onNext: _ => {
+                SceneManager.LoadScene(sceneName: SCENE_TITLE);
             });
 
             ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -133,7 +135,7 @@ namespace Studio.MeowToon {
             /// get targets count.
             /// </summary>
             int getTargetsCount() {
-                GameObject targets = Find(name: Env.TARGETS_OBJECT);
+                GameObject targets = Find(name: TARGETS_OBJECT);
                 Transform targets_transform = targets.GetComponentInChildren<Transform>();
                 return targets_transform.childCount;
             }

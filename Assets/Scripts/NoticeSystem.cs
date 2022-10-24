@@ -19,6 +19,8 @@ using UnityEngine.UI;
 using static UnityEngine.GameObject;
 using UniRx;
 using UniRx.Triggers;
+
+using static Studio.MeowToon.Env;
 using static Studio.MeowToon.Utils;
 
 namespace Studio.MeowToon {
@@ -106,12 +108,12 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
-            _game_system = Find(name: Env.GAME_SYSTEM).Get<GameSystem>();
+            _game_system = Find(name: GAME_SYSTEM).Get<GameSystem>();
 
             /// <summary>
             /// game system pause on.
             /// </summary>
-            _game_system.OnPauseOn += () => { _message_text.text = Env.MESSAGE_GAME_PAUSE; };
+            _game_system.OnPauseOn += () => { _message_text.text = MESSAGE_GAME_PAUSE; };
 
             /// <summary>
             /// game system pause off.
@@ -129,7 +131,7 @@ namespace Studio.MeowToon {
             _game_system.OnDecrementPoints += () => { updateGameStatus(); };
 
             // get vehicle.
-            Vehicle vehicle = Find(name: Env.VEHICLE_TYPE).Get<Vehicle>();
+            Vehicle vehicle = Find(name: VEHICLE_TYPE).Get<Vehicle>();
 
             /// <summary>
             /// vehicle updated.
@@ -155,25 +157,25 @@ namespace Studio.MeowToon {
             /// vehicle on stall.
             /// </summary>
             vehicle.OnStall += () => {
-                _message_text.text = Env.MESSAGE_STALL;
-                Observable.Timer(TimeSpan.FromSeconds(2)).Subscribe(_ => {
+                _message_text.text = MESSAGE_STALL;
+                Observable.Timer(dueTime: TimeSpan.FromSeconds(value: 2)).Subscribe(onNext: _ => {
                     _message_text.text = string.Empty;
-                }).AddTo(this);
+                }).AddTo(gameObjectComponent: this);
             };
 
             // get home.
-            Home home = Find(name: Env.HOME_TYPE).Get<Home>();
+            Home home = Find(name: HOME_TYPE).Get<Home>();
 
             /// <summary>
             /// came back home.
             /// </summary>
-            home.OnCameBack += () => { _message_text.text = Env.MESSAGE_LEVEL_CLEAR; };
+            home.OnCameBack += () => { _message_text.text = MESSAGE_LEVEL_CLEAR; };
         }
 
         // Start is called before the first frame update
         void Start() {
             // update text ui.
-            this.UpdateAsObservable().Subscribe(_ => {
+            this.UpdateAsObservable().Subscribe(onNext: _ => {
                 updateGameStatus();
                 updateVehicleStatus();
             });
@@ -190,9 +192,9 @@ namespace Studio.MeowToon {
             _points_text.text = string.Format("POINT {0}", _game_system.pointTotal);
             _mode_text.text = string.Format("Mode: {0}", _game_system.mode);
             switch (_game_system.mode) {
-                case Env.MODE_EASY: _mode_text.color = yellow; break;
-                case Env.MODE_NORMAL: _mode_text.color = green; break;
-                case Env.MODE_HARD: _mode_text.color = purple; break;
+                case MODE_EASY: _mode_text.color = yellow; break;
+                case MODE_NORMAL: _mode_text.color = green; break;
+                case MODE_HARD: _mode_text.color = purple; break;
             }
         }
 
