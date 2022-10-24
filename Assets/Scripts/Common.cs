@@ -30,6 +30,8 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields
 
+        System.Random _random;
+
         AutoDestroyParam _auto_destroy_param;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,6 +56,7 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         protected void Awake() {
+            _random = new();
             _auto_destroy_param = AutoDestroyParam.GetInstance();
         }
 
@@ -75,8 +78,7 @@ namespace Studio.MeowToon {
         /// random number of seconds to remove automatically.
         /// </summary>
         float getRandomLimit(float limit) {
-            System.Random random = new System.Random();
-            return random.Next(2, (int)limit * 25); // from 2 seconds to (limit * 25) seconds.
+            return _random.Next(2, (int)limit * 25); // from 2 seconds to (limit * 25) seconds.
         }
 
         /// <summary>

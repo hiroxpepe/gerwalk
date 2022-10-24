@@ -38,6 +38,8 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives] 
 
+        System.Random _random;
+
         /// <summary>
         /// will be destroyed by the next attack.
         /// </summary>
@@ -54,6 +56,7 @@ namespace Studio.MeowToon {
 
         // Awake is called when the script instance is being loaded.
         void Awake() {
+            _random = new();
             _do_fixed_update = DoFixedUpdate.getInstance();
             _explode_param = ExplodeParam.getDefaultInstance();
             _game_system = Find(name: Env.GAME_SYSTEM).Get<GameSystem>();
@@ -132,10 +135,9 @@ namespace Studio.MeowToon {
             foreach (Transform piece in transform) {
                 piece.parent = null;
                 piece.transform.localScale = new Vector3(scale * 2, scale * 2, scale * 2);
-                System.Random random = new System.Random();
                 int min = -getRandomForce(force);
                 int max = getRandomForce(force);
-                Vector3 force_value = new Vector3(random.Next(min, max), random.Next(min, max), random.Next(min, max));
+                Vector3 force_value = new Vector3(_random.Next(min, max), _random.Next(min, max), _random.Next(min, max));
                 piece.Get<Rigidbody>().useGravity = true;
                 piece.Get<Rigidbody>().isKinematic = false;
                 piece.Get<Rigidbody>().AddTorque(force_value, ForceMode.Impulse);
@@ -148,8 +150,7 @@ namespace Studio.MeowToon {
         /// get a random value for the force applied to the flying pieces.
         /// </summary>
         int getRandomForce(int force) {
-            System.Random random = new System.Random();
-            return random.Next((int) force / 2, (int) force * 2); // range of 1/2 to 2 times the force.
+            return _random.Next((int) force / 2, (int) force * 2); // range of 1/2 to 2 times the force.
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
