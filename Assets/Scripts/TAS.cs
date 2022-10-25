@@ -25,9 +25,7 @@ namespace Studio.MeowToon {
     /// <summary>
     /// TAS class
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public class TAS : MonoBehaviour {
 #nullable enable
 
@@ -42,8 +40,7 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
-        [SerializeField]
-        GameObject _needle_object;
+        [SerializeField] GameObject _needle_object;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives]

@@ -26,26 +26,14 @@ namespace Studio.MeowToon {
     /// <summary>
     /// camera controller
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public class CameraSystem : InputMaper {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
-        [SerializeField]
-        GameObject _horizontal_axis;
-
-        [SerializeField]
-        GameObject _vertical_axis;
-
-        [SerializeField]
-        GameObject _main_camera;
-
-        [SerializeField]
-        GameObject _look_target;
+        [SerializeField] GameObject _horizontal_axis, _vertical_axis, _main_camera, _look_target;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives] 

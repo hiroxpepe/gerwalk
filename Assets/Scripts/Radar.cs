@@ -26,9 +26,7 @@ namespace Studio.MeowToon {
     /// <summary>
     /// radar class
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public class Radar : MonoBehaviour {
 #nullable enable
 
@@ -46,14 +44,7 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
-        [SerializeField]
-        GameObject _home_mark_object;
-
-        [SerializeField]
-        GameObject _target_mark_object;
-
-        [SerializeField]
-        GameObject _direction_object;
+        [SerializeField] GameObject _home_mark_object, _target_mark_object, _direction_object;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields

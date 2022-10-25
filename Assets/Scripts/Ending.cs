@@ -24,9 +24,7 @@ namespace Studio.MeowToon {
     /// <summary>
     /// ending scene
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public class Ending : InputMaper {
 #nullable enable
 

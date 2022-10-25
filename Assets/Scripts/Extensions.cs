@@ -20,9 +20,7 @@ namespace Studio.MeowToon {
     /// <summary>
     /// generic extension method
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public static class Extensions {
 #nullable enable
 

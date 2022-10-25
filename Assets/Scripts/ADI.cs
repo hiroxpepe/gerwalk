@@ -25,9 +25,7 @@ namespace Studio.MeowToon {
     /// <summary>
     /// ADI class
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public class ADI : MonoBehaviour {
 #nullable enable
 
@@ -42,11 +40,7 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
-        [SerializeField]
-        GameObject _direction_object;
-
-        [SerializeField]
-        GameObject _angle_object;
+        [SerializeField] GameObject _direction_object, _angle_object;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives]

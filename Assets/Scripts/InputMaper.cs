@@ -24,9 +24,7 @@ namespace Studio.MeowToon {
     /// <summary>
     /// to map physical gamepad
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public class InputMaper : MonoBehaviour {
 #nullable enable
 
@@ -35,43 +33,13 @@ namespace Studio.MeowToon {
 
         protected GameObject _v_controller_object;
 
-        protected ButtonControl _a_button;
+        protected ButtonControl _a_button, _b_button, _x_button, _y_button, _up_button, _down_button, _left_button, _right_button;
 
-        protected ButtonControl _b_button;
+        protected ButtonControl _left_1_button, _right_1_button, _left_2_button, _right_2_button;
 
-        protected ButtonControl _x_button;
+        protected ButtonControl _right_stick_up_button, _right_stick_down_button, _right_stick_left_button, _right_stick_right_button, _right_stick_button;
 
-        protected ButtonControl _y_button;
-
-        protected ButtonControl _up_button;
-
-        protected ButtonControl _down_button;
-
-        protected ButtonControl _left_button;
-
-        protected ButtonControl _right_button;
-
-        protected ButtonControl _left_1_button;
-
-        protected ButtonControl _right_1_button;
-
-        protected ButtonControl _left_2_button;
-
-        protected ButtonControl _right_2_button;
-
-        protected ButtonControl _right_stick_up_button;
-
-        protected ButtonControl _right_stick_down_button;
-
-        protected ButtonControl _right_stick_left_button;
-
-        protected ButtonControl _right_stick_right_button;
-
-        protected ButtonControl _right_stick_button;
-
-        protected ButtonControl _start_button;
-
-        protected ButtonControl _select_button;
+        protected ButtonControl _start_button, _select_button;
 
         bool _use_vibration = true;
 
@@ -127,8 +95,7 @@ namespace Studio.MeowToon {
             if (controller_names.Length == 0 || controller_names[0] == "") {
                 _v_controller_object.SetActive(value: true);
                 _use_v_controller = true;
-            }
-            else {
+            } else {
                 _v_controller_object.SetActive(value: false);
                 _use_v_controller = false;
             }
@@ -146,15 +113,13 @@ namespace Studio.MeowToon {
                 _b_button = Gamepad.current.bButton;
                 _x_button = Gamepad.current.xButton;
                 _y_button = Gamepad.current.yButton;
-            }
-            else if (Application.platform == RuntimePlatform.WindowsPlayer) {
+            } else if (Application.platform == RuntimePlatform.WindowsPlayer) {
                 // Windows OS
                 _a_button = Gamepad.current.bButton;
                 _b_button = Gamepad.current.aButton;
                 _x_button = Gamepad.current.yButton;
                 _y_button = Gamepad.current.xButton;
-            }
-            else {
+            } else {
                 // FIXME: can't get it during development with Unity?
                 _a_button = Gamepad.current.bButton;
                 _b_button = Gamepad.current.aButton;

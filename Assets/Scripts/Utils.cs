@@ -45,9 +45,7 @@ namespace Studio.MeowToon {
     /// <summary>
     /// generic utility class
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public static class Utils {
 #nullable enable
 
@@ -186,8 +184,7 @@ namespace Studio.MeowToon {
         public static void Vibrate(long milliseconds) {
             if (isAndroid()) {
                 vibrator.Call(methodName: "vibrate", args: milliseconds);
-            }
-            else {
+            } else {
                 Handheld.Vibrate();
             }
         }

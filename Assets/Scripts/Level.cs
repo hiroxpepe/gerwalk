@@ -26,9 +26,7 @@ namespace Studio.MeowToon {
     /// <summary>
     /// lavel scene
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public class Level : InputMaper {
 #nullable enable
 
@@ -78,8 +76,7 @@ namespace Studio.MeowToon {
                 if (_is_pausing) {
                     Time.timeScale = 1f;
                     OnPauseOff?.Invoke();
-                }
-                else {
+                } else {
                     Time.timeScale = 0f;
                     OnPauseOn?.Invoke();
                 }

@@ -25,9 +25,7 @@ namespace Studio.MeowToon {
     /// <summary>
     /// VSL class
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public class VSI : MonoBehaviour {
 #nullable enable
 
@@ -42,8 +40,7 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
-        [SerializeField]
-        GameObject _needle_object;
+        [SerializeField] GameObject _needle_object;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives]

@@ -24,9 +24,7 @@ namespace Studio.MeowToon {
     /// <summary>
     /// item coin class
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public class Coin : Common {
 #nullable enable
 

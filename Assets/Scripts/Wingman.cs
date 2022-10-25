@@ -13,7 +13,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System;
+using static System.Math;
 using UnityEngine;
 using static UnityEngine.GameObject;
 using UniRx;
@@ -25,9 +25,7 @@ namespace Studio.MeowToon {
     /// <summary>
     /// wingman class
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public class Wingman : MonoBehaviour {
 #nullable enable
 
@@ -116,41 +114,41 @@ namespace Studio.MeowToon {
             // z-axis positive.
             if (direction == Direction.PositiveZ ) {
                 move_position = new(
-                    _vehicle_object.transform.position.x + OFFSET_VALUE,
-                    _vehicle_object.transform.position.y,
-                    _vehicle_object.transform.position.z - OFFSET_VALUE
+                    x: _vehicle_object.transform.position.x + OFFSET_VALUE,
+                    y: _vehicle_object.transform.position.y,
+                    z: _vehicle_object.transform.position.z - OFFSET_VALUE
                 );
             }
             // z-axis negative.
             if (direction == Direction.NegativeZ) {
                 move_position = new(
-                    _vehicle_object.transform.position.x - OFFSET_VALUE,
-                    _vehicle_object.transform.position.y,
-                    _vehicle_object.transform.position.z + OFFSET_VALUE
+                    x: _vehicle_object.transform.position.x - OFFSET_VALUE,
+                    y: _vehicle_object.transform.position.y,
+                    z: _vehicle_object.transform.position.z + OFFSET_VALUE
                 );
             }
             // x-axis positive.
             if (direction == Direction.PositiveX) {
                 move_position = new(
-                    _vehicle_object.transform.position.x - OFFSET_VALUE,
-                    _vehicle_object.transform.position.y,
-                    _vehicle_object.transform.position.z - OFFSET_VALUE
+                    x: _vehicle_object.transform.position.x - OFFSET_VALUE,
+                    y: _vehicle_object.transform.position.y,
+                    z: _vehicle_object.transform.position.z - OFFSET_VALUE
                 );
             }
             // x-axis negative.
             if (direction == Direction.NegativeX) {
                 move_position = new(
-                    _vehicle_object.transform.position.x + OFFSET_VALUE,
-                    _vehicle_object.transform.position.y,
-                    _vehicle_object.transform.position.z + OFFSET_VALUE
+                    x: _vehicle_object.transform.position.x + OFFSET_VALUE,
+                    y: _vehicle_object.transform.position.y,
+                    z: _vehicle_object.transform.position.z + OFFSET_VALUE
                 );
             }
             // none.
             if (direction == Direction.None) {
                 move_position = new(
-                    _vehicle_object.transform.position.x + OFFSET_VALUE,
-                    _vehicle_object.transform.position.y,
-                    _vehicle_object.transform.position.z - OFFSET_VALUE
+                    x: _vehicle_object.transform.position.x + OFFSET_VALUE,
+                    y: _vehicle_object.transform.position.y,
+                    z: _vehicle_object.transform.position.z - OFFSET_VALUE
                 );
             }
             return move_position;
@@ -170,16 +168,16 @@ namespace Studio.MeowToon {
         /// returns an enum of the vehicle's direction.
         /// </summary>
         Direction getDirection(Vector3 forward_vector) {
-            float forward_x = (float) Math.Round(forward_vector.x);
-            float forward_y = (float) Math.Round(forward_vector.y);
-            float forward_z = (float) Math.Round(forward_vector.z);
+            float forward_x = (float) Round(a: forward_vector.x);
+            float forward_y = (float) Round(a: forward_vector.y);
+            float forward_z = (float) Round(a: forward_vector.z);
             if (forward_x == 0 && forward_z == 1) { return Direction.PositiveZ; } // z-axis positive.
             if (forward_x == 0 && forward_z == -1) { return Direction.NegativeZ; } // z-axis negative.
             if (forward_x == 1 && forward_z == 0) { return Direction.PositiveX; } // x-axis positive.
             if (forward_x == -1 && forward_z == 0) { return Direction.NegativeX; } // x-axis negative.
             // determine the difference between the two axes.
-            float absolute_x = Math.Abs(forward_vector.x);
-            float absolute_z = Math.Abs(forward_vector.z);
+            float absolute_x = Abs(value: forward_vector.x);
+            float absolute_z = Abs(value: forward_vector.z);
             if (absolute_x > absolute_z) {
                 if (forward_x == 1) { return Direction.PositiveX; } // x-axis positive.
                 if (forward_x == -1) { return Direction.NegativeX; } // x-axis negative.
