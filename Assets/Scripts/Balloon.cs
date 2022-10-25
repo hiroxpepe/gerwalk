@@ -25,17 +25,14 @@ namespace Studio.MeowToon {
     /// <summary>
     /// balloon class
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public class Balloon : MonoBehaviour {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
-        [SerializeField]
-        GameObject _item_object;
+        [SerializeField] GameObject _item_object;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives] 

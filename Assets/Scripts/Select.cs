@@ -27,9 +27,7 @@ namespace Studio.MeowToon {
     /// <summary>
     /// select scene
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public class Select : InputMaper {
 #nullable enable
 
@@ -41,14 +39,7 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
-        [SerializeField]
-        Image _easy;
-
-        [SerializeField]
-        Image _normal;
-
-        [SerializeField]
-        Image _hard;
+        [SerializeField] Image _easy, _normal, _hard;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives]

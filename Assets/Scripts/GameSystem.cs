@@ -24,9 +24,7 @@ namespace Studio.MeowToon {
     /// <summary>
     /// game system
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public class GameSystem : MonoBehaviour {
 #nullable enable
 

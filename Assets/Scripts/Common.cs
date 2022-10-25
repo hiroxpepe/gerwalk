@@ -21,9 +21,7 @@ namespace Studio.MeowToon {
     /// <summary>
     /// common processing of objects
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public class Common : MonoBehaviour {
 #nullable enable
 

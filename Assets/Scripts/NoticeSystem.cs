@@ -27,65 +27,21 @@ namespace Studio.MeowToon {
     /// <summary>
     /// status system
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public class NoticeSystem : MonoBehaviour {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
-        [SerializeField]
-        Text _message_text;
-
-        [SerializeField]
-        Text _targets_text;
-
-        [SerializeField]
-        Text _points_text;
-
-        [SerializeField]
-        Text _air_speed_text;
-
-        [SerializeField]
-        Text _vertical_speed_text;
-
-        [SerializeField]
-        Text _altitude_text;
-
-        [SerializeField]
-        Text _heading_text;
-
-        [SerializeField]
-        Text _pitch_text;
-
-        [SerializeField]
-        Text _roll_text;
-
-        [SerializeField]
-        Text _lift_spoiler_text;
-
-        [SerializeField]
-        Text _mode_text;
+        [SerializeField] Text _message_text, _targets_text, _points_text, _air_speed_text, _vertical_speed_text;
+ 
+        [SerializeField] Text _altitude_text, _heading_text, _pitch_text, _roll_text, _lift_spoiler_text, _mode_text;
 
         /// <remarks>
         /// for development.
         /// </remarks>
-        [SerializeField]
-        Text _energy_text;
-
-        /// <remarks>
-        /// for development.
-        /// </remarks>
-        [SerializeField]
-        Text _power_text;
-
-        /// <remarks>
-        /// for development.
-        /// </remarks>
-        [SerializeField]
-        Text _flight_text;
+        [SerializeField] Text _energy_text, _power_text, _flight_text;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives] 
@@ -140,14 +96,14 @@ namespace Studio.MeowToon {
                 const float VEHICLE_HEIGHT_OFFSET = 0.0f;
                 Vehicle vehicle = sender as Vehicle;
                 if (vehicle is not null) {
-                    if (e.Name.Equals(nameof(Vehicle.airSpeed))) { _air_speed = vehicle.airSpeed; return; }
-                    if (e.Name.Equals(nameof(Vehicle.verticalSpeed))) { _vertical_speed = vehicle.verticalSpeed; return; }
-                    if (e.Name.Equals(nameof(Vehicle.flightTime))) { _flight_time = vehicle.flightTime; return; }
-                    if (e.Name.Equals(nameof(Vehicle.total))) { _energy = vehicle.total; return; }
-                    if (e.Name.Equals(nameof(Vehicle.power))) { _power = vehicle.power; return; }
-                    if (e.Name.Equals(nameof(Vehicle.useLiftSpoiler))) { _use_lift_spoiler = vehicle.useLiftSpoiler; return; }
-                    if (e.Name.Equals(nameof(Vehicle.position))) { _altitude = vehicle.position.y - VEHICLE_HEIGHT_OFFSET; return; }
-                    if (e.Name.Equals(nameof(Vehicle.rotation))) {
+                    if (e.Name.Equals(value: nameof(Vehicle.airSpeed))) { _air_speed = vehicle.airSpeed; return; }
+                    if (e.Name.Equals(value: nameof(Vehicle.verticalSpeed))) { _vertical_speed = vehicle.verticalSpeed; return; }
+                    if (e.Name.Equals(value: nameof(Vehicle.flightTime))) { _flight_time = vehicle.flightTime; return; }
+                    if (e.Name.Equals(value: nameof(Vehicle.total))) { _energy = vehicle.total; return; }
+                    if (e.Name.Equals(value: nameof(Vehicle.power))) { _power = vehicle.power; return; }
+                    if (e.Name.Equals(value: nameof(Vehicle.useLiftSpoiler))) { _use_lift_spoiler = vehicle.useLiftSpoiler; return; }
+                    if (e.Name.Equals(value: nameof(Vehicle.position))) { _altitude = vehicle.position.y - VEHICLE_HEIGHT_OFFSET; return; }
+                    if (e.Name.Equals(value: nameof(Vehicle.rotation))) {
                         _heading = vehicle.heading; _pitch = vehicle.pitch; _roll = vehicle.roll; _bank = vehicle.bank; return;
                     }
                 }
@@ -202,21 +158,21 @@ namespace Studio.MeowToon {
         /// update vehicle status
         /// </summary>
         void updateVehicleStatus() {
-            _air_speed_text.text = string.Format("TAS {0:000.0}km/h", Math.Round(_air_speed, 1, MidpointRounding.AwayFromZero));
-            _vertical_speed_text.text = string.Format("VSI {0:000.0}m/s", Math.Round(_vertical_speed, 1, MidpointRounding.AwayFromZero));
-            _altitude_text.text = string.Format("ALT {0:000.0}m", Math.Round(_altitude, 1, MidpointRounding.AwayFromZero));
-            _heading_text.text = string.Format("HEADING {0:000.0}", Math.Round(_heading, 1, MidpointRounding.AwayFromZero));
-            _pitch_text.text = string.Format("PITCH {0:000.0}", Math.Round(_pitch, 1, MidpointRounding.AwayFromZero));
-            _roll_text.text = string.Format("BANK {0:000.0}", Math.Round(_bank, 1, MidpointRounding.AwayFromZero));
+            _air_speed_text.text = string.Format("TAS {0:000.0}km/h", Math.Round(value: _air_speed, digits: 1, mode: MidpointRounding.AwayFromZero));
+            _vertical_speed_text.text = string.Format("VSI {0:000.0}m/s", Math.Round(value: _vertical_speed, digits: 1, mode: MidpointRounding.AwayFromZero));
+            _altitude_text.text = string.Format("ALT {0:000.0}m", Math.Round(value: _altitude, digits: 1, mode: MidpointRounding.AwayFromZero));
+            _heading_text.text = string.Format("HEADING {0:000.0}", Math.Round(value: _heading, digits: 1, mode: MidpointRounding.AwayFromZero));
+            _pitch_text.text = string.Format("PITCH {0:000.0}", Math.Round(value: _pitch, digits: 1, mode: MidpointRounding.AwayFromZero));
+            _roll_text.text = string.Format("BANK {0:000.0}", Math.Round(value: _bank, digits: 1, mode: MidpointRounding.AwayFromZero));
             _lift_spoiler_text.text = "Spoiler: " + (_use_lift_spoiler ? "ON" : "OFF");
             _lift_spoiler_text.color = _use_lift_spoiler ? red : green;
             /// <remarks>
             /// for development.
             /// </remarks>
             setTotalEnergyColor(value: _energy);
-            _energy_text.text = string.Format("ENG {0:0000.0}", Math.Round(_energy, 1, MidpointRounding.AwayFromZero));
-            _power_text.text = string.Format("POW {0:0000.0}", Math.Round(_power, 1, MidpointRounding.AwayFromZero));
-            _flight_text.text = string.Format("TIME {0:000.0}sec", Math.Round(_flight_time, 1, MidpointRounding.AwayFromZero));
+            _energy_text.text = string.Format("ENG {0:0000.0}", Math.Round(value: _energy, digits: 1, mode: MidpointRounding.AwayFromZero));
+            _power_text.text = string.Format("POW {0:0000.0}", Math.Round(value: _power, digits: 1, mode: MidpointRounding.AwayFromZero));
+            _flight_text.text = string.Format("TIME {0:000.0}sec", Math.Round(value: _flight_time, digits: 1, mode: MidpointRounding.AwayFromZero));
         }
 
         /// <remarks>

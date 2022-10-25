@@ -17,9 +17,7 @@ namespace Studio.MeowToon {
     /// <summary>
     /// envelope class
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public static class Env {
 #nullable enable
 

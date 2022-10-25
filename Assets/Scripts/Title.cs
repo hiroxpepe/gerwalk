@@ -24,9 +24,7 @@ namespace Studio.MeowToon {
     /// <summary>
     /// title scene
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public class Title : InputMaper {
 #nullable enable
 

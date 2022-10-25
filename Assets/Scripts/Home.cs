@@ -25,9 +25,7 @@ namespace Studio.MeowToon {
     /// <summary>
     /// home class
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public class Home : MonoBehaviour {
 #nullable enable
 

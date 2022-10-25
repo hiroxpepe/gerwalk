@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using static System.Math;
 using UnityEngine;
 using static UnityEngine.GameObject;
 using static UnityEngine.Quaternion;
@@ -28,41 +29,30 @@ namespace Studio.MeowToon {
     /// <summary>
     /// vehicle controller
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public class Vehicle : InputMaper {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         #region References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
-        [SerializeField]
-        float _jump_power = 15.0f;
+        [SerializeField] float _jump_power = 15.0f;
 
-        [SerializeField]
-        float _rotational_speed = 10.0f;
+        [SerializeField] float _rotational_speed = 10.0f;
 
-        [SerializeField]
-        float _pitch_speed = 5.0f;
+        [SerializeField] float _pitch_speed = 5.0f;
 
-        [SerializeField]
-        float _roll_speed = 5.0f;
+        [SerializeField] float _roll_speed = 5.0f;
 
-        [SerializeField]
-        float _flight_power = 5.0f;
+        [SerializeField] float _flight_power = 5.0f;
 
-        [SerializeField]
-        float _forward_speed_limit = 1.1f;
+        [SerializeField] float _forward_speed_limit = 1.1f;
 
-        [SerializeField]
-        float _run_speed_limit = 3.25f;
+        [SerializeField] float _run_speed_limit = 3.25f;
 
-        [SerializeField]
-        float _backward_speed_limit = 0.75f;
+        [SerializeField] float _backward_speed_limit = 0.75f;
 
-        [SerializeField]
-        SimpleAnimation _simple_anime;
+        [SerializeField] SimpleAnimation _simple_anime;
 
         #endregion
 
@@ -438,8 +428,7 @@ namespace Studio.MeowToon {
                     int yaw_axis = _right_button.isPressed ? 1 : _left_button.isPressed ? -1 : 0;
                     transform.Rotate(xAngle: 0, yAngle: yaw_axis * _roll_speed * _energy.ratio * Time.deltaTime * ADD_FORCE_VALUE, zAngle: 0);
                 });
-            }
-            else if (_game_system.mode == MODE_NORMAL || _game_system.mode == MODE_HARD) {
+            } else if (_game_system.mode == MODE_NORMAL || _game_system.mode == MODE_HARD) {
                 this.UpdateAsObservable().Where(predicate: _ => _do_update.flighting && (_left_button.isPressed || _right_button.isPressed)).Subscribe(onNext: _ => {
                     int roll_axis = _left_button.isPressed ? 1 : _right_button.isPressed ? -1 : 0;
                     transform.Rotate(xAngle: 0, yAngle: 0, zAngle: roll_axis * _roll_speed * _energy.ratio * 2.0f * Time.deltaTime * ADD_FORCE_VALUE);
@@ -598,7 +587,7 @@ namespace Studio.MeowToon {
         /// the value until the top of the block.
         /// </summary>
         double getReach() {
-            return Math.Round(value: transform.position.y, digits: 2) % 1; // FIXME:
+            return Round(value: transform.position.y, digits: 2) % 1; // FIXME:
         }
 
         /// <summary>
@@ -628,8 +617,7 @@ namespace Studio.MeowToon {
                         y: transform.position.y,
                         z: transform.position.z
                     );
-                }
-                else if (transform.forward.x >= 0f) {
+                } else if (transform.forward.x >= 0f) {
                     move_position = new(
                         x: transform.position.x + MOVE_VALUE * Time.deltaTime,
                         y: transform.position.y,
@@ -645,8 +633,7 @@ namespace Studio.MeowToon {
                         y: transform.position.y,
                         z: transform.position.z - MOVE_VALUE * Time.deltaTime
                     );
-                }
-                else if (transform.forward.z >= 0f) {
+                } else if (transform.forward.z >= 0f) {
                     move_position = new(
                         x: transform.position.x,
                         y: transform.position.y,
@@ -662,21 +649,20 @@ namespace Studio.MeowToon {
         /// returns an enum of the vehicle's direction.
         /// </summary>
         Direction getDirection(Vector3 forward_vector) {
-            float forward_x = (float) Math.Round(forward_vector.x);
-            float forward_y = (float) Math.Round(forward_vector.y);
-            float forward_z = (float) Math.Round(forward_vector.z);
+            float forward_x = (float) Round(a: forward_vector.x);
+            float forward_y = (float) Round(a: forward_vector.y);
+            float forward_z = (float) Round(a: forward_vector.z);
             if (forward_x == 0 && forward_z == 1) { return Direction.PositiveZ; } // z-axis positive.
             if (forward_x == 0 && forward_z == -1) { return Direction.NegativeZ; } // z-axis negative.
             if (forward_x == 1 && forward_z == 0) { return Direction.PositiveX; } // x-axis positive.
             if (forward_x == -1 && forward_z == 0) { return Direction.NegativeX; } // x-axis negative.
             // determine the difference between the two axes.
-            float absolute_x = Math.Abs(forward_vector.x);
-            float absolute_z = Math.Abs(forward_vector.z);
+            float absolute_x = Abs(value: forward_vector.x);
+            float absolute_z = Abs(value: forward_vector.z);
             if (absolute_x > absolute_z) {
                 if (forward_x == 1) { return Direction.PositiveX; } // x-axis positive.
                 if (forward_x == -1) { return Direction.NegativeX; } // x-axis negative.
-            }
-            else if (absolute_x < absolute_z) {
+            } else if (absolute_x < absolute_z) {
                 if (forward_z == 1) { return Direction.PositiveZ; } // z-axis positive.
                 if (forward_z == -1) { return Direction.NegativeZ; } // z-axis negative.
             }
@@ -694,8 +680,7 @@ namespace Studio.MeowToon {
             float position_y = transform.position.y;
             if (position_y < (target_top - ADJUST)) {
                 return true;
-            }
-            else {
+            } else {
                 return false;
             }
         }
@@ -853,9 +838,9 @@ namespace Studio.MeowToon {
 
             public bool freeze {
                 get {
-                    if (Math.Round(value: _previous_speed, digits: 2) < 0.02 &&
-                        Math.Round(value: _current_speed, digits: 2) < 0.02 &&
-                        Math.Round(value: _previous_speed, digits: 2) == Math.Round(value: _current_speed, digits: 2)) {
+                    if (Round(value: _previous_speed, digits: 2) < 0.02 &&
+                        Round(value: _current_speed, digits: 2) < 0.02 &&
+                        Round(value: _previous_speed, digits: 2) == Round(value: _current_speed, digits: 2)) {
                         return true;
                     }
                     return false;
@@ -910,8 +895,7 @@ namespace Studio.MeowToon {
                     const int QUEUE_COUNT = FPS / 2; // 0.5 sec.
                     if (_previous_altitudes.Count < QUEUE_COUNT) {
                         _previous_altitudes.Enqueue(item: _altitude);
-                    }
-                    else {
+                    } else {
                         _previous_altitudes.Dequeue(); // keep the queue count.
                         _previous_altitudes.Enqueue(item: _altitude);
                     }
@@ -1007,7 +991,7 @@ namespace Studio.MeowToon {
                 const float AUTO_FLARE_ALTITUDE = 8.0f;
                 if (total > _threshold) {
                     float pitch_factor_value = 1.0f;
-                    pitch_factor_value *= Math.Abs(_pitch / ADJUSTED_VALUE_1);
+                    pitch_factor_value *= Abs(value: _pitch / ADJUSTED_VALUE_1);
                     float flight_value = ADD_OR_SUBTRACT_VALUE * POWAR_FACTOR_VALUE * _total_power_factor_value * pitch_factor_value;
                     if (_previous_altitudes.Peek() < _altitude) { // up
                         _flight_power_base -= flight_value;

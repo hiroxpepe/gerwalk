@@ -25,9 +25,7 @@ namespace Studio.MeowToon {
     /// <summary>
     /// ALT class
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public class ALT : MonoBehaviour {
 #nullable enable
 
@@ -43,11 +41,7 @@ namespace Studio.MeowToon {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // References [bool => is+adjective, has+past participle, can+verb prototype, triad verb]
 
-        [SerializeField]
-        GameObject _long_needle_object;
-
-        [SerializeField]
-        GameObject _short_needle_object;
+        [SerializeField] GameObject _long_needle_object, _short_needle_object;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [noun, adjectives]

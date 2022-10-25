@@ -17,9 +17,7 @@ namespace Studio.MeowToon {
     /// <summary>
     /// an enumeration that represents the direction.
     /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
+    /// <author>h.adachi (STUDIO MeowToon)</author>
     public enum Direction {
 #nullable enable
 
