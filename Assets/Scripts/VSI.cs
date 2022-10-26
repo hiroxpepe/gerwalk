@@ -63,7 +63,7 @@ namespace Studio.MeowToon {
                 /// set vertical speed.
                 /// </summary>
                 _needle_object.transform.rotation = Euler(x: 0f, y: 0f, z: -(360 / (DIVIDE_CIRCLE / _vehicle_object.Get<Vehicle>().verticalSpeed)));
-            });
+            }).AddTo(this);
         }
     }
 }

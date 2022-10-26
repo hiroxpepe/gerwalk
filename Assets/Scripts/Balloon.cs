@@ -73,14 +73,14 @@ namespace Studio.MeowToon {
                 if (_destroyable) {
                     Destroy(gameObject); // delete myself
                 }
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// wwhen being touched vehicle.
             /// </summary>
             this.OnCollisionEnterAsObservable().Where(predicate: x => x.Like(VEHICLE_TYPE)).Subscribe(onNext: x => {
                 destroyWithItems(x.transform);
-            });
+            }).AddTo(this);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////

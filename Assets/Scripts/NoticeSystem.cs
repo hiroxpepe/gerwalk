@@ -134,7 +134,7 @@ namespace Studio.MeowToon {
             this.UpdateAsObservable().Subscribe(onNext: _ => {
                 updateGameStatus();
                 updateVehicleStatus();
-            });
+            }).AddTo(this);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////

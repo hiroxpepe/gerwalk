@@ -67,7 +67,7 @@ namespace Studio.MeowToon {
                 float altitude = _vehicle_object.transform.position.y - VEHICLE_HEIGHT_OFFSET;
                 _long_needle_object.transform.rotation = Euler(x: 0f, y: 0f, z: -(360 / (DIVIDE_CIRCLE_LONG / altitude)));
                 _short_needle_object.transform.rotation = Euler(x: 0f, y: 0f, z: -(360 / (DIVIDE_CIRCLE_SHORT / altitude)));
-            });
+            }).AddTo(this);
         }
     }
 }

@@ -99,7 +99,7 @@ namespace Studio.MeowToon {
                 move_time_count = moveWingmanPosition(move_position: move_position, time_count: move_time_count);
                 transform.forward = _vehicle_object.transform.forward;
                 transform.rotation = _vehicle_rotation;
-            });
+            }).AddTo(this);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////

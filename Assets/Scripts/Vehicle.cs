@@ -14,7 +14,6 @@
  */
 
 using System;
-using System.Collections.Generic;
 using static System.Math;
 using UnityEngine;
 using static UnityEngine.GameObject;
@@ -30,7 +29,7 @@ namespace Studio.MeowToon {
     /// vehicle controller
     /// </summary>
     /// <author>h.adachi (STUDIO MeowToon)</author>
-    public class Vehicle : InputMaper {
+    public partial class Vehicle : InputMaper {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -253,7 +252,7 @@ namespace Studio.MeowToon {
             this.FixedUpdateAsObservable().Subscribe(onNext: _ => {
                 _acceleration.previousSpeed = _acceleration.currentSpeed;// hold previous speed.
                 _acceleration.currentSpeed = rb.velocity.magnitude; // get speed.
-            });
+            }).AddTo(this);
 
             // get vehicle speed for flight.
             Vector3 prev_position = transform.position;
@@ -262,7 +261,7 @@ namespace Studio.MeowToon {
                 airSpeed = ((transform.position - prev_position) / Time.deltaTime).magnitude * VALUE_MS_TO_KMH; 
                 verticalSpeed = ((transform.position.y - prev_position.y) / Time.deltaTime); // m/s
                 prev_position = transform.position;
-            });
+            }).AddTo(this);
 
             #region for Grounded Player
 
@@ -272,11 +271,11 @@ namespace Studio.MeowToon {
             this.UpdateAsObservable().Where(predicate: _ => _do_update.grounded && !_up_button.isPressed && !_down_button.isPressed).Subscribe(onNext: _ => {
                 //_simpleAnime.Play("Default");
                 _do_fixed_update.ApplyIdol();
-            });
+            }).AddTo(this);
 
             this.FixedUpdateAsObservable().Where(predicate: _ => _do_fixed_update.idol).Subscribe(onNext: _ => {
                 rb.useGravity = true;
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// walk.
@@ -284,13 +283,13 @@ namespace Studio.MeowToon {
             this.UpdateAsObservable().Where(predicate: _ => _do_update.grounded && _up_button.isPressed && !_y_button.isPressed).Subscribe(onNext: _ => {
                 /*_simpleAnime.Play("Walk");*/
                 _do_fixed_update.ApplyWalk();
-            });
+            }).AddTo(this);
 
             this.FixedUpdateAsObservable().Where(predicate: _ => _do_fixed_update.walk && _acceleration.canWalk).Subscribe(onNext: _ => {
                 const float ADJUST_VALUE = 7.5f;
                 rb.AddFor​​ce(force: transform.forward * ADD_FORCE_VALUE * ADJUST_VALUE, mode: ForceMode.Acceleration);
                 _do_fixed_update.CancelWalk();
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// run.
@@ -298,13 +297,13 @@ namespace Studio.MeowToon {
             this.UpdateAsObservable().Where(predicate: _ => _do_update.grounded && _up_button.isPressed && _y_button.isPressed).Subscribe(onNext: _ => {
                 /*_simpleAnime.Play("Run");*/
                 _do_fixed_update.ApplyRun();
-            });
+            }).AddTo(this);
 
             this.FixedUpdateAsObservable().Where(predicate: _ => _do_fixed_update.run && _acceleration.canRun).Subscribe(onNext: _ => {
                 const float ADJUST_VALUE = 7.5f;
                 rb.AddFor​​ce(force: transform.forward * ADD_FORCE_VALUE * ADJUST_VALUE, mode: ForceMode.Acceleration);
                 _do_fixed_update.CancelRun();
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// backward.
@@ -312,13 +311,13 @@ namespace Studio.MeowToon {
             this.UpdateAsObservable().Where(predicate: _ => _do_update.grounded && _down_button.isPressed).Subscribe(onNext: _ => {
                 /*_simpleAnime.Play("Walk");*/
                 _do_fixed_update.ApplyBackward();
-            });
+            }).AddTo(this);
 
             this.FixedUpdateAsObservable().Where(predicate: _ => _do_fixed_update.backward && _acceleration.canBackward).Subscribe(onNext: _ => {
                 const float ADJUST_VALUE = 7.5f;
                 rb.AddFor​​ce(force: -transform.forward * ADD_FORCE_VALUE * ADJUST_VALUE, mode: ForceMode.Acceleration);
                 _do_fixed_update.CancelBackward();
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// jump.
@@ -327,14 +326,14 @@ namespace Studio.MeowToon {
                 _do_update.grounded = false;
                 //_simpleAnime.Play("Jump");
                 _do_fixed_update.ApplyJump();
-            });
+            }).AddTo(this);
 
             this.FixedUpdateAsObservable().Where(predicate: _ => _do_fixed_update.jump).Subscribe(onNext: _ => {
                 const float ADJUST_VALUE = 2.0f;
                 rb.useGravity = true;
                 rb.AddRelativeFor​​ce(force: up * _jump_power * ADD_FORCE_VALUE * ADJUST_VALUE, mode: ForceMode.Acceleration);
                 _do_fixed_update.CancelJump();
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// rotate(yaw).
@@ -342,7 +341,7 @@ namespace Studio.MeowToon {
             this.UpdateAsObservable().Where(predicate: _ => _do_update.grounded).Subscribe(onNext: _ => {
                 int axis = _right_button.isPressed ? 1 : _left_button.isPressed ? -1 : 0;
                 transform.Rotate(xAngle: 0, yAngle: axis * (_rotational_speed * Time.deltaTime) * ADD_FORCE_VALUE, zAngle: 0);
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// freeze.
@@ -356,7 +355,7 @@ namespace Studio.MeowToon {
                     rb.useGravity = false;
                     moveTop();
                 }
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// when touching blocks.
@@ -367,7 +366,7 @@ namespace Studio.MeowToon {
                     _do_update.grounded = true;
                     rb.useGravity = true;
                 }
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// when leaving blocks.
@@ -375,7 +374,7 @@ namespace Studio.MeowToon {
             /// </summary>
             this.OnCollisionExitAsObservable().Where(predicate: x => x.Like(BLOCK_TYPE)).Subscribe(onNext: x => {
                 rb.useGravity = true;
-            });
+            }).AddTo(this);
 
             #endregion
 
@@ -391,7 +390,7 @@ namespace Studio.MeowToon {
                 _energy.hasLanded = false;
                 _do_fixed_update.ApplyFlight();
                 OnFlight?.Invoke(); // call event handler.
-            });
+            }).AddTo(this);
             this.FixedUpdateAsObservable().Where(predicate: _ => _do_fixed_update.flight).Subscribe(onNext: _ => {
                 const float FALL_VALUE = 5.0f; // 5.0 -> -5m/s
                 rb.useGravity = false;
@@ -402,7 +401,7 @@ namespace Studio.MeowToon {
                 }
                 _do_fixed_update.CancelFlight();
                 _flight_stopwatch.Start();
-            });
+            }).AddTo(this);
 
             #region Pitch
 
@@ -412,7 +411,7 @@ namespace Studio.MeowToon {
             this.UpdateAsObservable().Where(predicate: _ => _do_update.flighting && (_up_button.isPressed || _down_button.isPressed)).Subscribe(onNext: _ => {
                 int pitch_axis = _up_button.isPressed ? 1 : _down_button.isPressed ? -1 : 0;
                 transform.Rotate(xAngle: pitch_axis * _pitch_speed * _energy.ratio * Time.deltaTime * ADD_FORCE_VALUE, yAngle: 0, zAngle: 0);
-            });
+            }).AddTo(this);
 
             #endregion
 
@@ -427,16 +426,16 @@ namespace Studio.MeowToon {
                     transform.Rotate(xAngle: 0, yAngle: 0, zAngle: roll_axis * _roll_speed * _energy.ratio * Time.deltaTime * ADD_FORCE_VALUE);
                     int yaw_axis = _right_button.isPressed ? 1 : _left_button.isPressed ? -1 : 0;
                     transform.Rotate(xAngle: 0, yAngle: yaw_axis * _roll_speed * _energy.ratio * Time.deltaTime * ADD_FORCE_VALUE, zAngle: 0);
-                });
+                }).AddTo(this);
             } else if (_game_system.mode == MODE_NORMAL || _game_system.mode == MODE_HARD) {
                 this.UpdateAsObservable().Where(predicate: _ => _do_update.flighting && (_left_button.isPressed || _right_button.isPressed)).Subscribe(onNext: _ => {
                     int roll_axis = _left_button.isPressed ? 1 : _right_button.isPressed ? -1 : 0;
                     transform.Rotate(xAngle: 0, yAngle: 0, zAngle: roll_axis * _roll_speed * _energy.ratio * 2.0f * Time.deltaTime * ADD_FORCE_VALUE);
-                });
+                }).AddTo(this);
                 this.UpdateAsObservable().Where(predicate: _ => _do_update.flighting && (_left_1_button.isPressed || _right_1_button.isPressed)).Subscribe(onNext: _ => {
                     int yaw_axis = _right_1_button.isPressed ? 1 : _left_1_button.isPressed ? -1 : 0;
                     transform.Rotate(xAngle: 0, yAngle: yaw_axis * _roll_speed * _energy.ratio * 0.5f * Time.deltaTime * ADD_FORCE_VALUE, zAngle: 0);
-                });
+                }).AddTo(this);
             }
             /// <summary>
             /// persistent yaw against the world.
@@ -447,7 +446,7 @@ namespace Studio.MeowToon {
                 float power = (float) (angle * (airSpeed / 2) * ADJUSTED_VALUE);
                 int yaw_axis = roll >= 180 ? 1 : roll < 180 ? -1 : 0;
                 transform.Rotate(eulers: new Vector3(x: 0, y: yaw_axis * _roll_speed * _energy.ratio * Time.deltaTime * power, z: 0), relativeTo: Space.World);
-            });
+            }).AddTo(this);
 
             #endregion
 
@@ -473,7 +472,7 @@ namespace Studio.MeowToon {
                 left_quick_roll_time_count += Time.deltaTime * _energy.ratio;
                 transform.rotation = Slerp(a: transform.rotation, b: quick_roll_rotation, t: left_quick_roll_time_count);
                 if (left_quick_roll_time_count >= 1) { _do_update.needLeftQuickRoll = false; }
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// right quick roll.
@@ -487,14 +486,14 @@ namespace Studio.MeowToon {
                 right_quick_roll_time_count = 0f;
                 right_quick_roll_angle = transform.rotation.eulerAngles;
                 right_quick_roll_to_z = roll < 180 ? right_quick_roll_angle.z - 180f : -(right_quick_roll_angle.z - 180f);
-            });
+            }).AddTo(this);
             this.UpdateAsObservable().Where(predicate: _ => _do_update.needRightQuickRoll).Subscribe(onNext: _ => {
                 right_quick_roll_angle = new Vector3(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, right_quick_roll_to_z);
                 Quaternion quick_roll_rotation = Euler(euler: right_quick_roll_angle);
                 right_quick_roll_time_count += Time.deltaTime * _energy.ratio;
                 transform.rotation = Slerp(a: transform.rotation, b: quick_roll_rotation, t: right_quick_roll_time_count);
                 if (right_quick_roll_time_count >= 1) { _do_update.needRightQuickRoll = false; }
-            });
+            }).AddTo(this);
 
             # endregion
 
@@ -507,7 +506,7 @@ namespace Studio.MeowToon {
                 _do_update.stalling = true;
                 stall_time_count = 0f;
                 OnStall?.Invoke();
-            });
+            }).AddTo(this);
             this.UpdateAsObservable().Where(predicate: _ => _do_update.stalling).Subscribe(onNext: _ => {
                 GameObject ground_object = Find(name: GROUND_TYPE);
                 Quaternion ground_rotation = LookRotation(forward: ground_object.transform.position);
@@ -515,7 +514,7 @@ namespace Studio.MeowToon {
                 transform.rotation = Slerp(a: transform.rotation, b: ground_rotation, t: stall_time_count);
                 if (_energy.power < 10.0f || _energy.total < 10.0f || _energy.speed < 10.0f) { _energy.Gain(); } // FIXME: into _energy
                 if (stall_time_count >= 1) { _do_update.stalling = false; }
-            });
+            }).AddTo(this);
 
             #region Gain or Lose Energy
 
@@ -525,7 +524,7 @@ namespace Studio.MeowToon {
             this.UpdateAsObservable().Where(predicate: _ => _do_update.flighting && _b_button.wasPressedThisFrame && _game_system.usePoint).Subscribe(onNext: _ => {
                 _energy.Gain();
                 OnGainEnergy?.Invoke();
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// lose energy.
@@ -533,7 +532,7 @@ namespace Studio.MeowToon {
             this.UpdateAsObservable().Where(predicate: _ => _do_update.flighting && _y_button.wasPressedThisFrame && _game_system.usePoint).Subscribe(onNext: _ => {
                 _energy.Lose();
                 OnLoseEnergy?.Invoke();
-            });
+            }).AddTo(this);
 
             # endregion
 
@@ -542,7 +541,7 @@ namespace Studio.MeowToon {
             /// </summary>
             this.UpdateAsObservable().Where(predicate: _ => _do_update.flighting && _x_button.wasPressedThisFrame).Subscribe(onNext: _ => {
                 useLiftSpoiler = !useLiftSpoiler;
-            });
+            }).AddTo(this);
 
             // LateUpdate is called after all Update functions have been called.
             this.LateUpdateAsObservable().Subscribe(onNext: _ => {
@@ -555,7 +554,7 @@ namespace Studio.MeowToon {
                     _do_update.banking = false;
                 }
                 _energy.pitch = pitch;
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// when touching grounds.
@@ -573,7 +572,7 @@ namespace Studio.MeowToon {
                 _energy.hasLanded = true; // reset flight power.
                 _flight_stopwatch.Reset(); // reset flight time.
                 OnGrounded?.Invoke(); // call event handler.
-            });
+            }).AddTo(this);
         }
 
         #endregion
@@ -694,339 +693,6 @@ namespace Studio.MeowToon {
                 if (e.Name.Equals(value: nameof(Energy.power))) { power = _energy.power; }
             }
         }
-
-        #endregion
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        #region inner Classes
-
-        #region DoUpdate
-
-        /// <summary>
-        /// class for the Update() method.
-        /// </summary>
-        class DoUpdate {
-
-            ///////////////////////////////////////////////////////////////////////////////////////
-            // Fields [noun, adjectives] 
-
-            bool _grounded, _stall, _banking, _need_left_quick_roll, _need_right_quick_roll;
-
-            ///////////////////////////////////////////////////////////////////////////////////////
-            // Properties [noun, adjectives] 
-
-            public bool grounded { get => _grounded; set => _grounded = value; }
-
-            public bool flighting { get => !_grounded; }
-
-            public bool stalling { get => _stall; set => _stall = value; }
-
-            public bool banking { get => _banking; set => _banking = value; }
-
-            public bool needLeftQuickRoll { get => _need_left_quick_roll; set => _need_left_quick_roll = value; }
-
-            public bool needRightQuickRoll { get => _need_right_quick_roll; set => _need_right_quick_roll = value; }
-
-            ///////////////////////////////////////////////////////////////////////////////////////
-            // Constructor
-
-            /// <summary>
-            /// returns an initialized instance.
-            /// </summary>
-            public static DoUpdate GetInstance() {
-                DoUpdate instance = new();
-                instance.ResetState();
-                return instance;
-            }
-
-            ///////////////////////////////////////////////////////////////////////////////////////////
-            // public Methods [verb]
-
-            public void ResetState() {
-                _grounded = _stall = _banking = _need_left_quick_roll = _need_right_quick_roll = false;
-            }
-        }
-
-        #endregion
-
-        #region DoFixedUpdate
-
-        /// <summary>
-        /// class for the FixedUpdate() method.
-        /// </summary>
-        class DoFixedUpdate {
-
-            ///////////////////////////////////////////////////////////////////////////////////////
-            // Fields [noun, adjectives] 
-
-            bool _idol, _run, _walk, _jump, _backward, _flight;
-
-            ///////////////////////////////////////////////////////////////////////////////////////
-            // Properties [noun, adjectives] 
-
-            public bool idol { get => _idol; }
-
-            public bool run { get => _run; }
-
-            public bool walk { get => _walk; }
-
-            public bool jump { get => _jump; }
-
-            public bool backward { get => _backward; }
-
-            public bool flight { get => _flight; }
-
-            ///////////////////////////////////////////////////////////////////////////////////////
-            // Constructor
-
-            /// <summary>
-            /// returns an initialized instance.
-            /// </summary>
-            public static DoFixedUpdate GetInstance() {
-                return new DoFixedUpdate();
-            }
-
-            ///////////////////////////////////////////////////////////////////////////////////////////
-            // public Methods [verb]
-
-            public void ApplyIdol() { _idol = true; _run = _walk = _backward = _jump = _flight = false; }
-
-            public void ApplyRun() { _idol = _walk = _backward = _flight = false; _run = true; }
-
-            public void CancelRun() { _run = false; }
-
-            public void ApplyWalk() { _idol = _run = _backward = _flight = false; _walk = true; }
-
-            public void CancelWalk() { _walk = false; }
-
-            public void ApplyBackward() { _idol = _run = _walk = _flight = false; _backward = true; }
-
-            public void CancelBackward() { _backward = false; }
-
-            public void ApplyJump() { _jump = true; }
-
-            public void CancelJump() { _jump = false; }
-
-            public void ApplyFlight() { _idol = _walk = _run = _backward = false; _flight = true; }
-
-            public void CancelFlight() { _flight = false;}
-        }
-
-        #endregion
-
-        #region Acceleration
-
-        class Acceleration {
-
-            ///////////////////////////////////////////////////////////////////////////////////////
-            // Fields [noun, adjectives] 
-
-            float _current_speed, _previous_speed, _forward_speed_limit, _run_speed_limit, _backward_speed_limit;
-
-            ///////////////////////////////////////////////////////////////////////////////////////
-            // Properties [noun, adjectives] 
-
-            public float currentSpeed { get => _current_speed; set => _current_speed = value; }
-
-            public float previousSpeed { get => _previous_speed; set => _previous_speed = value; }
-
-            public bool canWalk { get => _current_speed < _forward_speed_limit; }
-
-            public bool canRun { get => _current_speed < _run_speed_limit; }
-
-            public bool canBackward { get => _current_speed < _backward_speed_limit; }
-
-            public bool freeze {
-                get {
-                    if (Round(value: _previous_speed, digits: 2) < 0.02 &&
-                        Round(value: _current_speed, digits: 2) < 0.02 &&
-                        Round(value: _previous_speed, digits: 2) == Round(value: _current_speed, digits: 2)) {
-                        return true;
-                    }
-                    return false;
-                }
-            }
-
-            ///////////////////////////////////////////////////////////////////////////////////////
-            // Constructor
-
-            /// <summary>
-            /// hide the constructor.
-            /// </summary>
-            Acceleration(float forward_speed_limit, float run_speed_limit, float backward_speed_limit) {
-                _forward_speed_limit = forward_speed_limit;
-                _run_speed_limit = run_speed_limit;
-                _backward_speed_limit = backward_speed_limit;
-            }
-
-            /// <summary>
-            /// returns an initialized instance.
-            /// </summary>
-            public static Acceleration GetInstance(float forward_speed_limit, float run_speed_limit, float backward_speed_limit) {
-                return new Acceleration(forward_speed_limit, run_speed_limit, backward_speed_limit);
-            }
-        }
-
-        #endregion
-
-        #region Energy
-
-        class Energy {
-
-            ///////////////////////////////////////////////////////////////////////////////////////////
-            // Fields [noun, adjectives] 
-
-            float _flight_power_base, _default_flight_power_base, _calculated_power, _altitude, _speed, _pitch;
-
-            float _threshold = 1f; // FIXME:
-
-            Queue<float> _previous_altitudes = new();
-
-            bool _has_landed = false;
-
-            ///////////////////////////////////////////////////////////////////////////////////////////
-            // Properties [noun, adjectives] 
-
-            /// <summary>
-            /// altitude.
-            /// </summary>
-            public float altitude {
-                set {
-                    const int QUEUE_COUNT = FPS / 2; // 0.5 sec.
-                    if (_previous_altitudes.Count < QUEUE_COUNT) {
-                        _previous_altitudes.Enqueue(item: _altitude);
-                    } else {
-                        _previous_altitudes.Dequeue(); // keep the queue count.
-                        _previous_altitudes.Enqueue(item: _altitude);
-                    }
-                    _altitude = value; Updated?.Invoke(this, new(nameof(total)));
-                }
-            }
-
-            /// <summary>
-            /// speed in flighting.
-            /// </summary>
-            public float speed { get => _speed; set { _speed = value; Updated?.Invoke(this, new(nameof(total))); }}
-
-            /// <summary>
-            /// total energy.
-            /// </summary>
-            public float total { get => _altitude + _speed; }
-
-            /// <summary>
-            /// power for velocity.
-            /// </summary>
-            public float power { get => _calculated_power; }
-
-            /// <summary>
-            /// whether it has landed.
-            /// </summary>
-            public bool hasLanded {
-                set {
-                    _has_landed = value;
-                    if (value) {
-                        _speed = 0;
-                        _flight_power_base = _default_flight_power_base;
-                    }
-                }
-            }
-
-            /// <summary>
-            /// pitch
-            /// </summary>
-            public float pitch { set => _pitch = value; }
-
-            /// <summary>
-            /// ratio value to adjust pitch, roll, yaw speed.
-            /// </summary>
-            public float ratio {
-                get {
-                    const float REFERENCE_SPEED = 80f;
-                    const float ADJUSTED_VALUE_1 = 0.01f;
-                    const float ADJUSTED_VALUE_2 = 7.5f;
-                    if (speed < 10.0f && !_has_landed) { return 1.0f; }
-                    float ratio = 1.0f + ((speed - REFERENCE_SPEED) * ADJUSTED_VALUE_1 / ADJUSTED_VALUE_2);
-                    Debug.Log($"speed: {speed} ratio: {ratio}");
-                    return ratio;
-                }
-            }
-
-            ///////////////////////////////////////////////////////////////////////////////////////////
-            //internal  Events [verb, verb phrase] 
-
-            /// <summary>
-            /// changed event handler.
-            /// </summary>
-            internal event Changed? Updated;
-
-            ///////////////////////////////////////////////////////////////////////////////////////////
-            // Constructor
-
-            /// <summary>
-            /// hide the constructor.
-            /// </summary>
-            Energy(float flight_power) {
-                _flight_power_base = flight_power;
-                _default_flight_power_base = _flight_power_base;
-            }
-
-            /// <summary>
-            /// returns an initialized instance.
-            /// </summary>
-            public static Energy GetInstance(float flight_power) {
-                return new Energy(flight_power);
-            }
-
-            ///////////////////////////////////////////////////////////////////////////////////////////
-            // public Methods [verb]
-
-            /// <summary>
-            /// get the calculated power.
-            /// </summary>
-            public float GetCalculatedPower() {
-                const float ADD_OR_SUBTRACT_VALUE = 0.0009375f;
-                const float POWAR_FACTOR_VALUE = 5.0f;
-                const float ADJUSTED_VALUE_1 = 25.0f;
-                const float ADJUSTED_VALUE_2 = 2.65f;
-                const float AUTO_FLARE_ALTITUDE = 8.0f;
-                if (total > _threshold) {
-                    float pitch_factor_value = 1.0f;
-                    pitch_factor_value *= Abs(value: _pitch / ADJUSTED_VALUE_1);
-                    float flight_value = ADD_OR_SUBTRACT_VALUE * POWAR_FACTOR_VALUE * _total_power_factor_value * pitch_factor_value;
-                    if (_previous_altitudes.Peek() < _altitude) { // up
-                        _flight_power_base -= flight_value;
-                    }
-                    if (_previous_altitudes.Peek() > _altitude) { // down
-                        _flight_power_base += flight_value;
-                    }
-                }
-                if (total <= _threshold && _altitude < AUTO_FLARE_ALTITUDE) {
-                    _flight_power_base = _default_flight_power_base;
-                }
-                float power_value = _flight_power_base * ADJUSTED_VALUE_2 * _total_power_factor_value;
-                _calculated_power = power_value < 0 ? 0 : power_value;
-                Updated?.Invoke(this, new(nameof(power))); // call event handler.
-                return _calculated_power;
-            }
-
-            /// <summary>
-            /// gain the power.
-            /// </summary>
-            public void Gain() {
-                const float ADD_VALUE = 0.125f;
-                _flight_power_base += ADD_VALUE * _total_power_factor_value; ;
-            }
-
-            /// <summary>
-            /// lose the power.
-            /// </summary>
-            public void Lose() {
-                const float SUBTRACT_VALUE = 0.125f;
-                _flight_power_base -= SUBTRACT_VALUE * _total_power_factor_value; ;
-            }
-        }
-
-        #endregion
 
         #endregion
     }

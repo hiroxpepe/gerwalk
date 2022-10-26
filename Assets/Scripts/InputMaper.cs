@@ -64,7 +64,7 @@ namespace Studio.MeowToon {
             // Update is called once per frame.
             this.UpdateAsObservable().Subscribe(onNext: _ => {
                 mapGamepad();
-            });
+            }).AddTo(this);
 
             #region mobile phone vibration.
 
@@ -75,13 +75,13 @@ namespace Studio.MeowToon {
                 _left_1_button.wasPressedThisFrame || _right_1_button.wasPressedThisFrame || 
                 _select_button.wasPressedThisFrame || _start_button.wasPressedThisFrame)).Subscribe(onNext: _ => {
                     AndroidVibrator.Vibrate(milliseconds: 50L);
-            });
+            }).AddTo(this);
 
             // no vibration of the smartphone by pressing the start and X buttons at the same time.
             this.UpdateAsObservable().Where(predicate: _ => (_x_button.isPressed && _start_button.wasPressedThisFrame) || 
                 (_x_button.wasPressedThisFrame && _start_button.isPressed)).Subscribe(onNext: _ => {
                 _use_vibration = !_use_vibration;
-            });
+            }).AddTo(this);
 
             #endregion
         }

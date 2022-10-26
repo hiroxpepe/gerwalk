@@ -46,7 +46,7 @@ namespace Studio.MeowToon {
             this.OnCollisionEnterAsObservable().Where(predicate: x => x.Like(VEHICLE_TYPE)).Subscribe(onNext: x => {
                 OnDestroy?.Invoke();
                 Destroy(gameObject);
-            });
+            }).AddTo(this);
         }
     }
 }
