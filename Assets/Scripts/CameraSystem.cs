@@ -60,14 +60,14 @@ namespace Studio.MeowToon {
             /// </summary>
             this.UpdateAsObservable().Subscribe(onNext: _ => {
                 rotateView();
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// reset the camera view.
             /// </summary>
             this.UpdateAsObservable().Where(predicate: _ => _right_stick_button.wasPressedThisFrame).Subscribe(onNext: _ => {
                 resetRotateView();
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// when touching the back wall.
@@ -75,7 +75,7 @@ namespace Studio.MeowToon {
             this.OnTriggerEnterAsObservable().Where(predicate: x => x.Like(WALL_TYPE)).Subscribe(onNext: x => {
                 List<Material> material_list = x.gameObject.Get<MeshRenderer>().materials.ToList();
                 material_list.ForEach(material => { material.ToOpaque(); });
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// when leaving the back wall.
@@ -83,7 +83,7 @@ namespace Studio.MeowToon {
             this.OnTriggerExitAsObservable().Where(predicate: x => x.Like(WALL_TYPE)).Subscribe(onNext: x => {
                 List<Material> material_list = x.gameObject.Get<MeshRenderer>().materials.ToList();
                 material_list.ForEach(material => { material.ToTransparent(); });
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// when touching the block.
@@ -91,7 +91,7 @@ namespace Studio.MeowToon {
             this.OnTriggerEnterAsObservable().Where(predicate: x => x.Like(BLOCK_TYPE)).Subscribe(onNext: x => {
                 List<Material> material_list = x.gameObject.Get<MeshRenderer>().materials.ToList();
                 material_list.ForEach(material => { material.ToOpaque(); });
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// when leaving the block.
@@ -99,7 +99,7 @@ namespace Studio.MeowToon {
             this.OnTriggerExitAsObservable().Where(predicate: x => x.Like(BLOCK_TYPE)).Subscribe(onNext: x => {
                 List<Material> material_list = x.gameObject.Get<MeshRenderer>().materials.ToList();
                 material_list.ForEach(material => { material.ToTransparent(); });
-            });
+            }).AddTo(this);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////

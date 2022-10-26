@@ -66,7 +66,7 @@ namespace Studio.MeowToon {
                 if (transform.position.y < -100f) { // less than -100m, it has fallen from the level,
                     Destroy(gameObject); // so it is deleted.
                 }
-            });
+            }).AddTo(this);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////

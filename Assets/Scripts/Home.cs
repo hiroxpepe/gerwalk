@@ -54,7 +54,7 @@ namespace Studio.MeowToon {
             /// </summary>
             this.OnCollisionEnterAsObservable().Where(predicate: x => x.Like(VEHICLE_TYPE) && _game_system.beatLevel).Subscribe(onNext: x => {
                 OnCameBack?.Invoke();
-            });
+            }).AddTo(this);
         }
     }
 }

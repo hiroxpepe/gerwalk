@@ -50,14 +50,14 @@ namespace Studio.MeowToon {
             /// </summary>
             this.UpdateAsObservable().Where(predicate: _ => _select_button.wasPressedThisFrame).Subscribe(onNext: _ => {
                 SceneManager.LoadScene(sceneName: SCENE_SELECT);
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// start level.
             /// </summary>
             this.UpdateAsObservable().Where(predicate: _ => (_start_button.wasPressedThisFrame || _a_button.wasPressedThisFrame)).Subscribe(onNext: _ => {
                 SceneManager.LoadScene(sceneName: SCENE_LEVEL_1);
-            });
+            }).AddTo(this);
         }
     }
 }

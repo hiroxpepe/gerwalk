@@ -82,7 +82,7 @@ namespace Studio.MeowToon {
                 _selected = _focus[_idx];
                 _game_system.mode = _selected;
                 changeSelectedColor();
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// select down.
@@ -95,14 +95,14 @@ namespace Studio.MeowToon {
                 _selected = _focus[_idx];
                 _game_system.mode = _selected;
                 changeSelectedColor();
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// return title.
             /// </summary>
             this.UpdateAsObservable().Where(predicate: _ => _start_button.wasPressedThisFrame || _a_button.wasPressedThisFrame).Subscribe(onNext: _ => {
                 SceneManager.LoadScene(sceneName: SCENE_TITLE);
-            });
+            }).AddTo(this);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////

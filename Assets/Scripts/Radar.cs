@@ -80,7 +80,7 @@ namespace Studio.MeowToon {
             this.UpdateAsObservable().Subscribe(onNext: _ => {
                 mapHomePositionsToRadar();
                 mapTargetPositionsToRadar(create: false);
-            });
+            }).AddTo(this);
 
             // LateUpdate is called after all Update functions have been called.
             this.LateUpdateAsObservable().Subscribe(onNext: _ => {
@@ -89,7 +89,7 @@ namespace Studio.MeowToon {
                 /// </summary>
                 Quaternion vehicle_rotation = _vehicle_object.transform.rotation;
                 _direction_object.transform.rotation = Euler(x: 0f, y: 0f, z: vehicle_rotation.eulerAngles.y);
-            });
+            }).AddTo(this);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////

@@ -81,7 +81,7 @@ namespace Studio.MeowToon {
                     OnPauseOn?.Invoke();
                 }
                 _is_pausing = !_is_pausing;
-            });
+            }).AddTo(this);
 
             // get targets count.
             _game_system.targetTotal = getTargetsCount();
@@ -89,7 +89,7 @@ namespace Studio.MeowToon {
             // check game status.
             this.UpdateAsObservable().Subscribe(onNext: _ => {
                 checkGameStatus();
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// next level.
@@ -109,14 +109,14 @@ namespace Studio.MeowToon {
                         SceneManager.LoadScene(sceneName: SCENE_ENDING);
                         break;
                 }
-            });
+            }).AddTo(this);
 
             /// <summary>
             /// restart game.
             /// </summary>
             this.UpdateAsObservable().Where(predicate: _ => _select_button.wasPressedThisFrame).Subscribe(onNext: _ => {
                 SceneManager.LoadScene(sceneName: SCENE_TITLE);
-            });
+            }).AddTo(this);
 
             ///////////////////////////////////////////////////////////////////////////////////////////////
             // private Methods [verb]

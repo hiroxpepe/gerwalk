@@ -69,7 +69,7 @@ namespace Studio.MeowToon {
                     y: -_vehicle_object.Get<Vehicle>().pitch / ((float) (300f / 500f)),
                     z: _angle_object.transform.localPosition.z
                 );
-            });
+            }).AddTo(this);
         }
     }
 }
